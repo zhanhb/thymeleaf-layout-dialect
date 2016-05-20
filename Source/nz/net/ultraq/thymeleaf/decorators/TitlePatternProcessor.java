@@ -17,6 +17,7 @@ package nz.net.ultraq.thymeleaf.decorators;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -79,7 +80,7 @@ public class TitlePatternProcessor extends AbstractAttrProcessor {
 
 		Function<String, Predicate<Element>> findTitleType = titleType -> {
 			return childElement
-					-> childElement.getNodeProperty(TITLE_TYPE) == titleType;
+					-> Objects.equals(childElement.getNodeProperty(TITLE_TYPE), titleType);
 		};
 		Optional<Element> decoratorTitleElement = titleElements.stream().filter(findTitleType.apply(TITLE_TYPE_DECORATOR)).findFirst();
 		Optional<String> decoratorTitle = decoratorTitleElement.map(Element::getFirstChild).map(node -> ((Text) node).getContent());
