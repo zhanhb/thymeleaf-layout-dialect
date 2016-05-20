@@ -16,13 +16,9 @@
 package nz.net.ultraq.thymeleaf.decorators.strategies;
 
 import java.util.List;
-import java.util.ListIterator;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import org.thymeleaf.dom.Node;
-import org.thymeleaf.dom.Text;
 
 /**
  * The standard {@code <head>} merging strategy, which simply appends the

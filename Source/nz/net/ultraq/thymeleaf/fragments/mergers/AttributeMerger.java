@@ -15,7 +15,6 @@
  */
 package nz.net.ultraq.thymeleaf.fragments.mergers;
 
-import java.util.Objects;
 import java.util.stream.Stream;
 import static nz.net.ultraq.thymeleaf.LayoutDialect.DIALECT_PREFIX_LAYOUT;
 import nz.net.ultraq.thymeleaf.fragments.FragmentMerger;

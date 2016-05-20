@@ -18,14 +18,11 @@ package nz.net.ultraq.thymeleaf.decorators.strategies;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
-import org.thymeleaf.dom.AbstractTextNode;
 import org.thymeleaf.dom.Comment;
 import org.thymeleaf.dom.Element;
 import org.thymeleaf.dom.Node;
-import org.thymeleaf.dom.Text;
 
 /**
  * The {@code <head>} merging strategy which groups like elements together.

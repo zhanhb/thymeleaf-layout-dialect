@@ -15,8 +15,6 @@
  */
 package nz.net.ultraq.thymeleaf.decorators.html;
 
-import java.util.Objects;
-import java.util.function.Function;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;

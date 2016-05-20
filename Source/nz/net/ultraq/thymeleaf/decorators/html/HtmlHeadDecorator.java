@@ -16,9 +16,7 @@
 package nz.net.ultraq.thymeleaf.decorators.html;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import static nz.net.ultraq.thymeleaf.LayoutDialect.DIALECT_PREFIX_LAYOUT;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import static nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor.PROCESSOR_NAME_TITLEPATTERN;
@@ -27,12 +25,8 @@ import static nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor.TITLE_TYP
 import static nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor.TITLE_TYPE_DECORATOR;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlElementDecorator;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
-import org.thymeleaf.dom.AbstractTextNode;
-import org.thymeleaf.dom.Document;
 import org.thymeleaf.dom.Element;
-import org.thymeleaf.dom.NestableNode;
 import org.thymeleaf.dom.Node;
-import org.thymeleaf.dom.Text;
 
 /**
  * A decorator specific to processing an HTML {@code <head>} element.
