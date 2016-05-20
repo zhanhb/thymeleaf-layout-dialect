@@ -28,8 +28,8 @@ public class VariableDeclaration {
 
 	private static final Pattern DECLARATION_PATTERN = Pattern.compile("(.*?)=(.*)");
 
-	final String name;
-	final String value;
+	private final String name;
+	private final String value;
 
 	/**
 	 * Constructor, create an instance from the declaration string.

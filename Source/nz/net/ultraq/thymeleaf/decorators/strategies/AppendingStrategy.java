@@ -16,8 +16,11 @@
 package nz.net.ultraq.thymeleaf.decorators.strategies;
 
 import java.util.List;
+import java.util.ListIterator;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import org.thymeleaf.dom.Node;
 import org.thymeleaf.dom.Text;
 
@@ -30,15 +33,6 @@ import org.thymeleaf.dom.Text;
 public class AppendingStrategy implements SortingStrategy {
 
 	/**
-	 * Returns whether or not this node represents collapsible whitespace.
-	 *
-	 * @return <tt>true</tt> if this is a collapsible text node.
-	 */
-	private static boolean isWhitespaceNode(Node delegate) {
-		return delegate instanceof Text && ((Text) delegate).getContent().trim().isEmpty();
-	}
-
-	/**
 	 * Returns a value to append the content node to the end of the decorator
 	 * nodes.
 	 *
@@ -48,11 +42,10 @@ public class AppendingStrategy implements SortingStrategy {
 	 */
 	@Override
 	public int findPositionForContent(List<Node> decoratorNodes, Node contentNode) {
-		if (isWhitespaceNode(contentNode)) {
+		if (MetaClass.isWhitespaceNode(contentNode)) {
 			return -1;
 		}
-		List<Boolean> collect = decoratorNodes.stream().map(decoratorNode -> !isWhitespaceNode(decoratorNode)).collect(Collectors.toList());
-		return collect.lastIndexOf(Boolean.TRUE) + 1;
+		return MetaClass.lastIndexOf(decoratorNodes, decoratorNode -> !MetaClass.isWhitespaceNode(decoratorNode)) + 1;
 	}
-	
+
 }

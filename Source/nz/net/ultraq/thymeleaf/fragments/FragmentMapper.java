@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nz.net.ultraq.thymeleaf.fragments;
 
 import java.util.LinkedHashMap;
@@ -23,79 +22,38 @@ import java.util.function.Consumer;
 import static nz.net.ultraq.thymeleaf.fragments.FragmentProcessor.PROCESSOR_NAME_FRAGMENT;
 import static nz.net.ultraq.thymeleaf.includes.IncludeProcessor.PROCESSOR_NAME_INCLUDE;
 import static nz.net.ultraq.thymeleaf.includes.ReplaceProcessor.PROCESSOR_NAME_REPLACE;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import org.thymeleaf.dom.Element;
 
 /**
  * Searches for and returns layout dialect fragments amongst a given set of
  * elements.
- * 
+ *
  * @author Emanuel Rabina
  */
 public class FragmentMapper {
-	public static final String DIALECT_PREFIX_LAYOUT    = "layout";
 
-
-	/**
-	 * Returns an attribute processor's value, checks both prefix:processor and
-	 * data-prefix-processor variants.
-	 *
-	 * @param prefix
-	 * @param name
-	 * @return The value of the matching processor, or <tt>null</tt> if the
-	 * processor doesn't exist on the element.
-	 */
-	private static String getAttributeValue(Element delegate, String prefix, String name) {
-		String attributeValue = delegate.getAttributeValue(prefix + ":" + name);
-		if (attributeValue == null || attributeValue.isEmpty()) {
-			attributeValue = delegate.getAttributeValue("data-" + prefix + "-" + name);
-		}
-		return attributeValue;
-	}
-
-	/**
-	 * Removes an attribute processor from this element, checks both
-	 * prefix:processor and data-prefix-processor variants.
-	 *
-	 * @param prefix
-	 * @param name
-	 */
-	private static void removeAttribute(Element delegate, String prefix, String name) {
-		delegate.removeAttribute(prefix + ":" + name);
-		delegate.removeAttribute("data-" + prefix + "-" + name);
-	}
-
-	/**
-	 * Returns whether or not the element has an attribute processor, checks
-	 * both prefix:processor and data-prefix-processor variants.
-	 *
-	 * @param prefix
-	 * @param name
-	 * @return <tt>true</tt> if the processor exists on the element.
-	 */
-	private static boolean hasAttribute(Element delegate, String prefix, String name) {
-		return delegate.hasAttribute(prefix + ":" + name)
-				|| delegate.hasAttribute("data-" + prefix + "-" + name);
-	}
+	public static final String DIALECT_PREFIX_LAYOUT = "layout";
 
 	/**
 	 * Find and return clones of all fragments within the given elements,
 	 * without delving into <tt>layout:include</tt> or <tt>layout:replace</tt>
 	 * elements, mapped by the name of each fragment.
-	 * 
+	 *
 	 * @param elements List of elements to search.
 	 * @return Map of fragment names and their elements.
 	 */
-	public Map<String,Element> map(List<Element> elements) {
+	public Map<String, Element> map(List<Element> elements) {
 		Map<String, Element> fragments = new LinkedHashMap<String, Element>();
-		Consumer<Element>[] findFragments=new Consumer[1];
+		Consumer<Element>[] findFragments = new Consumer[1];
 		findFragments[0] = element -> {
-			String fragmentName = getAttributeValue(element, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_FRAGMENT);
+			String fragmentName = MetaClass.getAttributeValue(element, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_FRAGMENT);
 			if (fragmentName != null && !fragmentName.isEmpty()) {
 				Element fragment = (Element) element.cloneNode(null, false);
-				removeAttribute(fragment, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_FRAGMENT);
+				MetaClass.removeAttribute(fragment, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_FRAGMENT);
 				fragments.put(fragmentName, fragment);
-			} else if (!hasAttribute(element, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_INCLUDE)
-					|| !hasAttribute(element, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_REPLACE)) {
+			} else if (!MetaClass.hasAttribute(element, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_INCLUDE)
+					|| !MetaClass.hasAttribute(element, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_REPLACE)) {
 				element.getElementChildren().stream().forEach(findFragments[0]);
 			}
 		};

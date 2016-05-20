@@ -51,7 +51,7 @@ public class LayoutDialect extends AbstractDialect {
 	 */
 	public LayoutDialect(SortingStrategy sortingStrategy) {
 		this.sortingStrategy = sortingStrategy;
-		processors = new LinkedHashSet<>(Arrays.asList(
+		this.processors = new LinkedHashSet<>(Arrays.asList(
 				new DecoratorProcessor(sortingStrategy),
 				new IncludeProcessor(),
 				new ReplaceProcessor(),

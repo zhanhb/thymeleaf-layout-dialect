@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import org.thymeleaf.dom.Document;
 import org.thymeleaf.dom.Element;
 
@@ -30,25 +31,6 @@ import org.thymeleaf.dom.Element;
  * @author Emanuel Rabina
  */
 public class HtmlDocumentDecorator extends XmlDocumentDecorator {
-
-	/**
-	 * Searches this and all children of this element for an element of the
-	 * given name.
-	 *
-	 * @param name
-	 * @return The matching element, or <tt>null</tt> if no match was found.
-	 */
-	private static Element findElement(Element delegate, String name) {
-		Function<Element, Element>[] search = new Function[1];
-		search[0] = element -> {
-			if (Objects.equals(element.getOriginalName(), name)) {
-				return element;
-			}
-			return element.getElementChildren().stream().map(search[0]).filter(Objects::nonNull)
-					.findFirst().orElse(null);
-		};
-		return search[0].apply(delegate);
-	}
 
 	final SortingStrategy sortingStrategy;
 
@@ -65,8 +47,8 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
 	@Override
 	public void decorate(Element decoratorHtml, Element contentHtml) {
 
-		new HtmlHeadDecorator(sortingStrategy).decorate(decoratorHtml, findElement(contentHtml, "head"));
-		new HtmlBodyDecorator().decorate(decoratorHtml, findElement(contentHtml, "body"));
+		new HtmlHeadDecorator(sortingStrategy).decorate(decoratorHtml, MetaClass.findElement(contentHtml, "head"));
+		new HtmlBodyDecorator().decorate(decoratorHtml, MetaClass.findElement(contentHtml, "body"));
 
 		// Set the doctype from the decorator if missing from the content page
 		Document decoratorDocument = (Document) decoratorHtml.getParent();
