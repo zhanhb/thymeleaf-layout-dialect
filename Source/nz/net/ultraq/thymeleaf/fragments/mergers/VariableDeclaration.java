@@ -13,49 +13,56 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package nz.net.ultraq.thymeleaf.fragments.mergers;
 
-package nz.net.ultraq.thymeleaf.fragments.mergers
-
-import java.util.regex.Pattern
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Representation of a scoped variable declaration made through
  * <tt>th:with</tt> attributes.
- * 
+ *
  * @author Emanuel Rabina
  */
-class VariableDeclaration {
+public class VariableDeclaration {
 
-	static final Pattern DECLARATION_PATTERN = ~/(.*?)=(.*)/
+	private static final Pattern DECLARATION_PATTERN = Pattern.compile("(.*?)=(.*)");
 
-	final String name
-	final String value
+	final String name;
+	final String value;
 
 	/**
 	 * Constructor, create an instance from the declaration string.
-	 * 
+	 *
 	 * @param declaration
 	 */
-	VariableDeclaration(String declaration) {
+	public VariableDeclaration(String declaration) {
 
-		def matcher = DECLARATION_PATTERN.matcher(declaration)
+		Matcher matcher = DECLARATION_PATTERN.matcher(declaration);
 		if (matcher.matches()) {
-			name  = matcher.group(1)
-			value = matcher.group(2)
-		}
-		else {
-			throw new IllegalArgumentException("Unable to derive attribte declaration from string ${declaration}")
+			name = matcher.group(1);
+			value = matcher.group(2);
+		} else {
+			throw new IllegalArgumentException("Unable to derive attribte declaration from string " + declaration);
 		}
 	}
 
 	/**
 	 * Reconstructs the variable for use with <tt>th:with</tt>.
-	 * 
+	 *
 	 * @return {name}=${value}
 	 */
 	@Override
-	String toString() {
-
-		return "${name}=${value}"
+	public String toString() {
+		return name + "=" + value;
 	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
 }
