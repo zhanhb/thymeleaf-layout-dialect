@@ -30,31 +30,32 @@ import org.thymeleaf.dom.Element;
  */
 public class HtmlDocumentDecorator extends XmlDocumentDecorator {
 
-	final SortingStrategy sortingStrategy;
+    private final SortingStrategy sortingStrategy;
 
-	public HtmlDocumentDecorator(SortingStrategy sortingStrategy) {
-		this.sortingStrategy = sortingStrategy;
-	}
+    public HtmlDocumentDecorator(SortingStrategy sortingStrategy) {
+        this.sortingStrategy = sortingStrategy;
+    }
 
-	/**
-	 * Decorate an entire HTML page.
-	 *
-	 * @param decoratorHtml Decorator's HTML element.
-	 * @param contentHtml	Content's HTML element.
-	 */
-	@Override
-	public void decorate(Element decoratorHtml, Element contentHtml) {
+    /**
+     * Decorate an entire HTML page.
+     *
+     * @param decoratorHtml Decorator's HTML element.
+     * @param contentHtml	Content's HTML element.
+     */
+    @Override
+    public void decorate(Element decoratorHtml, Element contentHtml) {
 
-		new HtmlHeadDecorator(sortingStrategy).decorate(decoratorHtml, MetaClass.findElement(contentHtml, "head"));
-		new HtmlBodyDecorator().decorate(decoratorHtml, MetaClass.findElement(contentHtml, "body"));
+        new HtmlHeadDecorator(sortingStrategy).decorate(decoratorHtml, MetaClass.findElement(contentHtml, "head"));
+        new HtmlBodyDecorator().decorate(decoratorHtml, MetaClass.findElement(contentHtml, "body"));
 
-		// Set the doctype from the decorator if missing from the content page
-		Document decoratorDocument = (Document) decoratorHtml.getParent();
-		Document contentDocument = (Document) contentHtml.getParent();
-		if (contentDocument.getDocType() == null && decoratorDocument.getDocType() != null) {
-			contentDocument.setDocType(decoratorDocument.getDocType());
-		}
+        // Set the doctype from the decorator if missing from the content page
+        Document decoratorDocument = (Document) decoratorHtml.getParent();
+        Document contentDocument = (Document) contentHtml.getParent();
+        if (contentDocument.getDocType() == null && decoratorDocument.getDocType() != null) {
+            contentDocument.setDocType(decoratorDocument.getDocType());
+        }
 
-		super.decorate(decoratorHtml, contentHtml);
-	}
+        super.decorate(decoratorHtml, contentHtml);
+    }
+
 }

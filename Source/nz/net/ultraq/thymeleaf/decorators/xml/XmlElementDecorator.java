@@ -26,12 +26,12 @@ import org.thymeleaf.dom.Element;
  */
 public class XmlElementDecorator implements Decorator {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void decorate(Element decoratorElement, Element contentElement) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void decorate(Element decoratorElement, Element contentElement) {
 
-		new AttributeMerger().merge(decoratorElement, contentElement);
-	}
+        new AttributeMerger().merge(decoratorElement, contentElement);
+    }
 }

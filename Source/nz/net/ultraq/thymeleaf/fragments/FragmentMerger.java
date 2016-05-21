@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nz.net.ultraq.thymeleaf.fragments;
 
 import org.thymeleaf.dom.Element;
@@ -25,12 +24,13 @@ import org.thymeleaf.dom.Element;
  */
 public interface FragmentMerger {
 
-	/**
-	 * Merge both the attributes and content of the source element into the
-	 * target element.
-	 *
-	 * @param targetElement
-	 * @param sourceElement
-	 */
-	public void merge(Element targetElement, Element sourceElement);
+    /**
+     * Merge both the attributes and content of the source element into the
+     * target element.
+     *
+     * @param targetElement
+     * @param sourceElement
+     */
+    void merge(Element targetElement, Element sourceElement);
+
 }

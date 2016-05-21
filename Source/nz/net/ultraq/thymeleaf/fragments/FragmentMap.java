@@ -29,31 +29,31 @@ import org.thymeleaf.dom.Node;
  */
 public class FragmentMap extends HashMap<String, Element> {
 
-	private static final String FRAGMENT_COLLECTION_KEY = "LayoutDialect::FragmentCollection";
+    private static final String FRAGMENT_COLLECTION_KEY = "LayoutDialect::FragmentCollection";
 
-	/**
-	 * Retrieve the fragment collection specific to the given context. If none
-	 * exists, a new collection is created, applied to the context, and
-	 * returned.
-	 *
-	 * @param arguments
-	 * @return A new or existing fragment collection for the context.
-	 */
-	public static FragmentMap get(Arguments arguments) {
-		Object localVariable = arguments.getLocalVariable(FRAGMENT_COLLECTION_KEY);
-		return localVariable != null ? (FragmentMap) localVariable : new FragmentMap();
-	}
+    /**
+     * Retrieve the fragment collection specific to the given context. If none
+     * exists, a new collection is created, applied to the context, and
+     * returned.
+     *
+     * @param arguments
+     * @return A new or existing fragment collection for the context.
+     */
+    public static FragmentMap get(Arguments arguments) {
+        Object localVariable = arguments.getLocalVariable(FRAGMENT_COLLECTION_KEY);
+        return localVariable != null ? (FragmentMap) localVariable : new FragmentMap();
+    }
 
-	/**
-	 * Updates the fragment collection just for the current node.
-	 *
-	 * @param arguments
-	 * @param node
-	 * @param fragments The new fragments to add to the map.
-	 */
-	public static void updateForNode(Arguments arguments, Node node, Map<String, Element> fragments) {
-		FragmentMap map = get(arguments);
-		map.putAll(fragments);
-		node.setNodeLocalVariable(FRAGMENT_COLLECTION_KEY, map);
-	}
+    /**
+     * Updates the fragment collection just for the current node.
+     *
+     * @param arguments
+     * @param node
+     * @param fragments The new fragments to add to the map.
+     */
+    public static void updateForNode(Arguments arguments, Node node, Map<String, Element> fragments) {
+        FragmentMap map = get(arguments);
+        map.putAll(fragments);
+        node.setNodeLocalVariable(FRAGMENT_COLLECTION_KEY, map);
+    }
 }

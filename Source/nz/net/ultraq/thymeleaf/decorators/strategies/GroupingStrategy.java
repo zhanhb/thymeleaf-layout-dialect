@@ -32,64 +32,64 @@ import org.thymeleaf.dom.Node;
  */
 public class GroupingStrategy implements SortingStrategy {
 
-	/**
-	 * Returns the index of the last set of elements that are of the same 'type'
-	 * as the content node. eg: groups scripts with scripts, stylesheets with
-	 * stylesheets, and so on.
-	 *
-	 * @param decoratorNodes
-	 * @param contentNode
-	 * @return Position of the end of the matching element group.
-	 */
-	@Override
-	public int findPositionForContent(List<Node> decoratorNodes, Node contentNode) {
+    /**
+     * Returns the index of the last set of elements that are of the same 'type'
+     * as the content node. eg: groups scripts with scripts, stylesheets with
+     * stylesheets, and so on.
+     *
+     * @param decoratorNodes
+     * @param contentNode
+     * @return Position of the end of the matching element group.
+     */
+    @Override
+    public int findPositionForContent(List<Node> decoratorNodes, Node contentNode) {
 
-		// Discard text/whitespace nodes
-		if (MetaClass.isWhitespaceNode(contentNode)) {
-			return -1;
-		}
+        // Discard text/whitespace nodes
+        if (MetaClass.isWhitespaceNode(contentNode)) {
+            return -1;
+        }
 
-		HeadNodeTypes type = HeadNodeTypes.findMatchingType(contentNode);
-		return MetaClass.lastIndexOf(decoratorNodes, decoratorNode
-				-> type == HeadNodeTypes.findMatchingType(decoratorNode)) + 1;
-	}
+        HeadNodeTypes type = HeadNodeTypes.findMatchingType(contentNode);
+        return MetaClass.lastIndexOf(decoratorNodes, decoratorNode
+                -> type == HeadNodeTypes.findMatchingType(decoratorNode)) + 1;
+    }
 
-	/**
-	 * Enum for the types of elements in the HEAD section that we might need to
-	 * sort.
-	 *
-	 * TODO: Expand this to include more element types as they are requested.
-	 */
-	private static enum HeadNodeTypes {
+    /**
+     * Enum for the types of elements in the HEAD section that we might need to
+     * sort.
+     *
+     * TODO: Expand this to include more element types as they are requested.
+     */
+    private static enum HeadNodeTypes {
 
-		COMMENT(node -> node instanceof Comment),
-		META(node -> node instanceof Element && "meta".equals(((Element) node).getNormalizedName())),
-		STYLESHEET(node -> node instanceof Element && "link".equals(((Element) node).getNormalizedName()) && "stylesheet".equals(((Element) node).getAttributeValue("rel"))),
-		SCRIPT(node -> node instanceof Element && "script".equals(((Element) node).getNormalizedName())),
-		OTHER_ELEMENT(node -> node instanceof Element);
+        COMMENT(node -> node instanceof Comment),
+        META(node -> node instanceof Element && "meta".equals(((Element) node).getNormalizedName())),
+        STYLESHEET(node -> node instanceof Element && "link".equals(((Element) node).getNormalizedName()) && "stylesheet".equals(((Element) node).getAttributeValue("rel"))),
+        SCRIPT(node -> node instanceof Element && "script".equals(((Element) node).getNormalizedName())),
+        OTHER_ELEMENT(node -> node instanceof Element);
 
-		final Predicate<Node> determinant;
+        final Predicate<Node> determinant;
 
-		/**
-		 * Constructor, set the test that matches this type of head node.
-		 *
-		 * @param determinant
-		 */
-		HeadNodeTypes(Predicate<Node> determinant) {
-			this.determinant = determinant;
-		}
+        /**
+         * Constructor, set the test that matches this type of head node.
+         *
+         * @param determinant
+         */
+        HeadNodeTypes(Predicate<Node> determinant) {
+            this.determinant = determinant;
+        }
 
-		/**
-		 * Figure out the enum for the given node type.
-		 *
-		 * @param element The node to match.
-		 * @return Matching <tt>HeadNodeTypes</tt> enum to descript the node.
-		 */
-		static HeadNodeTypes findMatchingType(Node element) {
-			return Arrays.stream(values()).filter(headNodeType
-					-> headNodeType.determinant.test(element)
-			).findFirst().orElse(null);
-		}
-	}
+        /**
+         * Figure out the enum for the given node type.
+         *
+         * @param element The node to match.
+         * @return Matching <tt>HeadNodeTypes</tt> enum to descript the node.
+         */
+        static HeadNodeTypes findMatchingType(Node element) {
+            return Arrays.stream(values()).filter(headNodeType
+                    -> headNodeType.determinant.test(element)
+            ).findFirst().orElse(null);
+        }
+    }
 
 }

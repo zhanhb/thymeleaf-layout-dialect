@@ -36,52 +36,52 @@ import org.thymeleaf.processor.attr.AbstractAttrProcessor;
  */
 public class ReplaceProcessor extends AbstractAttrProcessor {
 
-	public static final String PROCESSOR_NAME_REPLACE = "replace";
+    public static final String PROCESSOR_NAME_REPLACE = "replace";
 
-	/**
-	 * Constructor, set this processor to work on the 'replace' attribute.
-	 */
-	public ReplaceProcessor() {
-		super(PROCESSOR_NAME_REPLACE);
-	}
+    /**
+     * Constructor, set this processor to work on the 'replace' attribute.
+     */
+    public ReplaceProcessor() {
+        super(PROCESSOR_NAME_REPLACE);
+    }
 
-	/**
-	 * Locates the specified page/fragment and brings it into the current
-	 * template.
-	 *
-	 * @param arguments
-	 * @param element
-	 * @param attributeName
-	 * @return Result of the processing.
-	 */
-	@Override
-	protected ProcessorResult processAttribute(Arguments arguments, Element element, String attributeName) {
+    /**
+     * Locates the specified page/fragment and brings it into the current
+     * template.
+     *
+     * @param arguments
+     * @param element
+     * @param attributeName
+     * @return Result of the processing.
+     */
+    @Override
+    protected ProcessorResult processAttribute(Arguments arguments, Element element, String attributeName) {
 
-		// Locate the page and fragment to include
-		List<Node> replaceFragments = new FragmentFinder(arguments)
-				.findFragments(element.getAttributeValue(attributeName));
+        // Locate the page and fragment to include
+        List<Node> replaceFragments = new FragmentFinder(arguments)
+                .findFragments(element.getAttributeValue(attributeName));
 
-		// Gather all fragment parts within the replace element
-		Map<String, Element> elementFragments = new FragmentMapper().map(element.getElementChildren());
+        // Gather all fragment parts within the replace element
+        Map<String, Element> elementFragments = new FragmentMapper().map(element.getElementChildren());
 
-		// Replace the children of this element with those of the replace page
-		// fragments, scoping any fragment parts to the immediate children
-		element.clearChildren();
-		if (replaceFragments != null && !replaceFragments.isEmpty()) {
-			replaceFragments.forEach(replaceFragment -> {
-				element.addChild(replaceFragment);
-				FragmentMap.updateForNode(arguments, replaceFragment, elementFragments);
-			});
-		}
-		element.getParent().extractChild(element);
+        // Replace the children of this element with those of the replace page
+        // fragments, scoping any fragment parts to the immediate children
+        element.clearChildren();
+        if (replaceFragments != null) {
+            for (Node replaceFragment : replaceFragments) {
+                element.addChild(replaceFragment);
+                FragmentMap.updateForNode(arguments, replaceFragment, elementFragments);
+            }
+        }
+        element.getParent().extractChild(element);
 
-		element.removeAttribute(attributeName);
-		return ProcessorResult.OK;
-	}
+        element.removeAttribute(attributeName);
+        return ProcessorResult.OK;
+    }
 
-	@Override
-	public int getPrecedence() {
-		return 0;
-	}
+    @Override
+    public int getPrecedence() {
+        return 0;
+    }
 
 }

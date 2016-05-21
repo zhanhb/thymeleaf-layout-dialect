@@ -39,71 +39,71 @@ import org.thymeleaf.processor.attr.AbstractAttrProcessor;
  */
 public class DecoratorProcessor extends AbstractAttrProcessor {
 
-	public static final String PROCESSOR_NAME_DECORATOR = "decorator";
+    public static final String PROCESSOR_NAME_DECORATOR = "decorator";
 
-	private final SortingStrategy sortingStrategy;
+    private final SortingStrategy sortingStrategy;
 
-	/**
-	 * Constructor, configure this processor to work on the 'decorator'
-	 * attribute and to use the given sorting strategy.
-	 *
-	 * @param sortingStrategy
-	 */
-	public DecoratorProcessor(SortingStrategy sortingStrategy) {
-		super(PROCESSOR_NAME_DECORATOR);
-		this.sortingStrategy = sortingStrategy;
-	}
+    /**
+     * Constructor, configure this processor to work on the 'decorator'
+     * attribute and to use the given sorting strategy.
+     *
+     * @param sortingStrategy
+     */
+    public DecoratorProcessor(SortingStrategy sortingStrategy) {
+        super(PROCESSOR_NAME_DECORATOR);
+        this.sortingStrategy = sortingStrategy;
+    }
 
-	/**
-	 * Locates the decorator page specified by the layout attribute and applies
-	 * it to the current page being processed.
-	 *
-	 * @param arguments
-	 * @param element
-	 * @param attributeName
-	 * @return Result of the processing.
-	 */
-	@Override
-	protected ProcessorResult processAttribute(Arguments arguments, Element element, String attributeName) {
+    /**
+     * Locates the decorator page specified by the layout attribute and applies
+     * it to the current page being processed.
+     *
+     * @param arguments
+     * @param element
+     * @param attributeName
+     * @return Result of the processing.
+     */
+    @Override
+    protected ProcessorResult processAttribute(Arguments arguments, Element element, String attributeName) {
 
-		// Ensure the decorator attribute is in the root element of the document
-		// NOTE: The NekoHTML parser adds <html> and <body> elements to template
-		//       fragments that don't already have them, potentially failing
-		//       this restriction.  For now I'll relax it for the LEGACYHTML5
-		//       template mode, but developers should be aware that putting the
-		//       layout:decorator attribute anywhere but the root element can
-		//       lead to unexpected results.
-		if (!(element.getParent() instanceof Document)
-				&& !"LEGACYHTML5".equals(arguments.getTemplateResolution().getTemplateMode())) {
-			throw new IllegalArgumentException("layout:decorator attribute must appear in the root element of your content page");
-		}
+        // Ensure the decorator attribute is in the root element of the document
+        // NOTE: The NekoHTML parser adds <html> and <body> elements to template
+        //       fragments that don't already have them, potentially failing
+        //       this restriction.  For now I'll relax it for the LEGACYHTML5
+        //       template mode, but developers should be aware that putting the
+        //       layout:decorator attribute anywhere but the root element can
+        //       lead to unexpected results.
+        if (!(element.getParent() instanceof Document)
+                && !"LEGACYHTML5".equals(arguments.getTemplateResolution().getTemplateMode())) {
+            throw new IllegalArgumentException("layout:decorator attribute must appear in the root element of your content page");
+        }
 
-		Document document = arguments.getDocument();
+        Document document = arguments.getDocument();
 
-		// Locate the decorator page
-		Template decoratorTemplate = new FragmentFinder(arguments)
-				.findFragmentTemplate(element.getAttributeValue(attributeName));
-		element.removeAttribute(attributeName);
+        // Locate the decorator page
+        Template decoratorTemplate = new FragmentFinder(arguments)
+                .findFragmentTemplate(element.getAttributeValue(attributeName));
+        element.removeAttribute(attributeName);
 
-		// Gather all fragment parts from this page to apply to the new document
-		// after decoration has taken place
-		Map<String, Element> pageFragments = new FragmentMapper().map(document.getElementChildren());
+        // Gather all fragment parts from this page to apply to the new document
+        // after decoration has taken place
+        Map<String, Element> pageFragments = new FragmentMapper().map(document.getElementChildren());
 
-		// Decide which kind of decorator to use, then apply it
-		Element decoratorRootElement = decoratorTemplate.getDocument().getFirstElementChild();
-		XmlDocumentDecorator decorator = decoratorRootElement != null && "html".equals(decoratorRootElement.getOriginalName())
-				? new HtmlDocumentDecorator(sortingStrategy)
-				: new XmlDocumentDecorator();
-		decorator.decorate(decoratorRootElement, document.getFirstElementChild());
+        // Decide which kind of decorator to use, then apply it
+        Element decoratorRootElement = decoratorTemplate.getDocument().getFirstElementChild();
+        XmlDocumentDecorator decorator = decoratorRootElement != null && "html".equals(decoratorRootElement.getOriginalName())
+                ? new HtmlDocumentDecorator(sortingStrategy)
+                : new XmlDocumentDecorator();
+        decorator.decorate(decoratorRootElement, document.getFirstElementChild());
 
-		FragmentMap.updateForNode(arguments, document.getFirstElementChild(), pageFragments);
+        FragmentMap.updateForNode(arguments, document.getFirstElementChild(), pageFragments);
 
-		return ProcessorResult.OK;
-	}
+        return ProcessorResult.OK;
+    }
 
-	@Override
-	public int getPrecedence() {
-		return 0;
-	}
+    @Override
+    public int getPrecedence() {
+        return 0;
+    }
 
 }

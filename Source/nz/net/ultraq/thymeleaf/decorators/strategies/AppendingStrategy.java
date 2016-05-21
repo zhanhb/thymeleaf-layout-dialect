@@ -28,20 +28,20 @@ import org.thymeleaf.dom.Node;
  */
 public class AppendingStrategy implements SortingStrategy {
 
-	/**
-	 * Returns a value to append the content node to the end of the decorator
-	 * nodes.
-	 *
-	 * @param decoratorNodes
-	 * @param contentNode
-	 * @return The size of the decorator nodes list.
-	 */
-	@Override
-	public int findPositionForContent(List<Node> decoratorNodes, Node contentNode) {
-		if (MetaClass.isWhitespaceNode(contentNode)) {
-			return -1;
-		}
-		return MetaClass.lastIndexOf(decoratorNodes, decoratorNode -> !MetaClass.isWhitespaceNode(decoratorNode)) + 1;
-	}
+    /**
+     * Returns a value to append the content node to the end of the decorator
+     * nodes.
+     *
+     * @param decoratorNodes
+     * @param contentNode
+     * @return The size of the decorator nodes list.
+     */
+    @Override
+    public int findPositionForContent(List<Node> decoratorNodes, Node contentNode) {
+        if (MetaClass.isWhitespaceNode(contentNode)) {
+            return -1;
+        }
+        return MetaClass.lastIndexOf(decoratorNodes, decoratorNode -> !MetaClass.isWhitespaceNode(decoratorNode)) + 1;
+    }
 
 }

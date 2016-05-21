@@ -15,15 +15,15 @@
  */
 package nz.net.ultraq.thymeleaf.fragments.mergers;
 
-import java.util.stream.Stream;
-import static nz.net.ultraq.thymeleaf.LayoutDialect.DIALECT_PREFIX_LAYOUT;
 import nz.net.ultraq.thymeleaf.fragments.FragmentMerger;
-import static nz.net.ultraq.thymeleaf.fragments.FragmentProcessor.PROCESSOR_NAME_FRAGMENT;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import org.thymeleaf.dom.Attribute;
 import org.thymeleaf.dom.Element;
 import org.thymeleaf.standard.StandardDialect;
 import org.thymeleaf.standard.processor.attr.StandardWithAttrProcessor;
+
+import static nz.net.ultraq.thymeleaf.LayoutDialect.DIALECT_PREFIX_LAYOUT;
+import static nz.net.ultraq.thymeleaf.fragments.FragmentProcessor.PROCESSOR_NAME_FRAGMENT;
 
 /**
  * Merges a source element's attributes into a target element.
@@ -32,34 +32,34 @@ import org.thymeleaf.standard.processor.attr.StandardWithAttrProcessor;
  */
 public class AttributeMerger implements FragmentMerger {
 
-	/**
-	 * Merge source element attributes into a target element, overwriting those
-	 * attributes found in the target with those from the source.
-	 *
-	 * @param sourceElement
-	 * @param targetElement
-	 */
-	@Override
-	public void merge(Element targetElement, Element sourceElement) {
+    /**
+     * Merge source element attributes into a target element, overwriting those
+     * attributes found in the target with those from the source.
+     *
+     * @param sourceElement
+     * @param targetElement
+     */
+    @Override
+    public void merge(Element targetElement, Element sourceElement) {
 
-		if (sourceElement == null || targetElement == null) {
-			return;
-		}
+        if (sourceElement == null || targetElement == null) {
+            return;
+        }
 
-		// Exclude the copying of fragment attributes
-		Stream<Attribute> sourceAttributes = sourceElement.getAttributeMap().values().stream().filter(sourceAttribute
-				-> !MetaClass.equalsName(sourceAttribute, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_FRAGMENT)
-		);
-		// Merge th:with attributes
-		sourceAttributes.forEach(sourceAttribute -> {
-			if (MetaClass.equalsName(sourceAttribute, StandardDialect.PREFIX, StandardWithAttrProcessor.ATTR_NAME)) {
-				String mergedWithValue = new VariableDeclarationMerger().merge(sourceAttribute.getValue(),
-						MetaClass.getAttributeValue(targetElement, StandardDialect.PREFIX, StandardWithAttrProcessor.ATTR_NAME));
-				targetElement.setAttribute(StandardDialect.PREFIX + ":" + StandardWithAttrProcessor.ATTR_NAME, mergedWithValue);
-			} else { // Copy every other attribute straight
-				targetElement.setAttribute(sourceAttribute.getOriginalName(), sourceAttribute.getValue());
-			}
-		});
-	}
+        // Exclude the copying of fragment attributes
+        for (Attribute sourceAttribute : sourceElement.getAttributeMap().values()) {
+            if (MetaClass.equalsName(sourceAttribute, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_FRAGMENT)) {
+                continue;
+            }
+            // Merge th:with attributes
+            if (MetaClass.equalsName(sourceAttribute, StandardDialect.PREFIX, StandardWithAttrProcessor.ATTR_NAME)) {
+                String mergedWithValue = new VariableDeclarationMerger().merge(sourceAttribute.getValue(),
+                        MetaClass.getAttributeValue(targetElement, StandardDialect.PREFIX, StandardWithAttrProcessor.ATTR_NAME));
+                targetElement.setAttribute(StandardDialect.PREFIX + ":" + StandardWithAttrProcessor.ATTR_NAME, mergedWithValue);
+            } else { // Copy every other attribute straight
+                targetElement.setAttribute(sourceAttribute.getOriginalName(), sourceAttribute.getValue());
+            }
+        }
+    }
 
 }

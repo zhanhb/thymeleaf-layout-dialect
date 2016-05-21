@@ -30,49 +30,48 @@ import java.util.stream.Collectors;
  */
 public class VariableDeclarationMerger {
 
-	/**
-	 * Create variable declaration objects out of the declaration string.
-	 *
-	 * @param declarationString
-	 * @return A list of variable declaration objects that make up the
-	 * declaration string.
-	 */
-	private static List<VariableDeclaration> deriveDeclarations(String declarationString) {
-		String[] attributeTokens = declarationString.split(",");
-		return Arrays.stream(attributeTokens).map(VariableDeclaration::new).collect(Collectors.toList());
-	}
+    /**
+     * Create variable declaration objects out of the declaration string.
+     *
+     * @param declarationString
+     * @return A list of variable declaration objects that make up the
+     * declaration string.
+     */
+    private static List<VariableDeclaration> deriveDeclarations(String declarationString) {
+        String[] attributeTokens = declarationString.split(",");
+        return Arrays.stream(attributeTokens).map(VariableDeclaration::new).collect(Collectors.toList());
+    }
 
-	/**
-	 * Merge <tt>th:with</tt> attributes so that names from the source value
-	 * overwrite the same names in the target value.
-	 */
-	public String merge(String target, String source) {
-		if (target == null || target.isEmpty()) {
-			return source;
-		}
-		if (source == null || source.isEmpty()) {
-			return target;
-		}
-		List<VariableDeclaration> targetDeclarations = deriveDeclarations(target);
-		List<VariableDeclaration> sourceDeclarations = deriveDeclarations(source);
+    /**
+     * Merge <tt>th:with</tt> attributes so that names from the source value
+     * overwrite the same names in the target value.
+     */
+    public String merge(String target, String source) {
+        if (target == null || target.isEmpty()) {
+            return source;
+        }
+        if (source == null || source.isEmpty()) {
+            return target;
+        }
+        List<VariableDeclaration> targetDeclarations = deriveDeclarations(target);
+        List<VariableDeclaration> sourceDeclarations = deriveDeclarations(source);
 
-		List<VariableDeclaration> newDeclarations = new ArrayList<>();
-		targetDeclarations.forEach(targetDeclaration -> {
-			VariableDeclaration override = sourceDeclarations.stream().filter(sourceDeclaration
-					-> Objects.equals(sourceDeclaration.getName(), targetDeclaration.getName())
-			).findFirst().orElse(null);
-			if (override != null) {
-				sourceDeclarations.remove(override);
-				newDeclarations.add(override);
-			} else {
-				newDeclarations.add(targetDeclaration);
-			}
-		}
-		);
-		sourceDeclarations.forEach(targetAttributeDeclaration
-				-> newDeclarations.add(targetAttributeDeclaration)
-		);
+        List<VariableDeclaration> newDeclarations = new ArrayList<>();
+        for (VariableDeclaration targetDeclaration : targetDeclarations) {
+            VariableDeclaration override = sourceDeclarations.stream().filter(sourceDeclaration
+                    -> Objects.equals(sourceDeclaration.getName(), targetDeclaration.getName())
+            ).findFirst().orElse(null);
+            if (override != null) {
+                sourceDeclarations.remove(override);
+                newDeclarations.add(override);
+            } else {
+                newDeclarations.add(targetDeclaration);
+            }
+        }
+        for (VariableDeclaration targetAttributeDeclaration : sourceDeclarations) {
+            newDeclarations.add(targetAttributeDeclaration);
+        }
 
-		return newDeclarations.stream().map(Object::toString).collect(Collectors.joining(","));
-	}
+        return newDeclarations.stream().map(Object::toString).collect(Collectors.joining(","));
+    }
 }

@@ -36,46 +36,46 @@ import org.thymeleaf.processor.IProcessor;
  */
 public class LayoutDialect extends AbstractDialect {
 
-	public static final String DIALECT_NAMESPACE_LAYOUT = "http://www.ultraq.net.nz/thymeleaf/layout";
-	public static final String DIALECT_PREFIX_LAYOUT = "layout";
+    public static final String DIALECT_NAMESPACE_LAYOUT = "http://www.ultraq.net.nz/thymeleaf/layout";
+    public static final String DIALECT_PREFIX_LAYOUT = "layout";
 
-	private final SortingStrategy sortingStrategy;
+    private final SortingStrategy sortingStrategy;
 
-	final String prefix = DIALECT_PREFIX_LAYOUT;
-	final Set<IProcessor> processors;
+    private final String prefix = DIALECT_PREFIX_LAYOUT;
+    private final Set<IProcessor> processors;
 
-	/**
-	 * Constructor, configure the layout dialect with the given values.
-	 *
-	 * @param sortingStrategy
-	 */
-	public LayoutDialect(SortingStrategy sortingStrategy) {
-		this.sortingStrategy = sortingStrategy;
-		this.processors = new LinkedHashSet<>(Arrays.asList(
-				new DecoratorProcessor(sortingStrategy),
-				new IncludeProcessor(),
-				new ReplaceProcessor(),
-				new FragmentProcessor(),
-				new TitlePatternProcessor()
-		));
-	}
+    /**
+     * Constructor, configure the layout dialect with the given values.
+     *
+     * @param sortingStrategy
+     */
+    public LayoutDialect(SortingStrategy sortingStrategy) {
+        this.sortingStrategy = sortingStrategy;
+        this.processors = new LinkedHashSet<>(Arrays.asList(
+                new DecoratorProcessor(sortingStrategy),
+                new IncludeProcessor(),
+                new ReplaceProcessor(),
+                new FragmentProcessor(),
+                new TitlePatternProcessor()
+        ));
+    }
 
-	public LayoutDialect() {
-		this(new AppendingStrategy());
-	}
+    public LayoutDialect() {
+        this(new AppendingStrategy());
+    }
 
-	@Override
-	public String getPrefix() {
-		return prefix;
-	}
+    @Override
+    public String getPrefix() {
+        return prefix;
+    }
 
-	@Override
-	public Set<IProcessor> getProcessors() {
-		return Collections.unmodifiableSet(processors);
-	}
+    @Override
+    public Set<IProcessor> getProcessors() {
+        return Collections.unmodifiableSet(processors);
+    }
 
-	public SortingStrategy getSortingStrategy() {
-		return sortingStrategy;
-	}
+    public SortingStrategy getSortingStrategy() {
+        return sortingStrategy;
+    }
 
 }

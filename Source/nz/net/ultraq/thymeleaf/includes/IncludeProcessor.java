@@ -36,59 +36,59 @@ import org.thymeleaf.processor.attr.AbstractAttrProcessor;
  */
 public class IncludeProcessor extends AbstractAttrProcessor {
 
-	public static final String PROCESSOR_NAME_INCLUDE = "include";
+    public static final String PROCESSOR_NAME_INCLUDE = "include";
 
-	/**
-	 * Constructor, sets this processor to work on the 'include' attribute.
-	 */
-	public IncludeProcessor() {
+    /**
+     * Constructor, sets this processor to work on the 'include' attribute.
+     */
+    public IncludeProcessor() {
 
-		super(PROCESSOR_NAME_INCLUDE);
-	}
+        super(PROCESSOR_NAME_INCLUDE);
+    }
 
-	/**
-	 * Locates the specified page and includes it into the current template.
-	 *
-	 * @param arguments
-	 * @param element
-	 * @param attributeName
-	 * @return Result of the processing.
-	 */
-	@Override
-	protected ProcessorResult processAttribute(Arguments arguments, Element element, String attributeName) {
+    /**
+     * Locates the specified page and includes it into the current template.
+     *
+     * @param arguments
+     * @param element
+     * @param attributeName
+     * @return Result of the processing.
+     */
+    @Override
+    protected ProcessorResult processAttribute(Arguments arguments, Element element, String attributeName) {
 
-		// Locate the page and fragment to include
-		List<Node> includeFragments = new FragmentFinder(arguments)
-				.findFragments(element.getAttributeValue(attributeName));
+        // Locate the page and fragment to include
+        List<Node> includeFragments = new FragmentFinder(arguments)
+                .findFragments(element.getAttributeValue(attributeName));
 
-		// Gather all fragment parts within the include element, scoping them to
-		// this element
-		Map<String, Element> elementFragments = new FragmentMapper().map(element.getElementChildren());
-		FragmentMap.updateForNode(arguments, element, elementFragments);
+        // Gather all fragment parts within the include element, scoping them to
+        // this element
+        Map<String, Element> elementFragments = new FragmentMapper().map(element.getElementChildren());
+        FragmentMap.updateForNode(arguments, element, elementFragments);
 
-		// Replace the children of this element with those of the include page
-		// fragments.  The 'container' element is copied from how Thymeleaf does
-		// it's include processor, which is to maintain internal structures like
-		// local variables
-		element.clearChildren();
-		if (includeFragments != null && !includeFragments.isEmpty()) {
-			Element containerElement = new Element("container");
-			includeFragments.forEach(includeFragment -> {
-				containerElement.addChild(includeFragment);
-				containerElement.extractChild(includeFragment);
-			});
-			containerElement.getChildren().forEach(extractedChild -> {
-				element.addChild(extractedChild);
-			});
-		}
+        // Replace the children of this element with those of the include page
+        // fragments.  The 'container' element is copied from how Thymeleaf does
+        // it's include processor, which is to maintain internal structures like
+        // local variables
+        element.clearChildren();
+        if (includeFragments != null && !includeFragments.isEmpty()) {
+            Element containerElement = new Element("container");
+            for (Node includeFragment : includeFragments) {
+                containerElement.addChild(includeFragment);
+                containerElement.extractChild(includeFragment);
+            }
+            for (Node extractedChild : containerElement.getChildren()) {
+                element.addChild(extractedChild);
+            }
+        }
 
-		element.removeAttribute(attributeName);
-		return ProcessorResult.OK;
-	}
+        element.removeAttribute(attributeName);
+        return ProcessorResult.OK;
+    }
 
-	@Override
-	public int getPrecedence() {
-		return 1;
-	}
+    @Override
+    public int getPrecedence() {
+        return 1;
+    }
 
 }

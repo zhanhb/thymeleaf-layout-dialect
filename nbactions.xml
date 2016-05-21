@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+    <action>
+        <actionName>CUSTOM-Build All</actionName>
+        <displayName>Build All</displayName>
+        <goals>
+            <goal>clean</goal>
+            <goal>package</goal>
+            <goal>source:jar</goal>
+            <goal>javadoc:jar</goal>
+            <goal>gpg:sign</goal>
+            <goal>deploy</goal>
+        </goals>
+    </action>
+</actions>

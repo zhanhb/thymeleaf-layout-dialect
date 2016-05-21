@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nz.net.ultraq.thymeleaf.decorators;
 
 import org.thymeleaf.dom.Element;
@@ -25,13 +24,13 @@ import org.thymeleaf.dom.Element;
  */
 public interface Decorator {
 
-	/**
-	 * Apply the contents of the decorator element to the content element.
-	 *
-	 * @param decorator Element from the decorator template to bring in to the
-	 * 					content template which is currently being processed.
-	 * @param content	Element from the content template.
-	 */
-	public void decorate(Element decorator, Element content);
+    /**
+     * Apply the contents of the decorator element to the content element.
+     *
+     * @param decorator Element from the decorator template to bring in to the
+     * content template which is currently being processed.
+     * @param content	Element from the content template.
+     */
+    void decorate(Element decorator, Element content);
 
 }

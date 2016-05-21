@@ -15,6 +15,7 @@
  */
 package nz.net.ultraq.thymeleaf.fragments.mergers;
 
+import org.thymeleaf.dom.Attribute;
 import org.thymeleaf.dom.Element;
 import org.thymeleaf.dom.Node;
 
@@ -25,43 +26,43 @@ import org.thymeleaf.dom.Node;
  */
 public class ElementMerger extends AttributeMerger {
 
-	/**
-	 * Flag for indicating that the merge is over a root element, in which some
-	 * special rules apply.
-	 */
-	private final boolean rootElementMerge;
+    /**
+     * Flag for indicating that the merge is over a root element, in which some
+     * special rules apply.
+     */
+    private final boolean rootElementMerge;
 
-	public ElementMerger() {
-		this(false);
-	}
+    public ElementMerger() {
+        this(false);
+    }
 
-	public ElementMerger(boolean rootElementMerge) {
-		this.rootElementMerge = rootElementMerge;
-	}
+    public ElementMerger(boolean rootElementMerge) {
+        this.rootElementMerge = rootElementMerge;
+    }
 
-	/**
-	 * Replace the content of the target element, with the content of the source
-	 * element.
-	 *
-	 * @param targetElement
-	 * @param sourceElement
-	 */
-	@Override
-	public void merge(Element targetElement, Element sourceElement) {
+    /**
+     * Replace the content of the target element, with the content of the source
+     * element.
+     *
+     * @param targetElement
+     * @param sourceElement
+     */
+    @Override
+    public void merge(Element targetElement, Element sourceElement) {
 
-		// Create a new merged element to mess with
-		Node mergedNode = sourceElement.cloneNode(null, false);
-		if (!rootElementMerge) {
-			Element mergedElement = (Element) mergedNode;
-			mergedElement.clearAttributes();
-			targetElement.getAttributeMap().values().forEach(attribute
-					-> mergedElement.setAttribute(attribute.getNormalizedName(), attribute.getValue())
-			);
-			super.merge(mergedElement, sourceElement);
-		}
-		targetElement.clearChildren();
-		targetElement.addChild(mergedNode);
-		targetElement.getParent().extractChild(targetElement);
-	}
+        // Create a new merged element to mess with
+        Node mergedNode = sourceElement.cloneNode(null, false);
+        if (!rootElementMerge) {
+            Element mergedElement = (Element) mergedNode;
+            mergedElement.clearAttributes();
+            for (Attribute attribute : targetElement.getAttributeMap().values()) {
+                mergedElement.setAttribute(attribute.getNormalizedName(), attribute.getValue());
+            }
+            super.merge(mergedElement, sourceElement);
+        }
+        targetElement.clearChildren();
+        targetElement.addChild(mergedNode);
+        targetElement.getParent().extractChild(targetElement);
+    }
 
 }

@@ -18,12 +18,12 @@ package nz.net.ultraq.thymeleaf.fragments;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import org.thymeleaf.dom.Element;
+
 import static nz.net.ultraq.thymeleaf.fragments.FragmentProcessor.PROCESSOR_NAME_FRAGMENT;
 import static nz.net.ultraq.thymeleaf.includes.IncludeProcessor.PROCESSOR_NAME_INCLUDE;
 import static nz.net.ultraq.thymeleaf.includes.ReplaceProcessor.PROCESSOR_NAME_REPLACE;
-import nz.net.ultraq.thymeleaf.internal.MetaClass;
-import org.thymeleaf.dom.Element;
 
 /**
  * Searches for and returns layout dialect fragments amongst a given set of
@@ -33,31 +33,35 @@ import org.thymeleaf.dom.Element;
  */
 public class FragmentMapper {
 
-	public static final String DIALECT_PREFIX_LAYOUT = "layout";
+    public static final String DIALECT_PREFIX_LAYOUT = "layout";
 
-	/**
-	 * Find and return clones of all fragments within the given elements,
-	 * without delving into <tt>layout:include</tt> or <tt>layout:replace</tt>
-	 * elements, mapped by the name of each fragment.
-	 *
-	 * @param elements List of elements to search.
-	 * @return Map of fragment names and their elements.
-	 */
-	public Map<String, Element> map(List<Element> elements) {
-		Map<String, Element> fragments = new LinkedHashMap<String, Element>();
-		Consumer<Element>[] findFragments = new Consumer[1];
-		findFragments[0] = element -> {
-			String fragmentName = MetaClass.getAttributeValue(element, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_FRAGMENT);
-			if (fragmentName != null && !fragmentName.isEmpty()) {
-				Element fragment = (Element) element.cloneNode(null, false);
-				MetaClass.removeAttribute(fragment, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_FRAGMENT);
-				fragments.put(fragmentName, fragment);
-			} else if (!MetaClass.hasAttribute(element, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_INCLUDE)
-					|| !MetaClass.hasAttribute(element, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_REPLACE)) {
-				element.getElementChildren().stream().forEach(findFragments[0]);
-			}
-		};
-		elements.forEach(findFragments[0]);
-		return fragments;
-	}
+    /**
+     * Find and return clones of all fragments within the given elements,
+     * without delving into <tt>layout:include</tt> or <tt>layout:replace</tt>
+     * elements, mapped by the name of each fragment.
+     *
+     * @param elements List of elements to search.
+     * @return Map of fragment names and their elements.
+     */
+    public Map<String, Element> map(List<Element> elements) {
+        Map<String, Element> fragments = new LinkedHashMap<String, Element>();
+        for (Element element : elements) {
+            findFragments(element, fragments);
+        }
+        return fragments;
+    }
+
+    private void findFragments(Element element, Map<String, Element> fragments) {
+        String fragmentName = MetaClass.getAttributeValue(element, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_FRAGMENT);
+        if (fragmentName != null && !fragmentName.isEmpty()) {
+            Element fragment = (Element) element.cloneNode(null, false);
+            MetaClass.removeAttribute(fragment, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_FRAGMENT);
+            fragments.put(fragmentName, fragment);
+        } else if (!MetaClass.hasAttribute(element, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_INCLUDE)
+                || !MetaClass.hasAttribute(element, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_REPLACE)) {
+            for (Element e : element.getElementChildren()) {
+                findFragments(e, fragments);
+            }
+        }
+    }
 }

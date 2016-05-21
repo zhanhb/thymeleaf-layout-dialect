@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nz.net.ultraq.thymeleaf.decorators;
 
 import java.util.List;
@@ -22,18 +21,19 @@ import org.thymeleaf.dom.Node;
 /**
  * Interface for controlling the sort order in which elements are placed into
  * decorator template from the content one.
- * 
+ *
  * @author Emanuel Rabina
  */
 public interface SortingStrategy {
 
-	/**
-	 * Returns the position in amongst a list of the decorator's  nodes to
-	 * insert a content child node.
-	 * 
-	 * @param decoratorNodes
-	 * @param contentNode
-	 * @return Index in the list of decorator nodes to insert the content node.
-	 */
-	public int findPositionForContent(List<Node> decoratorNodes, Node contentNode);
+    /**
+     * Returns the position in amongst a list of the decorator's nodes to insert
+     * a content child node.
+     *
+     * @param decoratorNodes
+     * @param contentNode
+     * @return Index in the list of decorator nodes to insert the content node.
+     */
+    int findPositionForContent(List<Node> decoratorNodes, Node contentNode);
+
 }

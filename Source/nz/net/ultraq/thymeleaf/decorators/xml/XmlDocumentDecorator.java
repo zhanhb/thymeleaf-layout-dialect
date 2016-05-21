@@ -30,37 +30,37 @@ import org.thymeleaf.dom.Node;
  */
 public class XmlDocumentDecorator implements Decorator {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void decorate(Element decoratorXml, Element contentXml) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void decorate(Element decoratorXml, Element contentXml) {
 
-		NestableNode decoratorDocument = decoratorXml.getParent();
-		NestableNode contentDocument = contentXml.getParent();
+        NestableNode decoratorDocument = decoratorXml.getParent();
+        NestableNode contentDocument = contentXml.getParent();
 
-		// Copy text outside of the root element, keeping whitespace copied to a minimum
-		boolean beforeHtml = true;
-		boolean allowNext = false;
-		Node lastNode = contentXml;
-		for (Node externalNode : decoratorDocument.getChildren()) {
-			if (externalNode == decoratorXml) {
-				beforeHtml = false;
-				allowNext = true;
-				continue;
-			}
-			if (externalNode instanceof Comment || allowNext) {
-				if (beforeHtml) {
-					contentDocument.insertBefore(contentXml, externalNode);
-				} else {
-					contentDocument.insertAfter(lastNode, externalNode);
-					lastNode = externalNode;
-				}
-				allowNext = externalNode instanceof Comment;
-			}
-		}
+        // Copy text outside of the root element, keeping whitespace copied to a minimum
+        boolean beforeHtml = true;
+        boolean allowNext = false;
+        Node lastNode = contentXml;
+        for (Node externalNode : decoratorDocument.getChildren()) {
+            if (externalNode == decoratorXml) {
+                beforeHtml = false;
+                allowNext = true;
+                continue;
+            }
+            if (externalNode instanceof Comment || allowNext) {
+                if (beforeHtml) {
+                    contentDocument.insertBefore(contentXml, externalNode);
+                } else {
+                    contentDocument.insertAfter(lastNode, externalNode);
+                    lastNode = externalNode;
+                }
+                allowNext = externalNode instanceof Comment;
+            }
+        }
 
-		// Bring the decorator into the content page (which is the one being processed)
-		new ElementMerger(!Objects.equals(decoratorXml.getNormalizedName(), contentXml.getNormalizedName())).merge(contentXml, decoratorXml);
-	}
+        // Bring the decorator into the content page (which is the one being processed)
+        new ElementMerger(!Objects.equals(decoratorXml.getNormalizedName(), contentXml.getNormalizedName())).merge(contentXml, decoratorXml);
+    }
 }
