@@ -34,7 +34,7 @@ import static nz.net.ultraq.thymeleaf.fragments.FragmentProcessor.PROCESSOR_NAME
  */
 public class FragmentFinder {
 
-    final Arguments arguments;
+    private final Arguments arguments;
 
     public FragmentFinder(Arguments arguments) {
         this.arguments = arguments;
@@ -48,7 +48,6 @@ public class FragmentFinder {
      * @return Thymeleaf fragment object.
      */
     private StandardFragment computeFragment(String fragmentSpec) {
-
         return StandardFragmentProcessor.computeStandardFragmentSpec(
                 arguments.getConfiguration(), arguments, fragmentSpec,
                 DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_FRAGMENT);
@@ -61,7 +60,6 @@ public class FragmentFinder {
      * @return List of fragment nodes matching the fragment specification.
      */
     public List<Node> findFragments(String fragmentSpec) {
-
         return computeFragment(fragmentSpec).extractFragment(
                 arguments.getConfiguration(), arguments, arguments.getTemplateRepository());
     }

@@ -56,7 +56,6 @@ public class ReplaceProcessor extends AbstractAttrProcessor {
      */
     @Override
     protected ProcessorResult processAttribute(Arguments arguments, Element element, String attributeName) {
-
         // Locate the page and fragment to include
         List<Node> replaceFragments = new FragmentFinder(arguments)
                 .findFragments(element.getAttributeValue(attributeName));

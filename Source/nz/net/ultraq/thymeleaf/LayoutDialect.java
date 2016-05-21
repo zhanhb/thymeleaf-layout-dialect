@@ -16,7 +16,6 @@
 package nz.net.ultraq.thymeleaf;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import nz.net.ultraq.thymeleaf.decorators.DecoratorProcessor;
@@ -70,8 +69,9 @@ public class LayoutDialect extends AbstractDialect {
     }
 
     @Override
+    @SuppressWarnings("ReturnOfCollectionOrArrayField")
     public Set<IProcessor> getProcessors() {
-        return Collections.unmodifiableSet(processors);
+        return processors;
     }
 
     public SortingStrategy getSortingStrategy() {

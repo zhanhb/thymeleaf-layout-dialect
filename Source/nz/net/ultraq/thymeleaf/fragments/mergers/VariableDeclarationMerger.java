@@ -56,7 +56,7 @@ public class VariableDeclarationMerger {
         List<VariableDeclaration> targetDeclarations = deriveDeclarations(target);
         List<VariableDeclaration> sourceDeclarations = deriveDeclarations(source);
 
-        List<VariableDeclaration> newDeclarations = new ArrayList<>();
+        List<VariableDeclaration> newDeclarations = new ArrayList<>(targetDeclarations.size() + sourceDeclarations.size());
         for (VariableDeclaration targetDeclaration : targetDeclarations) {
             VariableDeclaration override = sourceDeclarations.stream().filter(sourceDeclaration
                     -> Objects.equals(sourceDeclaration.getName(), targetDeclaration.getName())
@@ -72,6 +72,6 @@ public class VariableDeclarationMerger {
             newDeclarations.add(targetAttributeDeclaration);
         }
 
-        return newDeclarations.stream().map(Object::toString).collect(Collectors.joining(","));
+        return newDeclarations.stream().map(String::valueOf).collect(Collectors.joining(","));
     }
 }

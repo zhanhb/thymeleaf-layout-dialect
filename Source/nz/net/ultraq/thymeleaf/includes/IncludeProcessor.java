@@ -42,7 +42,6 @@ public class IncludeProcessor extends AbstractAttrProcessor {
      * Constructor, sets this processor to work on the 'include' attribute.
      */
     public IncludeProcessor() {
-
         super(PROCESSOR_NAME_INCLUDE);
     }
 
@@ -56,7 +55,6 @@ public class IncludeProcessor extends AbstractAttrProcessor {
      */
     @Override
     protected ProcessorResult processAttribute(Arguments arguments, Element element, String attributeName) {
-
         // Locate the page and fragment to include
         List<Node> includeFragments = new FragmentFinder(arguments)
                 .findFragments(element.getAttributeValue(attributeName));

@@ -40,7 +40,6 @@ public class FragmentProcessor extends AbstractAttrProcessor {
      * Constructor, sets this processor to work on the 'fragment' attribute.
      */
     public FragmentProcessor() {
-
         super(PROCESSOR_NAME_FRAGMENT);
     }
 
