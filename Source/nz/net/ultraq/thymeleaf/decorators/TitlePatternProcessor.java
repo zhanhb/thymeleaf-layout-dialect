@@ -63,6 +63,7 @@ public class TitlePatternProcessor extends AbstractAttrProcessor {
      * {@inheritDoc}
      */
     @Override
+    @SuppressWarnings("null")
     protected ProcessorResult processAttribute(Arguments arguments, Element element, String attributeName) {
 
         // Ensure this attribute is only on the <title> element

@@ -56,4 +56,5 @@ public class FragmentMap extends HashMap<String, Element> {
         map.putAll(fragments);
         node.setNodeLocalVariable(FRAGMENT_COLLECTION_KEY, map);
     }
+
 }

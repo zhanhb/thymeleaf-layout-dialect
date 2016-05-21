@@ -31,7 +31,7 @@ public class XmlElementDecorator implements Decorator {
      */
     @Override
     public void decorate(Element decoratorElement, Element contentElement) {
-
         new AttributeMerger().merge(decoratorElement, contentElement);
     }
+
 }

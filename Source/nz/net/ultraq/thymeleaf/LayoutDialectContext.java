@@ -38,24 +38,25 @@ public class LayoutDialectContext extends HashMap<String, Object> {
      * @return A new or existing layout dialect context for the context.
      */
     public static LayoutDialectContext forContext(IContext context) {
-
         VariablesMap<String, Object> variables = context.getVariables();
-        Object dialectContext = variables.get(CONTEXT_KEY);
+        Object contextKey = variables.get(CONTEXT_KEY);
 
         // Error if something has already taken this value.  Hopefully there
         // aren't any collisions, but this name isn't exactly rare, so it *just*
         // might happen.
-        if (dialectContext != null && !(dialectContext instanceof LayoutDialectContext)) {
-            throw new Error("Name collision on the Thymeleaf processing "
-                    + "context.  An object with the key \"layout\" exists, but is needed "
-                    + "by the Layout Dialect to work");
-        }
-
-        if (dialectContext == null) {
-            dialectContext = new LayoutDialectContext();
+        if (contextKey != null) {
+            try {
+                return (LayoutDialectContext) contextKey;
+            } catch (ClassCastException ex) {
+                throw new Error("Name collision on the Thymeleaf processing "
+                        + "context.  An object with the key \"layout\" exists, but is needed "
+                        + "by the Layout Dialect to work");
+            }
+        } else {
+            LayoutDialectContext dialectContext = new LayoutDialectContext();
             variables.put(CONTEXT_KEY, dialectContext);
+            return dialectContext;
         }
-
-        return (LayoutDialectContext) dialectContext;
     }
+
 }

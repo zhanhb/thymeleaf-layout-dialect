@@ -47,9 +47,7 @@ public class XmlDocumentDecorator implements Decorator {
             if (externalNode == decoratorXml) {
                 beforeHtml = false;
                 allowNext = true;
-                continue;
-            }
-            if (externalNode instanceof Comment || allowNext) {
+            } else if (externalNode instanceof Comment || allowNext) {
                 if (beforeHtml) {
                     contentDocument.insertBefore(contentXml, externalNode);
                 } else {

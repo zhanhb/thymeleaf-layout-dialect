@@ -15,9 +15,7 @@
  */
 package nz.net.ultraq.thymeleaf.decorators.strategies;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.function.Predicate;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import org.thymeleaf.dom.Comment;
@@ -62,33 +60,36 @@ public class GroupingStrategy implements SortingStrategy {
      */
     private static enum HeadNodeTypes {
 
-        COMMENT(node -> node instanceof Comment),
-        META(node -> node instanceof Element && "meta".equals(((Element) node).getNormalizedName())),
-        STYLESHEET(node -> node instanceof Element && "link".equals(((Element) node).getNormalizedName()) && "stylesheet".equals(((Element) node).getAttributeValue("rel"))),
-        SCRIPT(node -> node instanceof Element && "script".equals(((Element) node).getNormalizedName())),
-        OTHER_ELEMENT(node -> node instanceof Element);
-
-        final Predicate<Node> determinant;
-
-        /**
-         * Constructor, set the test that matches this type of head node.
-         *
-         * @param determinant
-         */
-        HeadNodeTypes(Predicate<Node> determinant) {
-            this.determinant = determinant;
-        }
+        COMMENT,
+        META,
+        STYLESHEET,
+        SCRIPT,
+        OTHER_ELEMENT;
 
         /**
          * Figure out the enum for the given node type.
          *
-         * @param element The node to match.
+         * @param node The node to match.
          * @return Matching <tt>HeadNodeTypes</tt> enum to descript the node.
          */
-        static HeadNodeTypes findMatchingType(Node element) {
-            return Arrays.stream(values()).filter(headNodeType
-                    -> headNodeType.determinant.test(element)
-            ).findFirst().orElse(null);
+        static HeadNodeTypes findMatchingType(Node node) {
+            if (node instanceof Comment) {
+                return COMMENT;
+            } else if (node instanceof Element) {
+                Element element = (Element) node;
+                String normalizedName = element.getNormalizedName();
+                if ("meta".equals(normalizedName)) {
+                    return META;
+                }
+                if ("link".equals(normalizedName) && "stylesheet".equals(element.getAttributeValue("rel"))) {
+                    return STYLESHEET;
+                }
+                if ("script".equals(normalizedName)) {
+                    return SCRIPT;
+                }
+                return OTHER_ELEMENT;
+            }
+            return null;
         }
     }
 

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import org.thymeleaf.dom.Element;
+import org.thymeleaf.util.StringUtils;
 
 import static nz.net.ultraq.thymeleaf.fragments.FragmentProcessor.PROCESSOR_NAME_FRAGMENT;
 import static nz.net.ultraq.thymeleaf.includes.IncludeProcessor.PROCESSOR_NAME_INCLUDE;
@@ -53,7 +54,7 @@ public class FragmentMapper {
 
     private void findFragments(Element element, Map<String, Element> fragments) {
         String fragmentName = MetaClass.getAttributeValue(element, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_FRAGMENT);
-        if (fragmentName != null && !fragmentName.isEmpty()) {
+        if (!StringUtils.isEmpty(fragmentName)) {
             Element fragment = (Element) element.cloneNode(null, false);
             MetaClass.removeAttribute(fragment, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_FRAGMENT);
             fragments.put(fragmentName, fragment);
@@ -64,4 +65,5 @@ public class FragmentMapper {
             }
         }
     }
+
 }

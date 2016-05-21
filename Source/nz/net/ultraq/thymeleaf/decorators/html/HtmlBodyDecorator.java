@@ -38,7 +38,6 @@ public class HtmlBodyDecorator extends XmlElementDecorator {
      */
     @Override
     public void decorate(Element decoratorHtml, Element contentBody) {
-
         // If the page has no BODY, then we don't need to do anything
         if (contentBody == null) {
             return;

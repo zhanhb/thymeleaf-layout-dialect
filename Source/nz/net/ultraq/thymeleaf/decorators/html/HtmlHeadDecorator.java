@@ -70,6 +70,7 @@ public class HtmlHeadDecorator extends XmlElementDecorator {
         //       blocks are doing almost the same thing.
         Element titleContainer = new Element("title-container");
         String[] titlePattern = new String[1];
+        @SuppressWarnings("null")
         BiConsumer<Element, String> titleExtraction = (headElement, titleType) -> {
             Element existingContainer = headElement != null ? MetaClass.findElement(headElement, "title-container") : null;
             if (existingContainer != null) {

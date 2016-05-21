@@ -22,9 +22,6 @@ import org.thymeleaf.dom.Element;
 import org.thymeleaf.standard.StandardDialect;
 import org.thymeleaf.standard.processor.attr.StandardWithAttrProcessor;
 
-import static nz.net.ultraq.thymeleaf.LayoutDialect.DIALECT_PREFIX_LAYOUT;
-import static nz.net.ultraq.thymeleaf.fragments.FragmentProcessor.PROCESSOR_NAME_FRAGMENT;
-
 /**
  * Merges a source element's attributes into a target element.
  *
@@ -46,11 +43,7 @@ public class AttributeMerger implements FragmentMerger {
             return;
         }
 
-        // Exclude the copying of fragment attributes
         for (Attribute sourceAttribute : sourceElement.getAttributeMap().values()) {
-            if (MetaClass.equalsName(sourceAttribute, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_FRAGMENT)) {
-                continue;
-            }
             // Merge th:with attributes
             if (MetaClass.equalsName(sourceAttribute, StandardDialect.PREFIX, StandardWithAttrProcessor.ATTR_NAME)) {
                 String mergedWithValue = new VariableDeclarationMerger().merge(sourceAttribute.getValue(),
