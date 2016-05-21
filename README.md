@@ -4,7 +4,7 @@ Thymeleaf Layout Dialect
 
 [![Build Status](https://travis-ci.org/zhanhb/thymeleaf-layout-dialect.svg?branch=master)](https://travis-ci.org/zhanhb/thymeleaf-layout-dialect)
 [![GitHub Release](https://img.shields.io/github/release/zhanhb/thymeleaf-layout-dialect.svg?maxAge=3600)](https://github.com/zhanhb/thymeleaf-layout-dialect/releases/latest)
-[![Maven Central](https://img.shields.io/maven-central/v/nz.net.zhanhb.thymeleaf/thymeleaf-layout-dialect.svg?maxAge=3600)](http://search.maven.org/#search|ga|1|g%3A%22nz.net.zhanhb.thymeleaf%22%20AND%20a%3A%22thymeleaf-layout-dialect%22)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.zhanhb/thymeleaf-layout-dialect.svg?maxAge=3600)](http://search.maven.org/#search|ga|1|g%3A%22com.github.zhanhb%22%20AND%20a%3A%22thymeleaf-layout-dialect%22)
 [![License](https://img.shields.io/github/license/zhanhb/thymeleaf-layout-dialect.svg?maxAge=2592000)](https://github.com/zhanhb/thymeleaf-layout-dialect/blob/master/LICENSE.txt)
 
 A dialect for Thymeleaf that allows you to use layout/decorator templates to
