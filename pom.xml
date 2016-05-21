@@ -188,7 +188,6 @@
                 <configuration>
                     <additionalJOption>-J-Dfile.encoding=${file.encoding}</additionalJOption>
                     <locale>en_US</locale>
-                    <linksource>true</linksource>
                 </configuration>
             </plugin>
             <plugin>
