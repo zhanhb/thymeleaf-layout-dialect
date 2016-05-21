@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.zhanhb</groupId>
     <artifactId>thymeleaf-layout-dialect</artifactId>
-    <version>1.4.0-SNAPSHOT</version>
+    <version>1.4.0</version>
     <name>Thymeleaf Layout Dialect</name>
     <description>A dialect for Thymeleaf that allows you to use layout/decorator templates to style your content.</description>
     <url>https://github.com/zhanhb/thymeleaf-layout-dialect</url>
@@ -17,18 +17,26 @@
     </licenses>
     <developers>
         <developer>
-            <id>emanuelrabina</id>
-            <name>Emanuel Rabina</name>
-            <email>emanuelrabina@gmail.com</email>
-            <url>http://www.ultraq.net.nz/</url>
+            <id>zhanhb</id>
+            <name>Huangbin Zhan</name>
+            <email>zhanhb88@gmail.com</email>
             <roles>
                 <role>author</role>
                 <role>developer</role>
             </roles>
-            <timezone>Pacific/Auckland</timezone>
+            <timezone>Asia/Shanghai</timezone>
         </developer>
     </developers>
     <contributors>
+        <contributor>
+            <name>Emanuel Rabina</name>
+            <email>emanuelrabina@gmail.com</email>
+            <organizationUrl>http://www.ultraq.net.nz/</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>Pacific/Auckland</timezone>
+        </contributor>
         <contributor>
             <name>Justin Munn</name>
             <roles>
