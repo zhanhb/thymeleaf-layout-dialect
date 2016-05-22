@@ -16,10 +16,8 @@
 package nz.net.ultraq.thymeleaf.fragments.mergers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import org.thymeleaf.util.StringUtils;
 
 /**
@@ -40,7 +38,11 @@ public class VariableDeclarationMerger {
      */
     private static List<VariableDeclaration> deriveDeclarations(String declarationString) {
         String[] attributeTokens = declarationString.split(",");
-        return Arrays.stream(attributeTokens).map(VariableDeclaration::new).collect(Collectors.toList());
+        ArrayList<VariableDeclaration> arrayList = new ArrayList<>(attributeTokens.length);
+        for (String attributeToken : attributeTokens) {
+            arrayList.add(new VariableDeclaration(attributeToken));
+        }
+        return arrayList;
     }
 
     /**
@@ -76,8 +78,14 @@ public class VariableDeclarationMerger {
         for (VariableDeclaration targetAttributeDeclaration : sourceDeclarations) {
             newDeclarations.add(targetAttributeDeclaration);
         }
-
-        return newDeclarations.stream().map(String::valueOf).collect(Collectors.joining(","));
+        if (newDeclarations.isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder().append(newDeclarations.get(0));
+        for (int i = 1, size = newDeclarations.size(); i < size; i++) {
+            sb.append(',').append(newDeclarations.get(i));
+        }
+        return sb.toString();
     }
 
 }

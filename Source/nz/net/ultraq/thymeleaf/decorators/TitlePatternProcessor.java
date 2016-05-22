@@ -17,15 +17,12 @@ package nz.net.ultraq.thymeleaf.decorators;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import nz.net.ultraq.thymeleaf.LayoutDialectContext;
 import nz.net.ultraq.thymeleaf.fragments.mergers.AttributeMerger;
 import org.thymeleaf.Arguments;
 import org.thymeleaf.dom.Element;
 import org.thymeleaf.dom.NestableNode;
+import org.thymeleaf.dom.Node;
 import org.thymeleaf.dom.Text;
 import org.thymeleaf.processor.ProcessorResult;
 import org.thymeleaf.processor.attr.AbstractAttrProcessor;
@@ -59,13 +56,31 @@ public class TitlePatternProcessor extends AbstractAttrProcessor {
         super(PROCESSOR_NAME_TITLEPATTERN);
     }
 
+    private String getTitle(Element element) {
+        if (element != null) {
+            Node node = element.getFirstChild();
+            if (node instanceof Text) {
+                return ((Text) node).getContent();
+            }
+        }
+        return null;
+    }
+
+    private Element findTitleType(List<Element> titleElements, String titleType) {
+        for (Element titleElement : titleElements) {
+            if (titleType.equals(titleElement.getNodeProperty(TITLE_TYPE))) {
+                return titleElement;
+            }
+        }
+        return null;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     @SuppressWarnings("null")
     protected ProcessorResult processAttribute(Arguments arguments, Element element, String attributeName) {
-
         // Ensure this attribute is only on the <title> element
         if (!"title".equals(element.getNormalizedName())) {
             throw new IllegalArgumentException(attributeName + " processor should only appear in a <title> element");
@@ -75,27 +90,23 @@ public class TitlePatternProcessor extends AbstractAttrProcessor {
         // processing container (if any)
         String titlePattern = element.getAttributeValue(attributeName);
         NestableNode titleContainer = element.getParent();
-        List<Element> titleElements = titleContainer != null ? titleContainer.getElementChildren() : Collections.emptyList();
+        List<Element> titleElements = titleContainer != null ? titleContainer.getElementChildren() : Collections.<Element>emptyList();
         element.removeAttribute(attributeName);
 
-        Function<String, Predicate<Element>> findTitleType = titleType -> {
-            return childElement
-                    -> Objects.equals(childElement.getNodeProperty(TITLE_TYPE), titleType);
-        };
-        Optional<Element> decoratorTitleElement = titleElements.stream().filter(findTitleType.apply(TITLE_TYPE_DECORATOR)).findFirst();
-        Optional<String> decoratorTitle = decoratorTitleElement.map(Element::getFirstChild).map(node -> ((Text) node).getContent());
-        Optional<Element> contentTitleElement = titleElements.stream().filter(findTitleType.apply(TITLE_TYPE_CONTENT)).findFirst();
-        Optional<String> contentTitle = contentTitleElement.map(Element::getFirstChild).map(node -> ((Text) node).getContent());
+        Element decoratorTitleElement = findTitleType(titleElements, TITLE_TYPE_DECORATOR);
+        String decoratorTitle = getTitle(decoratorTitleElement);
+        Element contentTitleElement = findTitleType(titleElements, TITLE_TYPE_CONTENT);
+        String contentTitle = getTitle(contentTitleElement);
 
         AttributeMerger attributeMerger = new AttributeMerger();
-        attributeMerger.merge(element, decoratorTitleElement.orElse(null));
-        attributeMerger.merge(element, contentTitleElement.orElse(null));
+        attributeMerger.merge(element, decoratorTitleElement);
+        attributeMerger.merge(element, contentTitleElement);
 
-        String title = !StringUtils.isEmpty(titlePattern) && !StringUtils.isEmpty(decoratorTitle.orElse(null)) && !StringUtils.isEmpty(contentTitle.orElse(null))
+        String title = !StringUtils.isEmpty(titlePattern) && !StringUtils.isEmpty(decoratorTitle) && !StringUtils.isEmpty(contentTitle)
                 ? titlePattern
-                .replace(PARAM_TITLE_DECORATOR, decoratorTitle.orElse(null))
-                .replace(PARAM_TITLE_CONTENT, contentTitle.orElse(null))
-                : contentTitle.orElse(decoratorTitle.orElse(""));
+                .replace(PARAM_TITLE_DECORATOR, decoratorTitle)
+                .replace(PARAM_TITLE_CONTENT, contentTitle)
+                : StringUtils.isEmpty(contentTitle) ? decoratorTitle != null ? decoratorTitle : "" : contentTitle;
 
         // If there's a title, bring it up
         if (!StringUtils.isEmpty(title)) {

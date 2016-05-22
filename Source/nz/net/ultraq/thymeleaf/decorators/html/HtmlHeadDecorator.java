@@ -16,7 +16,6 @@
 package nz.net.ultraq.thymeleaf.decorators.html;
 
 import java.util.List;
-import java.util.function.BiConsumer;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlElementDecorator;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
@@ -41,6 +40,30 @@ public class HtmlHeadDecorator extends XmlElementDecorator {
 
     public HtmlHeadDecorator(SortingStrategy sortingStrategy) {
         this.sortingStrategy = sortingStrategy;
+    }
+
+    @SuppressWarnings("null")
+    private void titleExtraction(Element headElement, String titleType, Element titleContainer, String[] titlePattern) {
+        Element existingContainer = headElement != null ? MetaClass.findElement(headElement, "title-container") : null;
+        if (existingContainer != null) {
+            List<Node> children = existingContainer.getChildren();
+            Node titleElement = children.isEmpty() ? null : children.get(children.size() - 1);
+            String attributeValue = MetaClass.getAttributeValue((Element) titleElement, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_TITLEPATTERN);
+            titlePattern[0] = !StringUtils.isEmpty(attributeValue) ? attributeValue : titlePattern[0];
+            titleElement.setNodeProperty(TITLE_TYPE, titleType);
+            MetaClass.removeChildWithWhitespace(headElement, existingContainer);
+            titleContainer.addChild(existingContainer);
+        } else {
+            Element titleElement = headElement != null ? MetaClass.findElement(headElement, "title") : null;
+            if (titleElement != null) {
+                String attributeValue = MetaClass.getAttributeValue(titleElement, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_TITLEPATTERN);
+                titlePattern[0] = !StringUtils.isEmpty(attributeValue) ? attributeValue : titlePattern[0];
+                titleElement.setNodeProperty(TITLE_TYPE, titleType);
+                MetaClass.removeAttribute(titleElement, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_TITLEPATTERN);
+                MetaClass.removeChildWithWhitespace(headElement, titleElement);
+                titleContainer.addChild(titleElement);
+            }
+        }
     }
 
     /**
@@ -71,31 +94,9 @@ public class HtmlHeadDecorator extends XmlElementDecorator {
         //       blocks are doing almost the same thing.
         Element titleContainer = new Element("title-container");
         String[] titlePattern = {null};
-        @SuppressWarnings("null")
-        BiConsumer<Element, String> titleExtraction = (headElement, titleType) -> {
-            Element existingContainer = headElement != null ? MetaClass.findElement(headElement, "title-container") : null;
-            if (existingContainer != null) {
-                List<Node> children = existingContainer.getChildren();
-                Node titleElement = children.isEmpty() ? null : children.get(children.size() - 1);
-                String attributeValue = MetaClass.getAttributeValue((Element) titleElement, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_TITLEPATTERN);
-                titlePattern[0] = !StringUtils.isEmpty(attributeValue) ? attributeValue : titlePattern[0];
-                titleElement.setNodeProperty(TITLE_TYPE, titleType);
-                MetaClass.removeChildWithWhitespace(headElement, existingContainer);
-                titleContainer.addChild(existingContainer);
-            } else {
-                Element titleElement = headElement != null ? MetaClass.findElement(headElement, "title") : null;
-                if (titleElement != null) {
-                    String attributeValue = MetaClass.getAttributeValue(titleElement, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_TITLEPATTERN);
-                    titlePattern[0] = !StringUtils.isEmpty(attributeValue) ? attributeValue : titlePattern[0];
-                    titleElement.setNodeProperty(TITLE_TYPE, titleType);
-                    MetaClass.removeAttribute(titleElement, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_TITLEPATTERN);
-                    MetaClass.removeChildWithWhitespace(headElement, titleElement);
-                    titleContainer.addChild(titleElement);
-                }
-            }
-        };
-        titleExtraction.accept(decoratorHead, TITLE_TYPE_DECORATOR);
-        titleExtraction.accept(contentHead, TITLE_TYPE_CONTENT);
+
+        titleExtraction(decoratorHead, TITLE_TYPE_DECORATOR, titleContainer, titlePattern);
+        titleExtraction(contentHead, TITLE_TYPE_CONTENT, titleContainer, titlePattern);
 
         Element resultTitle = new Element("title");
         resultTitle.setAttribute(DIALECT_PREFIX_LAYOUT + ":" + PROCESSOR_NAME_TITLEPATTERN, titlePattern[0]);

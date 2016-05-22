@@ -16,6 +16,7 @@
 package nz.net.ultraq.thymeleaf.decorators.strategies;
 
 import java.util.List;
+import java.util.ListIterator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import org.thymeleaf.dom.Comment;
@@ -83,8 +84,14 @@ public class GroupingStrategy implements SortingStrategy {
         }
 
         int type = findMatchingType(contentNode);
-        return MetaClass.lastIndexOf(decoratorNodes, decoratorNode
-                -> type == findMatchingType(decoratorNode)) + 1;
+        ListIterator<Node> it = decoratorNodes.listIterator(decoratorNodes.size());
+
+        while (it.hasPrevious()) {
+            if (type == findMatchingType(it.previous())) {
+                return it.nextIndex() + 1;
+            }
+        }
+        return 0;
     }
 
 }

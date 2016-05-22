@@ -1,9 +1,7 @@
 package nz.net.ultraq.thymeleaf.internal;
 
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Objects;
-import java.util.function.Predicate;
 import org.thymeleaf.dom.AbstractTextNode;
 import org.thymeleaf.dom.Attribute;
 import org.thymeleaf.dom.Document;
@@ -18,25 +16,6 @@ import org.thymeleaf.util.StringUtils;
  * @author zhanhb
  */
 public class MetaClass {
-
-    /**
-     * get the last index which the element matches the predicate.
-     *
-     * @param <T>
-     * @param list
-     * @param predicate
-     * @return
-     */
-    public static <T> int lastIndexOf(List<T> list, Predicate<? super T> predicate) {
-        ListIterator<T> it = list.listIterator(list.size());
-
-        while (it.hasPrevious()) {
-            if (predicate.test(it.previous())) {
-                return it.nextIndex();
-            }
-        }
-        return -1;
-    }
 
     /**
      * Searches this and all children of this element for an element of the
