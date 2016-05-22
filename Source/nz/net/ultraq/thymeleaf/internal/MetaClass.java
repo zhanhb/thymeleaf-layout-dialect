@@ -1,7 +1,6 @@
 package nz.net.ultraq.thymeleaf.internal;
 
 import java.util.List;
-import java.util.Objects;
 import org.thymeleaf.dom.AbstractTextNode;
 import org.thymeleaf.dom.Attribute;
 import org.thymeleaf.dom.Document;
@@ -26,7 +25,7 @@ public class MetaClass {
      * @return The matching element, or <tt>null</tt> if no match was found.
      */
     public static Element findElement(Element delegate, String name) {
-        if (Objects.equals(delegate.getOriginalName(), name)) {
+        if (name.equals(delegate.getOriginalName())) {
             return delegate;
         }
         for (Element element : delegate.getElementChildren()) {
@@ -133,7 +132,8 @@ public class MetaClass {
      */
     public static boolean equalsName(Attribute delegate, String prefix, String name) {
         String originalName = delegate.getOriginalName();
-        return Objects.equals(originalName, prefix + ":" + name) || Objects.equals(originalName, "data-" + prefix + "-" + name);
+        return (prefix + ":" + name).equals(originalName)
+                || ("data-" + prefix + "-" + name).equals(originalName);
     }
 
     /**

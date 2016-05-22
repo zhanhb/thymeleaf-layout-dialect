@@ -15,7 +15,6 @@
  */
 package nz.net.ultraq.thymeleaf.decorators.xml;
 
-import java.util.Objects;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.fragments.mergers.ElementMerger;
 import org.thymeleaf.dom.Comment;
@@ -58,7 +57,10 @@ public class XmlDocumentDecorator implements Decorator {
             }
         }
 
+        String normalizedName = decoratorXml.getNormalizedName();
+        String normalizedName1 = contentXml.getNormalizedName();
         // Bring the decorator into the content page (which is the one being processed)
-        new ElementMerger(!Objects.equals(decoratorXml.getNormalizedName(), contentXml.getNormalizedName())).merge(contentXml, decoratorXml);
+        new ElementMerger(normalizedName == null ? (normalizedName1) != null : !normalizedName.equals(normalizedName1)).merge(contentXml, decoratorXml);
     }
+
 }

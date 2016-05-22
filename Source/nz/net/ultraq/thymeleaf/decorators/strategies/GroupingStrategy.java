@@ -49,18 +49,14 @@ public class GroupingStrategy implements SortingStrategy {
         } else if (node instanceof Element) {
             Element element = (Element) node;
             String normalizedName = element.getNormalizedName();
-            if (normalizedName != null) {
-                switch (normalizedName) {
-                    case "meta":
-                        return META;
-                    case "script":
-                        return SCRIPT;
-                    case "link":
-                        if ("stylesheet".equals(element.getAttributeValue("rel"))) {
-                            return STYLESHEET;
-                        }
-                        break;
+            if ("meta".equals(normalizedName)) {
+                return META;
+            } else if ("link".equals(normalizedName)) {
+                if ("stylesheet".equals(element.getAttributeValue("rel"))) {
+                    return STYLESHEET;
                 }
+            } else if ("script".equals(normalizedName)) {
+                return SCRIPT;
             }
             return OTHER_ELEMENT;
         }

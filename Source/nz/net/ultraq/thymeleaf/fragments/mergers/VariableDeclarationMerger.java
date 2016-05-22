@@ -17,7 +17,6 @@ package nz.net.ultraq.thymeleaf.fragments.mergers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import org.thymeleaf.util.StringUtils;
 
 /**
@@ -38,7 +37,7 @@ public class VariableDeclarationMerger {
      */
     private static List<VariableDeclaration> deriveDeclarations(String declarationString) {
         String[] attributeTokens = declarationString.split(",");
-        ArrayList<VariableDeclaration> arrayList = new ArrayList<>(attributeTokens.length);
+        ArrayList<VariableDeclaration> arrayList = new ArrayList<VariableDeclaration>(attributeTokens.length);
         for (String attributeToken : attributeTokens) {
             arrayList.add(new VariableDeclaration(attributeToken));
         }
@@ -59,11 +58,11 @@ public class VariableDeclarationMerger {
         List<VariableDeclaration> targetDeclarations = deriveDeclarations(target);
         List<VariableDeclaration> sourceDeclarations = deriveDeclarations(source);
 
-        List<VariableDeclaration> newDeclarations = new ArrayList<>(targetDeclarations.size() + sourceDeclarations.size());
+        List<VariableDeclaration> newDeclarations = new ArrayList<VariableDeclaration>(targetDeclarations.size() + sourceDeclarations.size());
         for (VariableDeclaration targetDeclaration : targetDeclarations) {
             VariableDeclaration override = null;
             for (VariableDeclaration sourceDeclaration : sourceDeclarations) {
-                if (Objects.equals(sourceDeclaration.getName(), targetDeclaration.getName())) {
+                if (sourceDeclaration.getName().equals(targetDeclaration.getName())) {
                     override = sourceDeclaration;
                     break;
                 }
