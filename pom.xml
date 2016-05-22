@@ -187,6 +187,7 @@
                 <version>2.10.3</version>
                 <configuration>
                     <additionalJOption>-J-Dfile.encoding=${file.encoding}</additionalJOption>
+                    <excludePackageNames>*.internal.*</excludePackageNames>
                     <locale>en_US</locale>
                 </configuration>
             </plugin>
