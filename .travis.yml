@@ -3,7 +3,6 @@ cache:
   directories:
     - $HOME/.m2/repository
 jdk:
- - oraclejdk6
  - oraclejdk7
  - oraclejdk8
 
