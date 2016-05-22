@@ -30,6 +30,42 @@ import org.thymeleaf.dom.Node;
  */
 public class GroupingStrategy implements SortingStrategy {
 
+    private static final int COMMENT = 1;
+    private static final int META = 2;
+    private static final int STYLESHEET = 3;
+    private static final int SCRIPT = 4;
+    private static final int OTHER_ELEMENT = 5;
+
+    /**
+     * Figure out the type for the given node type.
+     *
+     * @param node The node to match.
+     * @return Matching <tt>int</tt> type to descript the node.
+     */
+    private static int findMatchingType(Node node) {
+        if (node instanceof Comment) {
+            return COMMENT;
+        } else if (node instanceof Element) {
+            Element element = (Element) node;
+            String normalizedName = element.getNormalizedName();
+            if (normalizedName != null) {
+                switch (normalizedName) {
+                    case "meta":
+                        return META;
+                    case "script":
+                        return SCRIPT;
+                    case "link":
+                        if ("stylesheet".equals(element.getAttributeValue("rel"))) {
+                            return STYLESHEET;
+                        }
+                        break;
+                }
+            }
+            return OTHER_ELEMENT;
+        }
+        return 0;
+    }
+
     /**
      * Returns the index of the last set of elements that are of the same 'type'
      * as the content node. eg: groups scripts with scripts, stylesheets with
@@ -41,56 +77,14 @@ public class GroupingStrategy implements SortingStrategy {
      */
     @Override
     public int findPositionForContent(List<Node> decoratorNodes, Node contentNode) {
-
         // Discard text/whitespace nodes
         if (MetaClass.isWhitespaceNode(contentNode)) {
             return -1;
         }
 
-        HeadNodeTypes type = HeadNodeTypes.findMatchingType(contentNode);
+        int type = findMatchingType(contentNode);
         return MetaClass.lastIndexOf(decoratorNodes, decoratorNode
-                -> type == HeadNodeTypes.findMatchingType(decoratorNode)) + 1;
-    }
-
-    /**
-     * Enum for the types of elements in the HEAD section that we might need to
-     * sort.
-     *
-     * TODO: Expand this to include more element types as they are requested.
-     */
-    private static enum HeadNodeTypes {
-
-        COMMENT,
-        META,
-        STYLESHEET,
-        SCRIPT,
-        OTHER_ELEMENT;
-
-        /**
-         * Figure out the enum for the given node type.
-         *
-         * @param node The node to match.
-         * @return Matching <tt>HeadNodeTypes</tt> enum to descript the node.
-         */
-        static HeadNodeTypes findMatchingType(Node node) {
-            if (node instanceof Comment) {
-                return COMMENT;
-            } else if (node instanceof Element) {
-                Element element = (Element) node;
-                String normalizedName = element.getNormalizedName();
-                if ("meta".equals(normalizedName)) {
-                    return META;
-                }
-                if ("link".equals(normalizedName) && "stylesheet".equals(element.getAttributeValue("rel"))) {
-                    return STYLESHEET;
-                }
-                if ("script".equals(normalizedName)) {
-                    return SCRIPT;
-                }
-                return OTHER_ELEMENT;
-            }
-            return null;
-        }
+                -> type == findMatchingType(decoratorNode)) + 1;
     }
 
 }

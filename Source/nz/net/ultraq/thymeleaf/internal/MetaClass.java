@@ -3,7 +3,6 @@ package nz.net.ultraq.thymeleaf.internal;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import org.thymeleaf.dom.AbstractTextNode;
 import org.thymeleaf.dom.Attribute;
@@ -12,6 +11,7 @@ import org.thymeleaf.dom.Element;
 import org.thymeleaf.dom.NestableNode;
 import org.thymeleaf.dom.Node;
 import org.thymeleaf.dom.Text;
+import org.thymeleaf.util.StringUtils;
 
 /**
  *
@@ -47,15 +47,16 @@ public class MetaClass {
      * @return The matching element, or <tt>null</tt> if no match was found.
      */
     public static Element findElement(Element delegate, String name) {
-        Function<Element, Element>[] search = new Function[1];
-        search[0] = element -> {
-            if (Objects.equals(element.getOriginalName(), name)) {
-                return element;
+        if (Objects.equals(delegate.getOriginalName(), name)) {
+            return delegate;
+        }
+        for (Element element : delegate.getElementChildren()) {
+            Element e = findElement(element, name);
+            if (e != null) {
+                return e;
             }
-            return element.getElementChildren().stream().map(search[0]).filter(Objects::nonNull)
-                    .findFirst().orElse(null);
-        };
-        return search[0].apply(delegate);
+        }
+        return null;
     }
 
     /**
@@ -70,10 +71,9 @@ public class MetaClass {
      */
     public static String getAttributeValue(Element delegate, String prefix, String name) {
         String attributeValue = delegate.getAttributeValue(prefix + ":" + name);
-        if (attributeValue == null || attributeValue.isEmpty()) {
-            attributeValue = delegate.getAttributeValue("data-" + prefix + "-" + name);
-        }
-        return attributeValue;
+        return StringUtils.isEmpty(attributeValue)
+                ? delegate.getAttributeValue("data-" + prefix + "-" + name)
+                : attributeValue;
     }
 
     /**

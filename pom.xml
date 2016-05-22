@@ -215,18 +215,9 @@
                         <goals>
                             <goal>addTestSources</goal>
                             <goal>testCompile</goal>
-                            <goal>testGenerateStubs</goal>
                         </goals>
                     </execution>
                 </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.groovy</groupId>
-                        <artifactId>groovy-all</artifactId>
-                        <version>2.4.3</version>
-                        <classifier>indy</classifier>
-                    </dependency>
-                </dependencies>
                 <configuration>
                     <testSources>
                         <testSource>

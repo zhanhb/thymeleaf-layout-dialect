@@ -25,6 +25,7 @@ import org.thymeleaf.context.VariablesMap;
  *
  * @author Emanuel Rabina
  */
+@SuppressWarnings("serial")
 public class LayoutDialectContext extends HashMap<String, Object> {
 
     private static final String CONTEXT_KEY = "layout";

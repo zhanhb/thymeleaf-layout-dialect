@@ -22,6 +22,7 @@ import nz.net.ultraq.thymeleaf.decorators.xml.XmlElementDecorator;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import org.thymeleaf.dom.Element;
 import org.thymeleaf.dom.Node;
+import org.thymeleaf.util.StringUtils;
 
 import static nz.net.ultraq.thymeleaf.LayoutDialect.DIALECT_PREFIX_LAYOUT;
 import static nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor.PROCESSOR_NAME_TITLEPATTERN;
@@ -69,7 +70,7 @@ public class HtmlHeadDecorator extends XmlElementDecorator {
         // TODO: Surely the code below can be simplified?  The 2 conditional
         //       blocks are doing almost the same thing.
         Element titleContainer = new Element("title-container");
-        String[] titlePattern = new String[1];
+        String[] titlePattern = {null};
         @SuppressWarnings("null")
         BiConsumer<Element, String> titleExtraction = (headElement, titleType) -> {
             Element existingContainer = headElement != null ? MetaClass.findElement(headElement, "title-container") : null;
@@ -77,7 +78,7 @@ public class HtmlHeadDecorator extends XmlElementDecorator {
                 List<Node> children = existingContainer.getChildren();
                 Node titleElement = children.isEmpty() ? null : children.get(children.size() - 1);
                 String attributeValue = MetaClass.getAttributeValue((Element) titleElement, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_TITLEPATTERN);
-                titlePattern[0] = attributeValue != null && !attributeValue.isEmpty() ? attributeValue : titlePattern[0];
+                titlePattern[0] = !StringUtils.isEmpty(attributeValue) ? attributeValue : titlePattern[0];
                 titleElement.setNodeProperty(TITLE_TYPE, titleType);
                 MetaClass.removeChildWithWhitespace(headElement, existingContainer);
                 titleContainer.addChild(existingContainer);
@@ -85,7 +86,7 @@ public class HtmlHeadDecorator extends XmlElementDecorator {
                 Element titleElement = headElement != null ? MetaClass.findElement(headElement, "title") : null;
                 if (titleElement != null) {
                     String attributeValue = MetaClass.getAttributeValue(titleElement, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_TITLEPATTERN);
-                    titlePattern[0] = attributeValue != null && !attributeValue.isEmpty() ? attributeValue : titlePattern[0];
+                    titlePattern[0] = !StringUtils.isEmpty(attributeValue) ? attributeValue : titlePattern[0];
                     titleElement.setNodeProperty(TITLE_TYPE, titleType);
                     MetaClass.removeAttribute(titleElement, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_TITLEPATTERN);
                     MetaClass.removeChildWithWhitespace(headElement, titleElement);

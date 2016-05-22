@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.thymeleaf.util.StringUtils;
 
 /**
  * Merges variable declarations in a <tt>th:with</tt> attribute processor,
@@ -47,10 +48,10 @@ public class VariableDeclarationMerger {
      * overwrite the same names in the target value.
      */
     public String merge(String target, String source) {
-        if (target == null || target.isEmpty()) {
+        if (StringUtils.isEmpty(target)) {
             return source;
         }
-        if (source == null || source.isEmpty()) {
+        if (StringUtils.isEmpty(source)) {
             return target;
         }
         List<VariableDeclaration> targetDeclarations = deriveDeclarations(target);
@@ -58,9 +59,13 @@ public class VariableDeclarationMerger {
 
         List<VariableDeclaration> newDeclarations = new ArrayList<>(targetDeclarations.size() + sourceDeclarations.size());
         for (VariableDeclaration targetDeclaration : targetDeclarations) {
-            VariableDeclaration override = sourceDeclarations.stream().filter(sourceDeclaration
-                    -> Objects.equals(sourceDeclaration.getName(), targetDeclaration.getName())
-            ).findFirst().orElse(null);
+            VariableDeclaration override = null;
+            for (VariableDeclaration sourceDeclaration : sourceDeclarations) {
+                if (Objects.equals(sourceDeclaration.getName(), targetDeclaration.getName())) {
+                    override = sourceDeclaration;
+                    break;
+                }
+            }
             if (override != null) {
                 sourceDeclarations.remove(override);
                 newDeclarations.add(override);
@@ -74,4 +79,5 @@ public class VariableDeclarationMerger {
 
         return newDeclarations.stream().map(String::valueOf).collect(Collectors.joining(","));
     }
+
 }
