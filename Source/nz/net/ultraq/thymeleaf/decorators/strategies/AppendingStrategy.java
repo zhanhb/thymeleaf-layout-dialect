@@ -16,7 +16,7 @@
 package nz.net.ultraq.thymeleaf.decorators.strategies;
 
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
-import nz.net.ultraq.thymeleaf.models.ModelExtensions;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import org.thymeleaf.model.IModel;
 
 /**
@@ -35,7 +35,7 @@ public class AppendingStrategy implements SortingStrategy {
 	 */
 	@Override
 	public int findPositionForModel(IModel headModel, IModel childModel) {
-		return !ModelExtensions.isWhitespace(childModel) ? headModel.size() - 2 : -1;
+		return !MetaClass.isWhitespace(childModel) ? headModel.size() - 2 : -1;
 	}
 
 }

@@ -16,7 +16,7 @@
 package nz.net.ultraq.thymeleaf.decorators.html;
 
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlElementDecorator;
-import nz.net.ultraq.thymeleaf.models.ModelExtensions;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
 
@@ -50,11 +50,11 @@ public class HtmlBodyDecorator extends XmlElementDecorator {
 
 		// Try to ensure there is a body as a result of decoration, applying the
 		// source body, or just using what is in the target
-		if (ModelExtensions.asBoolean(sourceBodyModel)) {
-			if (ModelExtensions.asBoolean(targetBodyModel)) {
+		if (MetaClass.asBoolean(sourceBodyModel)) {
+			if (MetaClass.asBoolean(targetBodyModel)) {
 				super.decorate(targetBodyModel, targetBodyTemplate, sourceBodyModel, sourceBodyTemplate);
 			} else {
-				ModelExtensions.replaceModel(targetBodyModel, sourceBodyModel);
+				MetaClass.replaceModel(targetBodyModel, sourceBodyModel);
 			}
 		}
 	}

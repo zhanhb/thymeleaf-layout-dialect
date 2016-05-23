@@ -18,7 +18,7 @@ package nz.net.ultraq.thymeleaf.decorators.html;
 import java.util.function.Predicate;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlElementDecorator;
-import nz.net.ultraq.thymeleaf.models.ModelExtensions;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.model.IOpenElementTag;
@@ -58,9 +58,9 @@ public class HtmlHeadDecorator extends XmlElementDecorator {
 
 		// Try to ensure there is a head as a result of decoration, applying the
 		// source head, or just using what is in the target
-		if (!ModelExtensions.asBoolean(targetHeadModel)) {
-			if (ModelExtensions.asBoolean(sourceHeadModel)) {
-				ModelExtensions.replaceModel(targetHeadModel, sourceHeadModel);
+		if (!MetaClass.asBoolean(targetHeadModel)) {
+			if (MetaClass.asBoolean(sourceHeadModel)) {
+				MetaClass.replaceModel(targetHeadModel, sourceHeadModel);
 			}
 			return;
 		}
@@ -71,17 +71,17 @@ public class HtmlHeadDecorator extends XmlElementDecorator {
 		};
 
 		IModel sourceTitle;
-		int sourceTitleIndex = ModelExtensions.findIndexOf(sourceHeadModel, titleEventIndexFinder);
+		int sourceTitleIndex = MetaClass.findIndexOf(sourceHeadModel, titleEventIndexFinder);
 		if (sourceTitleIndex != -1) {
-			sourceTitle = ModelExtensions.getModel(sourceHeadModel, sourceTitleIndex);
-			ModelExtensions.removeModelWithWhitespace(sourceHeadModel, sourceTitleIndex);
+			sourceTitle = MetaClass.getModel(sourceHeadModel, sourceTitleIndex);
+			MetaClass.removeModelWithWhitespace(sourceHeadModel, sourceTitleIndex);
 
-			int targetTitleIndex = ModelExtensions.findIndexOf(targetHeadModel, titleEventIndexFinder);
+			int targetTitleIndex = MetaClass.findIndexOf(targetHeadModel, titleEventIndexFinder);
 			if (targetTitleIndex != -1) {
-				ModelExtensions.removeModelWithWhitespace(targetHeadModel, targetTitleIndex);
+				MetaClass.removeModelWithWhitespace(targetHeadModel, targetTitleIndex);
 			}
 
-			ModelExtensions.insertModelWithWhitespace(targetHeadModel, 1, sourceTitle);
+			MetaClass.insertModelWithWhitespace(targetHeadModel, 1, sourceTitle);
 		}
 
 		// TODO: complicated title replacement
@@ -121,11 +121,11 @@ public class HtmlHeadDecorator extends XmlElementDecorator {
 		// Merge the source <head> elements with the target <head> elements using
 		// the current merging strategy, placing the resulting title at the
 		// beginning of it
-		if (ModelExtensions.asBoolean(sourceHeadModel)) {
-			ModelExtensions.modelIterator(sourceHeadModel).forEachRemaining(sourceHeadSubModel -> {
+		if (MetaClass.asBoolean(sourceHeadModel)) {
+			MetaClass.modelIterator(sourceHeadModel).forEachRemaining(sourceHeadSubModel -> {
 				int position = sortingStrategy.findPositionForModel(targetHeadModel, sourceHeadSubModel);
 				if (position != -1) {
-					ModelExtensions.insertModelWithWhitespace(targetHeadModel, position, sourceHeadSubModel);
+					MetaClass.insertModelWithWhitespace(targetHeadModel, position, sourceHeadSubModel);
 				}
 			});
 		}

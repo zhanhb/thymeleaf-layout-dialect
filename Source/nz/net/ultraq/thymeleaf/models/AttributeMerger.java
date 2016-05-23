@@ -18,6 +18,7 @@ package nz.net.ultraq.thymeleaf.models;
 import java.util.Arrays;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.model.IProcessableElementTag;
@@ -54,7 +55,7 @@ public class AttributeMerger implements ModelMerger {
 	 */
 	@Override
 	public void merge(IModel targetModel, IModel sourceModel) {
-		if (!ModelExtensions.asBoolean(targetModel) || !ModelExtensions.asBoolean(sourceModel)) {
+		if (!MetaClass.asBoolean(targetModel) || !MetaClass.asBoolean(sourceModel)) {
 			return;
 		}
 
@@ -62,14 +63,14 @@ public class AttributeMerger implements ModelMerger {
 		Arrays.stream(((IProcessableElementTag) sourceModel.get(0)).getAllAttributes())
 				// Don't include layout:fragment processors
 				.filter(sourceAttribute -> {
-					return !ModelExtensions.equalsName(sourceAttribute, LayoutDialect.DIALECT_PREFIX, FragmentProcessor.PROCESSOR_NAME);
+					return !MetaClass.equalsName(sourceAttribute, LayoutDialect.DIALECT_PREFIX, FragmentProcessor.PROCESSOR_NAME);
 				})
 				.forEach(sourceAttribute -> {
 					IProcessableElementTag targetEvent = (IProcessableElementTag) targetModel.get(0);
 					String mergedAttributeValue;
 
 					// Merge th:with attributes
-					if (ModelExtensions.equalsName(sourceAttribute, StandardDialect.PREFIX, StandardWithTagProcessor.ATTR_NAME)) {
+					if (MetaClass.equalsName(sourceAttribute, StandardDialect.PREFIX, StandardWithTagProcessor.ATTR_NAME)) {
 						mergedAttributeValue = new VariableDeclarationMerger().merge(sourceAttribute.getValue(),
 								targetEvent.getAttributeValue(StandardDialect.PREFIX, StandardWithTagProcessor.ATTR_NAME));
 					} else { // Copy every other attribute straight
@@ -77,7 +78,7 @@ public class AttributeMerger implements ModelMerger {
 					}
 
 					targetModel.replace(0, modelFactory.replaceAttribute(targetEvent,
-							ModelExtensions.getAttributeName(sourceAttribute), sourceAttribute.getAttributeCompleteName(),
+							MetaClass.getAttributeName(sourceAttribute), sourceAttribute.getAttributeCompleteName(),
 							mergedAttributeValue));
 				});
 	}

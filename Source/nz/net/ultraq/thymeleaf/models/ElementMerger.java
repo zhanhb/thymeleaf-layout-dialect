@@ -15,6 +15,7 @@
  */
 package nz.net.ultraq.thymeleaf.models;
 
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
 
@@ -53,7 +54,7 @@ public class ElementMerger implements ModelMerger {
 		// TODO: Shouldn't all this be done with the structureHandler?  I should
 		//       make another code branch that does that, and then I can compare.
 		// Replace the target model with the source model
-		ModelExtensions.replaceModel(targetModel, sourceModel);
+		MetaClass.replaceModel(targetModel, sourceModel);
 
 		new AttributeMerger(modelFactory).merge(targetModel, targetInitialRootElement);
 	}

@@ -17,8 +17,8 @@ package nz.net.ultraq.thymeleaf.decorators.html;
 
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
-import nz.net.ultraq.thymeleaf.models.ModelExtensions;
 import nz.net.ultraq.thymeleaf.models.ModelFinder;
 import org.thymeleaf.model.ICloseElementTag;
 import org.thymeleaf.model.IElementTag;
@@ -110,7 +110,7 @@ public class HtmlDocumentDecorator implements Decorator {
 //		}
 		// Find the root element of the target document to merge
 		// TODO: Way of obtaining a model from within a model
-		int rootElementEventIndex = ModelExtensions.findIndexOf(targetDocumentModel, targetDocumentEvent -> {
+		int rootElementEventIndex = MetaClass.findIndexOf(targetDocumentModel, targetDocumentEvent -> {
 			return targetDocumentEvent instanceof IOpenElementTag;
 		});
 		IModel targetDocumentRootModel = modelFinder.find(targetDocumentTemplate,

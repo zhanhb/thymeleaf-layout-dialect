@@ -21,7 +21,7 @@ import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
 import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
-import nz.net.ultraq.thymeleaf.models.ModelExtensions;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.models.ModelFinder;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
@@ -113,18 +113,18 @@ public class DecoratorProcessor extends AbstractAttributeModelProcessor {
 		//       element, which we don't want for the next step.  Strip those events
 		//       out for now,  but for future I should find a better way to merge
 		//       documents.
-		while (!(ModelExtensions.first(decoratorTemplate) instanceof IOpenElementTag)) {
-			ModelExtensions.removeFirst(decoratorTemplate);
+		while (!(MetaClass.first(decoratorTemplate) instanceof IOpenElementTag)) {
+			MetaClass.removeFirst(decoratorTemplate);
 		}
-		while (!(ModelExtensions.last(decoratorTemplate) instanceof ICloseElementTag)) {
-			ModelExtensions.removeLast(decoratorTemplate);
+		while (!(MetaClass.last(decoratorTemplate) instanceof ICloseElementTag)) {
+			MetaClass.removeLast(decoratorTemplate);
 		}
 
 		// TODO: Should probably return a new object so this doesn't look so
 		//       confusing, ie: why am I changing the source model when it's the
 		//       decorator model we are targeting???  See the point about
 		//       immutability in https://github.com/ultraq/thymeleaf-layout-dialect/issues/102
-		ModelExtensions.replaceModel(model, decoratorTemplate);
+		MetaClass.replaceModel(model, decoratorTemplate);
 
 		// Save layout fragments for use later by layout:fragment processors
 		FragmentMap.setForNode(context, structureHandler, (Map) pageFragments);

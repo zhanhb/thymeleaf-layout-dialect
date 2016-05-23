@@ -19,7 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import nz.net.ultraq.thymeleaf.includes.IncludeProcessor;
 import nz.net.ultraq.thymeleaf.includes.ReplaceProcessor;
-import nz.net.ultraq.thymeleaf.models.ModelExtensions;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.models.ModelFinder;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.ElementDefinition;
@@ -84,7 +84,7 @@ public class FragmentFinder {
 		//       we're at.
 		ElementDefinition[] insideLayoutElementDefinition = {null};
 
-		ModelExtensions.each(model, e -> {
+		MetaClass.each(model, e -> {
 			if (e instanceof IOpenElementTag) {
 				IOpenElementTag event = (IOpenElementTag) e;
 				if (insideLayoutElementDefinition[0] == null) {

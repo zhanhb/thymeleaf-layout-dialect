@@ -1,10 +1,9 @@
-package nz.net.ultraq.thymeleaf.models;
+package nz.net.ultraq.thymeleaf.internal;
 
-import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import nz.net.ultraq.thymeleaf.models.ModelIterator;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.model.IAttribute;
 import org.thymeleaf.model.ICloseElementTag;
@@ -17,13 +16,9 @@ import org.thymeleaf.model.IText;
  *
  * @author zhanhb
  */
-public class ModelExtensions {
+public class MetaClass {
 
-    private static Map<IModel, Integer> map = new IdentityHashMap<>();
-
-    public static void apply() {
-        // noop
-    }
+    private static final ConcurrentWeakIdentityHashMap<IModel, Integer> map = new ConcurrentWeakIdentityHashMap<>(200);
 
     /**
      * Set that a model evaluates to 'false' if it has no events.
@@ -311,7 +306,7 @@ public class ModelExtensions {
         return 1;
     }
 
-    public static int getEndIndex(IModel model) {
+    public static Integer getEndIndex(IModel model) {
         return map.get(model);
     }
 
@@ -319,7 +314,7 @@ public class ModelExtensions {
         map.put(model, endIndex);
     }
 
-    private ModelExtensions() {
+    private MetaClass() {
         throw new AssertionError();
     }
 

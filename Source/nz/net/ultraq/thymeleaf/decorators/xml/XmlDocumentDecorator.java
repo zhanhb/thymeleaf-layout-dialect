@@ -16,8 +16,8 @@
 package nz.net.ultraq.thymeleaf.decorators.xml;
 
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
-import nz.net.ultraq.thymeleaf.models.ModelExtensions;
 import nz.net.ultraq.thymeleaf.models.ModelFinder;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
@@ -75,12 +75,12 @@ public class XmlDocumentDecorator implements Decorator {
 //		}
 		// Find the root element of the target document to merge
 		// TODO: Way of obtaining a model from within a model
-		IOpenElementTag targetDocumentRootElement = (IOpenElementTag) ModelExtensions.find(sourceDocumentModel, targetDocumentEvent -> targetDocumentEvent instanceof IOpenElementTag);
+		IOpenElementTag targetDocumentRootElement = (IOpenElementTag) MetaClass.find(sourceDocumentModel, targetDocumentEvent -> targetDocumentEvent instanceof IOpenElementTag);
 		IModel targetDocumentRootModel = modelFinder.find(targetDocumentTemplate, targetDocumentRootElement.getElementCompleteName());
 
 		// Bring the decorator into the content page (which is the one being processed)
 		new AttributeMerger(modelFactory).merge(targetDocumentRootModel, sourceDocumentModel);
-		ModelExtensions.replaceModel(targetDocumentModel, targetDocumentRootModel);
+		MetaClass.replaceModel(targetDocumentModel, targetDocumentRootModel);
 	}
 
 }
