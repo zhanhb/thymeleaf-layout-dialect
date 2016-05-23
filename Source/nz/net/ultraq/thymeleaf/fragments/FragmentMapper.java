@@ -45,7 +45,7 @@ public class FragmentMapper {
      * @return Map of fragment names and their elements.
      */
     public Map<String, Element> map(List<Element> elements) {
-        Map<String, Element> fragments = new LinkedHashMap<String, Element>();
+        Map<String, Element> fragments = new LinkedHashMap<String, Element>(8);
         for (Element element : elements) {
             findFragments(element, fragments);
         }

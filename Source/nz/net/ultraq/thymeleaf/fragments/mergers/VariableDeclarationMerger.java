@@ -47,6 +47,10 @@ public class VariableDeclarationMerger {
     /**
      * Merge <tt>th:with</tt> attributes so that names from the source value
      * overwrite the same names in the target value.
+     *
+     * @param target
+     * @param source
+     * @return
      */
     public String merge(String target, String source) {
         if (StringUtils.isEmpty(target)) {
@@ -61,8 +65,9 @@ public class VariableDeclarationMerger {
         List<VariableDeclaration> newDeclarations = new ArrayList<VariableDeclaration>(targetDeclarations.size() + sourceDeclarations.size());
         for (VariableDeclaration targetDeclaration : targetDeclarations) {
             VariableDeclaration override = null;
+            String name = targetDeclaration.getName();
             for (VariableDeclaration sourceDeclaration : sourceDeclarations) {
-                if (sourceDeclaration.getName().equals(targetDeclaration.getName())) {
+                if (name == null ? sourceDeclaration.getName() == null : name.equals(sourceDeclaration.getName())) {
                     override = sourceDeclaration;
                     break;
                 }
@@ -80,7 +85,8 @@ public class VariableDeclarationMerger {
         if (newDeclarations.isEmpty()) {
             return "";
         }
-        StringBuilder sb = new StringBuilder().append(newDeclarations.get(0));
+        StringBuilder sb = new StringBuilder(source.length() + target.length())
+                .append(newDeclarations.get(0));
         for (int i = 1, size = newDeclarations.size(); i < size; i++) {
             sb.append(',').append(newDeclarations.get(i));
         }

@@ -179,6 +179,7 @@
                         <arg>-J-Dfile.encoding=${file.encoding}</arg>
                     </compilerArgs>
                     <showDeprecation>true</showDeprecation>
+                    <debug>false</debug>
                 </configuration>
             </plugin>
             <plugin>

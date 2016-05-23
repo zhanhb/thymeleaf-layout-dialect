@@ -60,7 +60,8 @@ public class XmlDocumentDecorator implements Decorator {
         String normalizedName = decoratorXml.getNormalizedName();
         String normalizedName1 = contentXml.getNormalizedName();
         // Bring the decorator into the content page (which is the one being processed)
-        new ElementMerger(normalizedName == null ? (normalizedName1) != null : !normalizedName.equals(normalizedName1)).merge(contentXml, decoratorXml);
+        new ElementMerger(normalizedName == null ? normalizedName1 != null
+                : !normalizedName.equals(normalizedName1)).merge(contentXml, decoratorXml);
     }
 
 }

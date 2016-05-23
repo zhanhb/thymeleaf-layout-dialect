@@ -25,7 +25,7 @@ public class MetaClass {
      * @return The matching element, or <tt>null</tt> if no match was found.
      */
     public static Element findElement(Element delegate, String name) {
-        if (name.equals(delegate.getOriginalName())) {
+        if (name == null ? delegate.getOriginalName() == null : name.equals(delegate.getOriginalName())) {
             return delegate;
         }
         for (Element element : delegate.getElementChildren()) {
@@ -116,7 +116,7 @@ public class MetaClass {
      * @return <tt>true</tt> if this is a collapsible text node.
      */
     public static boolean isWhitespaceNode(Node delegate) {
-        return delegate instanceof Text && ((Text) delegate).getContent().trim().isEmpty();
+        return delegate instanceof Text && ((AbstractTextNode) delegate).getContent().trim().isEmpty();
     }
 
     /**

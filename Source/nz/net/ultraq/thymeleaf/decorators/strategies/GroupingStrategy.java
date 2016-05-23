@@ -31,12 +31,6 @@ import org.thymeleaf.dom.Node;
  */
 public class GroupingStrategy implements SortingStrategy {
 
-    private static final int COMMENT = 1;
-    private static final int META = 2;
-    private static final int STYLESHEET = 3;
-    private static final int SCRIPT = 4;
-    private static final int OTHER_ELEMENT = 5;
-
     /**
      * Figure out the type for the given node type.
      *
@@ -44,6 +38,12 @@ public class GroupingStrategy implements SortingStrategy {
      * @return Matching <tt>int</tt> type to descript the node.
      */
     private static int findMatchingType(Node node) {
+        final int COMMENT = 1;
+        final int META = 2;
+        final int STYLESHEET = 3;
+        final int SCRIPT = 4;
+        final int OTHER_ELEMENT = 5;
+
         if (node instanceof Comment) {
             return COMMENT;
         } else if (node instanceof Element) {

@@ -27,6 +27,7 @@ import org.thymeleaf.dom.Node;
  *
  * @author Emanuel Rabina
  */
+@SuppressWarnings({"serial", "CloneableImplementsClone"})
 public class FragmentMap extends HashMap<String, Element> {
 
     private static final String FRAGMENT_COLLECTION_KEY = "LayoutDialect::FragmentCollection";

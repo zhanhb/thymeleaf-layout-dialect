@@ -20,6 +20,7 @@ import java.util.List;
 import nz.net.ultraq.thymeleaf.LayoutDialectContext;
 import nz.net.ultraq.thymeleaf.fragments.mergers.AttributeMerger;
 import org.thymeleaf.Arguments;
+import org.thymeleaf.dom.AbstractTextNode;
 import org.thymeleaf.dom.Element;
 import org.thymeleaf.dom.NestableNode;
 import org.thymeleaf.dom.Node;
@@ -59,8 +60,8 @@ public class TitlePatternProcessor extends AbstractAttrProcessor {
     private String getTitle(Element element) {
         if (element != null) {
             Node node = element.getFirstChild();
-            if (node instanceof Text) {
-                return ((Text) node).getContent();
+            if (node instanceof AbstractTextNode) {
+                return ((AbstractTextNode) node).getContent();
             }
         }
         return null;
