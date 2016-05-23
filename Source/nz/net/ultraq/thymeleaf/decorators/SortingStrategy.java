@@ -13,30 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package nz.net.ultraq.thymeleaf.decorators;
 
-package nz.net.ultraq.thymeleaf.decorators.strategies
-
-import nz.net.ultraq.thymeleaf.decorators.SortingStrategy
-
-import org.thymeleaf.model.IModel
+import org.thymeleaf.model.IModel;
 
 /**
- * The standard {@code <head>} merging strategy, which simply appends the
- * content to the decorator.
- * 
+ * Interface for controlling the sort order in which {@code <head>} elements
+ * from one source are placed into another.
+ *
  * @author Emanuel Rabina
  */
-class AppendingStrategy implements SortingStrategy {
+public interface SortingStrategy {
 
-	/**
-	 * Returns the position at the end of the {@code <head>} section.
-	 * 
-	 * @param headModel
-	 * @param event
-	 * @return The end of the head model.
-	 */
-	int findPositionForModel(IModel headModel, IModel childModel) {
+    /**
+     * Returns the position in a {@code <head>} element model to insert a child
+     * model.
+     *
+     * @param headModel Model of a {@code <head>} element.
+     * @param childModel A model that can be found in a {@code <head>} element.
+     * @return Position to insert the childe model into.
+     */
+    int findPositionForModel(IModel headModel, IModel childModel);
 
-		return !childModel.whitespace ? headModel.size() - 2 : -1
-	}
 }

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+    <action>
+        <actionName>CUSTOM-Build All</actionName>
+        <displayName>Build All</displayName>
+        <packagings>
+            <packaging>jar</packaging>
+        </packagings>
+        <goals>
+            <goal>clean</goal>
+            <goal>package</goal>
+            <goal>source:jar</goal>
+            <goal>javadoc:jar</goal>
+            <goal>gpg:sign</goal>
+            <goal>deploy</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>test.single</actionName>
+        <packagings>
+            <packaging>*</packaging>
+        </packagings>
+        <goals>
+            <goal>test</goal>
+        </goals>
+        <properties>
+            <test>${packageClassName}</test>
+        </properties>
+    </action>
+</actions>

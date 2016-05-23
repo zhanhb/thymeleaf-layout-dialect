@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package nz.net.ultraq.thymeleaf.expressions
+package nz.net.ultraq.thymeleaf.expressions;
 
-import org.thymeleaf.context.ITemplateContext
-import org.thymeleaf.standard.expression.StandardExpressions
+import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.standard.expression.StandardExpressions;
 
 /**
  * Simple utility that hides the Thymeleaf scaffolding required to process
@@ -26,18 +26,17 @@ import org.thymeleaf.standard.expression.StandardExpressions
  * 
  * @author Emanuel Rabina
  */
-class ExpressionProcessor {
+public class ExpressionProcessor {
 
-	private final ITemplateContext context
+	private final ITemplateContext context;
 
 	/**
 	 * Constructor, sets the execution context.
 	 * 
 	 * @param context
 	 */
-	ExpressionProcessor(ITemplateContext context) {
-
-		this.context = context
+	public ExpressionProcessor(ITemplateContext context) {
+		this.context = context;
 	}
 
 	/**
@@ -47,11 +46,11 @@ class ExpressionProcessor {
 	 * @param expression
 	 * @return Template or fragment name string.
 	 */
-	String process(String expression) {
-
-		return StandardExpressions.getExpressionParser(context.configuration)
+	public String process(String expression) {
+		return StandardExpressions.getExpressionParser(context.getConfiguration())
 			.parseExpression(context, expression)
 			.execute(context)
-			.toString()
+			.toString();
 	}
+
 }

@@ -13,46 +13,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package nz.net.ultraq.thymeleaf.fragments;
 
-package nz.net.ultraq.thymeleaf.fragments
-
-import org.thymeleaf.context.IContext
-import org.thymeleaf.model.IModel
-import org.thymeleaf.processor.element.IElementModelStructureHandler
+import java.util.HashMap;
+import java.util.Map;
+import org.thymeleaf.context.IContext;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.processor.element.IElementModelStructureHandler;
 
 /**
  * Holds the layout fragments encountered across layout/decorator and content
  * templates for use later.
- * 
+ *
  * @author Emanuel Rabina
  */
-class FragmentMap extends HashMap<String,IModel> {
+@SuppressWarnings({"serial", "CloneableImplementsClone"})
+public class FragmentMap extends HashMap<String, IModel> {
 
-	private static final String FRAGMENT_COLLECTION_KEY = 'LayoutDialect::FragmentCollection'
+	private static final String FRAGMENT_COLLECTION_KEY = "LayoutDialect::FragmentCollection";
 
 	/**
 	 * Retrieves either the fragment map for the current context, or a new
 	 * fragment map.
-	 * 
+	 *
 	 * @param context
 	 * @return A new or existing fragment collection for the context.
 	 */
-	static FragmentMap get(IContext context) {
-
-		return context.getVariable(FRAGMENT_COLLECTION_KEY) ?: [:]
+	public static FragmentMap get(IContext context) {
+		Object variable = context.getVariable(FRAGMENT_COLLECTION_KEY);
+		return variable != null ? (FragmentMap) variable : new FragmentMap();
 	}
 
 	/**
-	 * Set the fragment collection to contain whatever it initially had, plus the
-	 * given fragments, just for the scope of the current node.
-	 * 
+	 * Set the fragment collection to contain whatever it initially had, plus
+	 * the given fragments, just for the scope of the current node.
+	 *
 	 * @param context
 	 * @param structureHandler
 	 * @param fragments The new fragments to add to the map.
 	 */
-	static void setForNode(IContext context, IElementModelStructureHandler structureHandler,
-		Map<String,IModel> fragments) {
-
-		structureHandler.setLocalVariable(FRAGMENT_COLLECTION_KEY, get(context) + fragments)
+	public static void setForNode(IContext context, IElementModelStructureHandler structureHandler,
+			Map<String, IModel> fragments) {
+		FragmentMap fragmentMap = get(context);
+		fragmentMap.putAll(fragments);
+		structureHandler.setLocalVariable(FRAGMENT_COLLECTION_KEY, fragmentMap);
 	}
+
 }
