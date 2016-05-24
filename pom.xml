@@ -83,11 +83,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>net.sourceforge.nekohtml</groupId>
@@ -105,6 +100,7 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
             <version>2.4.6</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -200,7 +196,10 @@
                 <configuration>
                     <argLine>-Dfile.encoding=${file.encoding}</argLine>
                     <includes>
-                        <include>**/*Test*.class</include>
+                        <include>**/*Test.class</include>
+                        <include>**/*Tests.class</include>
+                        <include>**/*Executor.class</include>
+                        <include>**/*ExecutorGrouping.class</include>
                     </includes>
                 </configuration>
             </plugin>
