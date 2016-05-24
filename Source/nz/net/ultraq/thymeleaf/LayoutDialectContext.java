@@ -27,34 +27,34 @@ import org.thymeleaf.context.IEngineContext;
  */
 public class LayoutDialectContext extends HashMap<String, Object> {
 
-	private static final String CONTEXT_KEY = "layout";
+    private static final String CONTEXT_KEY = "layout";
 
-	/**
-	 * Retrieve the layout dialect context specific to the given Thymeleaf
-	 * context. If none exists, a new collection is created, applied to the
-	 * Thymeleaf context, and returned.
-	 *
-	 * @param context
-	 * @return A new or existing layout dialect context for the context.
-	 */
-	public static LayoutDialectContext forContext(IContext context) {
-		Object dialectContext = context.getVariable(CONTEXT_KEY);
+    /**
+     * Retrieve the layout dialect context specific to the given Thymeleaf
+     * context. If none exists, a new collection is created, applied to the
+     * Thymeleaf context, and returned.
+     *
+     * @param context
+     * @return A new or existing layout dialect context for the context.
+     */
+    public static LayoutDialectContext forContext(IContext context) {
+        Object dialectContext = context.getVariable(CONTEXT_KEY);
 
-		// Error if something has already taken this value.  Hopefully there
-		// aren't any collisions, but this name isn't exactly rare, so it *just*
-		// might happen.
-		if (dialectContext != null && !(dialectContext instanceof LayoutDialectContext)) {
-			throw new Error("Name collision on the Thymeleaf processing "
-					+ "context.  An object with the key \"layout\" exists, but is needed "
-					+ "by the Layout Dialect to work");
-		}
+        // Error if something has already taken this value.  Hopefully there
+        // aren't any collisions, but this name isn't exactly rare, so it *just*
+        // might happen.
+        if (dialectContext != null && !(dialectContext instanceof LayoutDialectContext)) {
+            throw new Error("Name collision on the Thymeleaf processing "
+                    + "context.  An object with the key \"layout\" exists, but is needed "
+                    + "by the Layout Dialect to work");
+        }
 
-		if (dialectContext == null) {
-			dialectContext = new LayoutDialectContext();
-			((IEngineContext) context).setVariable(CONTEXT_KEY, dialectContext);
-		}
+        if (dialectContext == null) {
+            dialectContext = new LayoutDialectContext();
+            ((IEngineContext) context).setVariable(CONTEXT_KEY, dialectContext);
+        }
 
-		return (LayoutDialectContext) dialectContext;
-	}
+        return (LayoutDialectContext) dialectContext;
+    }
 
 }

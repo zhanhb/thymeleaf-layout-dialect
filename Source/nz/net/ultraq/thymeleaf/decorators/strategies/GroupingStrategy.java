@@ -35,83 +35,83 @@ import org.thymeleaf.model.ITemplateEvent;
  */
 public class GroupingStrategy implements SortingStrategy {
 
-	/**
-	 * Returns the index of the last set of elements that are of the same 'type'
-	 * as the content node. eg: groups scripts with scripts, stylesheets with
-	 * stylesheets, and so on.
-	 *
-	 * @param headModel
-	 * @param childModel
-	 * @return Position of the end of the matching element group.
-	 */
-	@Override
-	public int findPositionForModel(IModel headModel, IModel childModel) {
-		// Discard text/whitespace nodes
-		if (MetaClass.isWhitespace(childModel)) {
-			return -1;
-		}
+    /**
+     * Returns the index of the last set of elements that are of the same 'type'
+     * as the content node. eg: groups scripts with scripts, stylesheets with
+     * stylesheets, and so on.
+     *
+     * @param headModel
+     * @param childModel
+     * @return Position of the end of the matching element group.
+     */
+    @Override
+    public int findPositionForModel(IModel headModel, IModel childModel) {
+        // Discard text/whitespace nodes
+        if (MetaClass.isWhitespace(childModel)) {
+            return -1;
+        }
 
-		HeadEventTypes type = HeadEventTypes.findMatchingType(childModel);
-		Iterator<IModel> it = MetaClass.modelIterator(headModel);
+        HeadEventTypes type = HeadEventTypes.findMatchingType(childModel);
+        Iterator<IModel> it = MetaClass.modelIterator(headModel);
 
-		ArrayList<IModel> list = new ArrayList<>();
-		while (it.hasNext()) {
-			list.add(it.next());
-		}
-		ListIterator<IModel> listIterator = list.listIterator(list.size());
-		while (listIterator.hasPrevious()) {
-			IModel headSubModel = listIterator.previous();
-			if (type == HeadEventTypes.findMatchingType(headSubModel)) {
-				return MetaClass.getEndIndex(headSubModel);
-			}
-		}
-		throw new NullPointerException();
-	}
+        ArrayList<IModel> list = new ArrayList<>();
+        while (it.hasNext()) {
+            list.add(it.next());
+        }
+        ListIterator<IModel> listIterator = list.listIterator(list.size());
+        while (listIterator.hasPrevious()) {
+            IModel headSubModel = listIterator.previous();
+            if (type == HeadEventTypes.findMatchingType(headSubModel)) {
+                return MetaClass.getEndIndex(headSubModel);
+            }
+        }
+        throw new NullPointerException();
+    }
 
-	/**
-	 * Enum for the types of elements in the {@code <head>} section that we
-	 * might need to sort.
-	 */
-	private static enum HeadEventTypes {
+    /**
+     * Enum for the types of elements in the {@code <head>} section that we
+     * might need to sort.
+     */
+    private static enum HeadEventTypes {
 
-		COMMENT,
-		META,
-		SCRIPT,
-		STYLE,
-		STYLESHEET,
-		OTHER;
+        COMMENT,
+        META,
+        SCRIPT,
+        STYLE,
+        STYLESHEET,
+        OTHER;
 
-		/**
-		 * Figure out the enum for the given model.
-		 *
-		 * @param model
-		 * @return Matching enum to describe the model.
-		 */
-		private static HeadEventTypes findMatchingType(IModel model) {
-			ITemplateEvent event = MetaClass.first(model);
+        /**
+         * Figure out the enum for the given model.
+         *
+         * @param model
+         * @return Matching enum to describe the model.
+         */
+        private static HeadEventTypes findMatchingType(IModel model) {
+            ITemplateEvent event = MetaClass.first(model);
 
-			if (event instanceof IComment) {
-				return COMMENT;
-			}
-			if (event instanceof IElementTag) {
-				String elementCompleteName = ((IElementTag) event).getElementCompleteName();
-				if (event instanceof IProcessableElementTag && "meta".equals(elementCompleteName)) {
-					return META;
-				}
-				if (event instanceof IOpenElementTag && "script".equals(elementCompleteName)) {
-					return SCRIPT;
-				}
-				if (event instanceof IOpenElementTag && "style".equals(elementCompleteName)) {
-					return STYLE;
-				}
-				if (event instanceof IProcessableElementTag && "link".equals(elementCompleteName)
-						&& "stylesheet".equals(((IProcessableElementTag) event).getAttributeValue("rel"))) {
-					return STYLESHEET;
-				}
-				return OTHER;
-			}
-			return null;
-		}
-	}
+            if (event instanceof IComment) {
+                return COMMENT;
+            }
+            if (event instanceof IElementTag) {
+                String elementCompleteName = ((IElementTag) event).getElementCompleteName();
+                if (event instanceof IProcessableElementTag && "meta".equals(elementCompleteName)) {
+                    return META;
+                }
+                if (event instanceof IOpenElementTag && "script".equals(elementCompleteName)) {
+                    return SCRIPT;
+                }
+                if (event instanceof IOpenElementTag && "style".equals(elementCompleteName)) {
+                    return STYLE;
+                }
+                if (event instanceof IProcessableElementTag && "link".equals(elementCompleteName)
+                        && "stylesheet".equals(((IProcessableElementTag) event).getAttributeValue("rel"))) {
+                    return STYLESHEET;
+                }
+                return OTHER;
+            }
+            return null;
+        }
+    }
 
 }

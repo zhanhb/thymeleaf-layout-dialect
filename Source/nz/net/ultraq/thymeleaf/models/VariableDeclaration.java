@@ -26,42 +26,42 @@ import java.util.regex.Pattern;
  */
 public class VariableDeclaration {
 
-	private static final Pattern DECLARATION_PATTERN = Pattern.compile("(.*?)=(.*)");
+    private static final Pattern DECLARATION_PATTERN = Pattern.compile("(.*?)=(.*)");
 
-	private final String name;
-	private final String value;
+    private final String name;
+    private final String value;
 
-	/**
-	 * Constructor, create an instance from the declaration string.
-	 *
-	 * @param declaration
-	 */
-	public VariableDeclaration(String declaration) {
-		Matcher matcher = DECLARATION_PATTERN.matcher(declaration);
-		if (matcher.matches()) {
-			name = matcher.group(1);
-			value = matcher.group(2);
-		} else {
-			throw new IllegalArgumentException("Unable to derive attribte declaration from string " + declaration);
-		}
-	}
+    /**
+     * Constructor, create an instance from the declaration string.
+     *
+     * @param declaration
+     */
+    public VariableDeclaration(String declaration) {
+        Matcher matcher = DECLARATION_PATTERN.matcher(declaration);
+        if (matcher.matches()) {
+            name = matcher.group(1);
+            value = matcher.group(2);
+        } else {
+            throw new IllegalArgumentException("Unable to derive attribte declaration from string " + declaration);
+        }
+    }
 
-	/**
-	 * Reconstructs the variable for use with {@code th:with}.
-	 *
-	 * @return {name}=${value}
-	 */
-	@Override
-	public String toString() {
-		return name + "=" + value;
-	}
+    /**
+     * Reconstructs the variable for use with {@code th:with}.
+     *
+     * @return {name}=${value}
+     */
+    @Override
+    public String toString() {
+        return name + "=" + value;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getValue() {
-		return value;
-	}
+    public String getValue() {
+        return value;
+    }
 
 }

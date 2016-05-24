@@ -37,50 +37,50 @@ import org.thymeleaf.templatemode.TemplateMode;
  */
 public class LayoutDialect extends AbstractProcessorDialect {
 
-	public static final String DIALECT_NAME = "Layout";
-	public static final String DIALECT_PREFIX = "layout";
-	public static final int DIALECT_PRECEDENCE = 10;
+    public static final String DIALECT_NAME = "Layout";
+    public static final String DIALECT_PREFIX = "layout";
+    public static final int DIALECT_PRECEDENCE = 10;
 
-	private final SortingStrategy sortingStrategy;
+    private final SortingStrategy sortingStrategy;
 
-	/**
-	 * Constructor, configure the layout dialect with the given values.
-	 *
-	 * @param sortingStrategy
-	 */
-	public LayoutDialect(SortingStrategy sortingStrategy) {
-		super(DIALECT_NAME, DIALECT_PREFIX, DIALECT_PRECEDENCE);
-		this.sortingStrategy = sortingStrategy;
-	}
+    /**
+     * Constructor, configure the layout dialect with the given values.
+     *
+     * @param sortingStrategy
+     */
+    public LayoutDialect(SortingStrategy sortingStrategy) {
+        super(DIALECT_NAME, DIALECT_PREFIX, DIALECT_PRECEDENCE);
+        this.sortingStrategy = sortingStrategy;
+    }
 
-	public LayoutDialect() {
-		this(new AppendingStrategy());
-	}
+    public LayoutDialect() {
+        this(new AppendingStrategy());
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Set<IProcessor> getProcessors(String dialectPrefix) {
-		// TODO: Many of the underlying classes don't respect the runtime-configured
-		//       dialect prefix, so I'll need to do something about that later.
-		//       https://github.com/ultraq/thymeleaf-layout-dialect/issues/103
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<IProcessor> getProcessors(String dialectPrefix) {
+        // TODO: Many of the underlying classes don't respect the runtime-configured
+        //       dialect prefix, so I'll need to do something about that later.
+        //       https://github.com/ultraq/thymeleaf-layout-dialect/issues/103
 
-		return new LinkedHashSet<>(Arrays.asList(
-				// Processors available in the HTML template mode
-				new StandardXmlNsTagProcessor(TemplateMode.HTML, dialectPrefix),
-				new DecoratorProcessor(TemplateMode.HTML, dialectPrefix, sortingStrategy),
-				new IncludeProcessor(TemplateMode.HTML, dialectPrefix),
-				new ReplaceProcessor(TemplateMode.HTML, dialectPrefix),
-				new FragmentProcessor(TemplateMode.HTML, dialectPrefix),
-				new TitlePatternProcessor(TemplateMode.HTML, dialectPrefix),
-				// Processors available in the XML template mode
-				new StandardXmlNsTagProcessor(TemplateMode.XML, dialectPrefix),
-				new DecoratorProcessor(TemplateMode.XML, dialectPrefix, sortingStrategy),
-				new IncludeProcessor(TemplateMode.XML, dialectPrefix),
-				new ReplaceProcessor(TemplateMode.XML, dialectPrefix),
-				new FragmentProcessor(TemplateMode.XML, dialectPrefix)
-		));
-	}
+        return new LinkedHashSet<>(Arrays.asList(
+                // Processors available in the HTML template mode
+                new StandardXmlNsTagProcessor(TemplateMode.HTML, dialectPrefix),
+                new DecoratorProcessor(TemplateMode.HTML, dialectPrefix, sortingStrategy),
+                new IncludeProcessor(TemplateMode.HTML, dialectPrefix),
+                new ReplaceProcessor(TemplateMode.HTML, dialectPrefix),
+                new FragmentProcessor(TemplateMode.HTML, dialectPrefix),
+                new TitlePatternProcessor(TemplateMode.HTML, dialectPrefix),
+                // Processors available in the XML template mode
+                new StandardXmlNsTagProcessor(TemplateMode.XML, dialectPrefix),
+                new DecoratorProcessor(TemplateMode.XML, dialectPrefix, sortingStrategy),
+                new IncludeProcessor(TemplateMode.XML, dialectPrefix),
+                new ReplaceProcessor(TemplateMode.XML, dialectPrefix),
+                new FragmentProcessor(TemplateMode.XML, dialectPrefix)
+        ));
+    }
 
 }

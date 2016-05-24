@@ -31,37 +31,37 @@ import org.thymeleaf.templatemode.TemplateMode;
  */
 public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
 
-	private static final String PARAM_TITLE_DECORATOR = "$DECORATOR_TITLE";
-	private static final String PARAM_TITLE_CONTENT = "$CONTENT_TITLE";
+    private static final String PARAM_TITLE_DECORATOR = "$DECORATOR_TITLE";
+    private static final String PARAM_TITLE_CONTENT = "$CONTENT_TITLE";
 
-	public static final String PROCESSOR_NAME = "title-pattern";
-	public static final int PROCESSOR_PRECEDENCE = 1;
+    public static final String PROCESSOR_NAME = "title-pattern";
+    public static final int PROCESSOR_PRECEDENCE = 1;
 
-	public static final String TITLE_TYPE = "LayoutDialect::TitlePattern::Type";
-	public static final String TITLE_TYPE_DECORATOR = "decorator-title";
-	public static final String TITLE_TYPE_CONTENT = "content-title";
+    public static final String TITLE_TYPE = "LayoutDialect::TitlePattern::Type";
+    public static final String TITLE_TYPE_DECORATOR = "decorator-title";
+    public static final String TITLE_TYPE_CONTENT = "content-title";
 
-	public static final String RESULTING_TITLE = "resultingTitle";
+    public static final String RESULTING_TITLE = "resultingTitle";
 
-	/**
-	 * Constructor, sets this processor to work on the 'title-pattern'
-	 * attribute.
-	 *
-	 * @param templateMode
-	 * @param dialectPrefix
-	 */
-	public TitlePatternProcessor(TemplateMode templateMode, String dialectPrefix) {
-		super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);
-	}
+    /**
+     * Constructor, sets this processor to work on the 'title-pattern'
+     * attribute.
+     *
+     * @param templateMode
+     * @param dialectPrefix
+     */
+    public TitlePatternProcessor(TemplateMode templateMode, String dialectPrefix) {
+        super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void doProcess(ITemplateContext context, IProcessableElementTag tag,
-			AttributeName attributeName, String attributeValue, IElementTagStructureHandler structureHandler) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void doProcess(ITemplateContext context, IProcessableElementTag tag,
+            AttributeName attributeName, String attributeValue, IElementTagStructureHandler structureHandler) {
 
-		// Ensure this attribute is only on the <title> element
+        // Ensure this attribute is only on the <title> element
 /*		if (element.normalizedName != 'title') {
 			throw new IllegalArgumentException("${attributeName} processor should only appear in a <title> element")
 		}
@@ -104,7 +104,7 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
 		titleContainer.parent.removeChild(titleContainer)
 
 		return ProcessorResult.OK
-		 */
-	}
+         */
+    }
 
 }

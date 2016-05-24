@@ -32,33 +32,33 @@ import org.thymeleaf.templatemode.TemplateMode;
  */
 public class IncludeProcessor extends AbstractAttributeModelProcessor {
 
-	public static final String PROCESSOR_NAME = "include";
-	public static final int PROCESSOR_PRECEDENCE = 0;
+    public static final String PROCESSOR_NAME = "include";
+    public static final int PROCESSOR_PRECEDENCE = 0;
 
-	/**
-	 * Constructor, sets this processor to work on the 'include' attribute.
-	 *
-	 * @param templateMode
-	 * @param dialectPrefix
-	 */
-	public IncludeProcessor(TemplateMode templateMode, String dialectPrefix) {
-		super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);
-	}
+    /**
+     * Constructor, sets this processor to work on the 'include' attribute.
+     *
+     * @param templateMode
+     * @param dialectPrefix
+     */
+    public IncludeProcessor(TemplateMode templateMode, String dialectPrefix) {
+        super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);
+    }
 
-	/**
-	 * Locates a page fragment and includes it in the current template.
-	 *
-	 * @param context
-	 * @param model
-	 * @param attributeName
-	 * @param attributeValue
-	 * @param structureHandler
-	 */
-	@Override
-	protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
-			String attributeValue, IElementModelStructureHandler structureHandler) {
+    /**
+     * Locates a page fragment and includes it in the current template.
+     *
+     * @param context
+     * @param model
+     * @param attributeName
+     * @param attributeValue
+     * @param structureHandler
+     */
+    @Override
+    protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
+            String attributeValue, IElementModelStructureHandler structureHandler) {
 
-		// Locate the page and fragment to include
+        // Locate the page and fragment to include
 /*		def includeFragments = new FragmentFinder(arguments)
 				.findFragments(element.getAttributeValue(attributeName))
 
@@ -85,7 +85,7 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
 
 		element.removeAttribute(attributeName)
 		return ProcessorResult.OK
-		 */
-	}
+         */
+    }
 
 }

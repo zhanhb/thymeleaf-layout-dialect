@@ -39,78 +39,78 @@ import org.thymeleaf.templatemode.TemplateMode;
  */
 public class FragmentFinder {
 
-	private final ModelFinder modelFinder;
-	private final String dialectPrefix;
+    private final ModelFinder modelFinder;
+    private final String dialectPrefix;
 
-	/**
-	 * Constructor, create a new fragment finder for the context and template
-	 * mode.
-	 *
-	 * @param context
-	 * @param templateMode
-	 * @param dialectPrefix
-	 */
-	public FragmentFinder(ITemplateContext context, TemplateMode templateMode, String dialectPrefix) {
-		this(new ModelFinder(context, templateMode), dialectPrefix);
-	}
+    /**
+     * Constructor, create a new fragment finder for the context and template
+     * mode.
+     *
+     * @param context
+     * @param templateMode
+     * @param dialectPrefix
+     */
+    public FragmentFinder(ITemplateContext context, TemplateMode templateMode, String dialectPrefix) {
+        this(new ModelFinder(context, templateMode), dialectPrefix);
+    }
 
-	/**
-	 * Constructor, create a new fragment finder using an existing model finder.
-	 *
-	 * @param modelFinder
-	 * @param dialectPrefix
-	 */
-	public FragmentFinder(ModelFinder modelFinder, String dialectPrefix) {
-		this.modelFinder = modelFinder;
-		this.dialectPrefix = dialectPrefix;
-	}
+    /**
+     * Constructor, create a new fragment finder using an existing model finder.
+     *
+     * @param modelFinder
+     * @param dialectPrefix
+     */
+    public FragmentFinder(ModelFinder modelFinder, String dialectPrefix) {
+        this.modelFinder = modelFinder;
+        this.dialectPrefix = dialectPrefix;
+    }
 
-	/**
-	 * Find and return models for layout dialect fragments within the scope of
-	 * the given element, without delving into {@code layout:include} or
-	 * {@code layout:replace} elements, mapped by the name of each fragment.
-	 *
-	 * @param templateName Name of the current template
-	 * @param model Element whose children are to be searched.
-	 * @return Map of fragment names and their elements.
-	 */
-	@SuppressWarnings("unchecked")
-	public Map<String, TemplateModel> findFragments(String templateName, IModel model) {
-		Map<String, TemplateModel> fragments = new LinkedHashMap<>();
+    /**
+     * Find and return models for layout dialect fragments within the scope of
+     * the given element, without delving into {@code layout:include} or
+     * {@code layout:replace} elements, mapped by the name of each fragment.
+     *
+     * @param templateName Name of the current template
+     * @param model Element whose children are to be searched.
+     * @return Map of fragment names and their elements.
+     */
+    @SuppressWarnings("unchecked")
+    public Map<String, TemplateModel> findFragments(String templateName, IModel model) {
+        Map<String, TemplateModel> fragments = new LinkedHashMap<>();
 
-		// TODO: Replace with some way of extracting models from models
-		// NOTE: Using element definitions to match open and close tags, probably
-		//       not going to work...  Other options include counting the level
-		//       we're at.
-		ElementDefinition[] insideLayoutElementDefinition = {null};
+        // TODO: Replace with some way of extracting models from models
+        // NOTE: Using element definitions to match open and close tags, probably
+        //       not going to work...  Other options include counting the level
+        //       we're at.
+        ElementDefinition[] insideLayoutElementDefinition = {null};
 
-		MetaClass.each(model, e -> {
-			if (e instanceof IOpenElementTag) {
-				IOpenElementTag event = (IOpenElementTag) e;
-				if (insideLayoutElementDefinition[0] == null) {
-					IAttribute fragmentAttribute = event.getAttribute(dialectPrefix, FragmentProcessor.PROCESSOR_NAME);
-					if (fragmentAttribute != null) {
-						String fragmentName = fragmentAttribute.getValue();
-						((Map) fragments).put(fragmentName, modelFinder.findFragment(templateName, fragmentName, dialectPrefix));
-					}
-					if (isLayoutElement(event)) {
-						insideLayoutElementDefinition[0] = event.getElementDefinition();
-					}
-				}
-			} else if (e instanceof ICloseElementTag) {
-				ICloseElementTag event = (ICloseElementTag) e;
-				if (insideLayoutElementDefinition[0] == event.getElementDefinition()) {
-					insideLayoutElementDefinition[0] = null;
-				}
-			}
-		});
+        MetaClass.each(model, e -> {
+            if (e instanceof IOpenElementTag) {
+                IOpenElementTag event = (IOpenElementTag) e;
+                if (insideLayoutElementDefinition[0] == null) {
+                    IAttribute fragmentAttribute = event.getAttribute(dialectPrefix, FragmentProcessor.PROCESSOR_NAME);
+                    if (fragmentAttribute != null) {
+                        String fragmentName = fragmentAttribute.getValue();
+                        ((Map) fragments).put(fragmentName, modelFinder.findFragment(templateName, fragmentName, dialectPrefix));
+                    }
+                    if (isLayoutElement(event)) {
+                        insideLayoutElementDefinition[0] = event.getElementDefinition();
+                    }
+                }
+            } else if (e instanceof ICloseElementTag) {
+                ICloseElementTag event = (ICloseElementTag) e;
+                if (insideLayoutElementDefinition[0] == event.getElementDefinition()) {
+                    insideLayoutElementDefinition[0] = null;
+                }
+            }
+        });
 
-		return fragments;
-	}
+        return fragments;
+    }
 
-	private boolean isLayoutElement(IProcessableElementTag elementTag) {
-		return elementTag.hasAttribute(dialectPrefix, IncludeProcessor.PROCESSOR_NAME)
-				|| elementTag.hasAttribute(dialectPrefix, ReplaceProcessor.PROCESSOR_NAME);
-	}
+    private boolean isLayoutElement(IProcessableElementTag elementTag) {
+        return elementTag.hasAttribute(dialectPrefix, IncludeProcessor.PROCESSOR_NAME)
+                || elementTag.hasAttribute(dialectPrefix, ReplaceProcessor.PROCESSOR_NAME);
+    }
 
 }

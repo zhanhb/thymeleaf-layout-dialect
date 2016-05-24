@@ -30,29 +30,29 @@ import org.thymeleaf.model.IOpenElementTag;
  */
 public class XmlDocumentDecorator implements Decorator {
 
-	protected final IModelFactory modelFactory;
-	protected final ModelFinder modelFinder;
+    protected final IModelFactory modelFactory;
+    protected final ModelFinder modelFinder;
 
-	/**
-	 * Constructor, set up the document decorator context.
-	 *
-	 * @param modelFactory
-	 * @param modelFinder
-	 */
-	public XmlDocumentDecorator(IModelFactory modelFactory, ModelFinder modelFinder) {
-		this.modelFactory = modelFactory;
-		this.modelFinder = modelFinder;
-	}
+    /**
+     * Constructor, set up the document decorator context.
+     *
+     * @param modelFactory
+     * @param modelFinder
+     */
+    public XmlDocumentDecorator(IModelFactory modelFactory, ModelFinder modelFinder) {
+        this.modelFactory = modelFactory;
+        this.modelFinder = modelFinder;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void decorate(IModel targetDocumentModel, String targetDocumentTemplate,
-			IModel sourceDocumentModel, String sourceDocumentTemplate) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void decorate(IModel targetDocumentModel, String targetDocumentTemplate,
+            IModel sourceDocumentModel, String sourceDocumentTemplate) {
 
-		// TODO
-		// Copy text outside of the root element, keeping whitespace copied to a minimum
+        // TODO
+        // Copy text outside of the root element, keeping whitespace copied to a minimum
 //		def beforeHtml = true
 //		def allowNext = false
 //		def lastNode = contentXml
@@ -73,14 +73,14 @@ public class XmlDocumentDecorator implements Decorator {
 //				allowNext = externalNode instanceof Comment
 //			}
 //		}
-		// Find the root element of the target document to merge
-		// TODO: Way of obtaining a model from within a model
-		IOpenElementTag targetDocumentRootElement = (IOpenElementTag) MetaClass.find(sourceDocumentModel, targetDocumentEvent -> targetDocumentEvent instanceof IOpenElementTag);
-		IModel targetDocumentRootModel = modelFinder.find(targetDocumentTemplate, targetDocumentRootElement.getElementCompleteName());
+        // Find the root element of the target document to merge
+        // TODO: Way of obtaining a model from within a model
+        IOpenElementTag targetDocumentRootElement = (IOpenElementTag) MetaClass.find(sourceDocumentModel, targetDocumentEvent -> targetDocumentEvent instanceof IOpenElementTag);
+        IModel targetDocumentRootModel = modelFinder.find(targetDocumentTemplate, targetDocumentRootElement.getElementCompleteName());
 
-		// Bring the decorator into the content page (which is the one being processed)
-		new AttributeMerger(modelFactory).merge(targetDocumentRootModel, sourceDocumentModel);
-		MetaClass.replaceModel(targetDocumentModel, targetDocumentRootModel);
-	}
+        // Bring the decorator into the content page (which is the one being processed)
+        new AttributeMerger(modelFactory).merge(targetDocumentRootModel, sourceDocumentModel);
+        MetaClass.replaceModel(targetDocumentModel, targetDocumentRootModel);
+    }
 
 }

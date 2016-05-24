@@ -30,33 +30,33 @@ import org.thymeleaf.processor.element.IElementModelStructureHandler;
 @SuppressWarnings({"serial", "CloneableImplementsClone"})
 public class FragmentMap extends HashMap<String, IModel> {
 
-	private static final String FRAGMENT_COLLECTION_KEY = "LayoutDialect::FragmentCollection";
+    private static final String FRAGMENT_COLLECTION_KEY = "LayoutDialect::FragmentCollection";
 
-	/**
-	 * Retrieves either the fragment map for the current context, or a new
-	 * fragment map.
-	 *
-	 * @param context
-	 * @return A new or existing fragment collection for the context.
-	 */
-	public static FragmentMap get(IContext context) {
-		Object variable = context.getVariable(FRAGMENT_COLLECTION_KEY);
-		return variable != null ? (FragmentMap) variable : new FragmentMap();
-	}
+    /**
+     * Retrieves either the fragment map for the current context, or a new
+     * fragment map.
+     *
+     * @param context
+     * @return A new or existing fragment collection for the context.
+     */
+    public static FragmentMap get(IContext context) {
+        Object variable = context.getVariable(FRAGMENT_COLLECTION_KEY);
+        return variable != null ? (FragmentMap) variable : new FragmentMap();
+    }
 
-	/**
-	 * Set the fragment collection to contain whatever it initially had, plus
-	 * the given fragments, just for the scope of the current node.
-	 *
-	 * @param context
-	 * @param structureHandler
-	 * @param fragments The new fragments to add to the map.
-	 */
-	public static void setForNode(IContext context, IElementModelStructureHandler structureHandler,
-			Map<String, IModel> fragments) {
-		FragmentMap fragmentMap = get(context);
-		fragmentMap.putAll(fragments);
-		structureHandler.setLocalVariable(FRAGMENT_COLLECTION_KEY, fragmentMap);
-	}
+    /**
+     * Set the fragment collection to contain whatever it initially had, plus
+     * the given fragments, just for the scope of the current node.
+     *
+     * @param context
+     * @param structureHandler
+     * @param fragments The new fragments to add to the map.
+     */
+    public static void setForNode(IContext context, IElementModelStructureHandler structureHandler,
+            Map<String, IModel> fragments) {
+        FragmentMap fragmentMap = get(context);
+        fragmentMap.putAll(fragments);
+        structureHandler.setLocalVariable(FRAGMENT_COLLECTION_KEY, fragmentMap);
+    }
 
 }

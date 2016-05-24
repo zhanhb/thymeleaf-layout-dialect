@@ -27,36 +27,36 @@ import org.thymeleaf.model.IModelFactory;
  */
 public class HtmlBodyDecorator extends XmlElementDecorator {
 
-	/**
-	 * Constructor, sets up the element decorator context.
-	 *
-	 * @param modelFactory
-	 */
-	public HtmlBodyDecorator(IModelFactory modelFactory) {
-		super(modelFactory);
-	}
+    /**
+     * Constructor, sets up the element decorator context.
+     *
+     * @param modelFactory
+     */
+    public HtmlBodyDecorator(IModelFactory modelFactory) {
+        super(modelFactory);
+    }
 
-	/**
-	 * Decorate the {@code <body>} part.
-	 *
-	 * @param targetBodyModel
-	 * @param targetBodyTemplate
-	 * @param sourceBodyModel
-	 * @param sourceBodyTemplate
-	 */
-	@Override
-	public void decorate(IModel targetBodyModel, String targetBodyTemplate,
-			IModel sourceBodyModel, String sourceBodyTemplate) {
+    /**
+     * Decorate the {@code <body>} part.
+     *
+     * @param targetBodyModel
+     * @param targetBodyTemplate
+     * @param sourceBodyModel
+     * @param sourceBodyTemplate
+     */
+    @Override
+    public void decorate(IModel targetBodyModel, String targetBodyTemplate,
+            IModel sourceBodyModel, String sourceBodyTemplate) {
 
-		// Try to ensure there is a body as a result of decoration, applying the
-		// source body, or just using what is in the target
-		if (MetaClass.asBoolean(sourceBodyModel)) {
-			if (MetaClass.asBoolean(targetBodyModel)) {
-				super.decorate(targetBodyModel, targetBodyTemplate, sourceBodyModel, sourceBodyTemplate);
-			} else {
-				MetaClass.replaceModel(targetBodyModel, sourceBodyModel);
-			}
-		}
-	}
+        // Try to ensure there is a body as a result of decoration, applying the
+        // source body, or just using what is in the target
+        if (MetaClass.asBoolean(sourceBodyModel)) {
+            if (MetaClass.asBoolean(targetBodyModel)) {
+                super.decorate(targetBodyModel, targetBodyTemplate, sourceBodyModel, sourceBodyTemplate);
+            } else {
+                MetaClass.replaceModel(targetBodyModel, sourceBodyModel);
+            }
+        }
+    }
 
 }

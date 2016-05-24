@@ -25,12 +25,12 @@ import org.thymeleaf.model.IModel;
  */
 public interface ModelMerger {
 
-	/**
-	 * Merge the source model into the target model.
-	 *
-	 * @param targetModel
-	 * @param sourceModel
-	 */
-	void merge(IModel targetModel, IModel sourceModel);
+    /**
+     * Merge the source model into the target model.
+     *
+     * @param targetModel
+     * @param sourceModel
+     */
+    void merge(IModel targetModel, IModel sourceModel);
 
 }

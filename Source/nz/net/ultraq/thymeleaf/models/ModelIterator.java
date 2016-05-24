@@ -29,53 +29,53 @@ import org.thymeleaf.model.IModel;
  */
 public class ModelIterator implements Iterator<IModel> {
 
-	private final IModel model;
+    private final IModel model;
 
-	private int currentIndex = 1;  // Starts after the root element
+    private int currentIndex = 1;  // Starts after the root element
 
-	/**
-	 * Constructor, sets the model to iterate over.
-	 *
-	 * @param model
-	 */
-	public ModelIterator(IModel model) {
-		this.model = model;
-	}
+    /**
+     * Constructor, sets the model to iterate over.
+     *
+     * @param model
+     */
+    public ModelIterator(IModel model) {
+        this.model = model;
+    }
 
-	/**
-	 * Returns whether or not there is another sub-model to be retrieved.
-	 *
-	 * @return {@code true} if there are more events to process as models.
-	 */
-	@Override
-	public boolean hasNext() {
-		return currentIndex < (model.size() - 1);
-	}
+    /**
+     * Returns whether or not there is another sub-model to be retrieved.
+     *
+     * @return {@code true} if there are more events to process as models.
+     */
+    @Override
+    public boolean hasNext() {
+        return currentIndex < (model.size() - 1);
+    }
 
-	/**
-	 * Returns the next immediate child model of this model.
-	 *
-	 * @return The next model in the iteration.
-	 */
-	@Override
-	public IModel next() {
-		IModel subModel = MetaClass.getModel(model, currentIndex);
+    /**
+     * Returns the next immediate child model of this model.
+     *
+     * @return The next model in the iteration.
+     */
+    @Override
+    public IModel next() {
+        IModel subModel = MetaClass.getModel(model, currentIndex);
 
-		// TODO MetaClass.setStartIndex(subModel, currentIndex);
-		currentIndex += subModel.size();
-		MetaClass.setEndIndex(subModel, currentIndex);
+        // TODO MetaClass.setStartIndex(subModel, currentIndex);
+        currentIndex += subModel.size();
+        MetaClass.setEndIndex(subModel, currentIndex);
 
-		return subModel;
-	}
+        return subModel;
+    }
 
-	/**
-	 * Not applicable for this iterator.
-	 *
-	 * @throws UnsupportedOperationException
-	 */
-	@Override
-	public void remove() {
-		throw new UnsupportedOperationException();
-	}
+    /**
+     * Not applicable for this iterator.
+     *
+     * @throws UnsupportedOperationException
+     */
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException();
+    }
 
 }

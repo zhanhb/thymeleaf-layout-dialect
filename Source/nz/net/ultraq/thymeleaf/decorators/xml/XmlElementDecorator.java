@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nz.net.ultraq.thymeleaf.decorators.xml;
 
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
@@ -23,39 +22,39 @@ import org.thymeleaf.model.IModelFactory;
 
 /**
  * A decorator made to work over a Thymeleaf event/element.
- * 
+ *
  * TODO: I'm thinking this file is very redundant, given it's just an attribute
- *       merger.  See if I can delete this file and we use that instead.
- * 
+ * merger. See if I can delete this file and we use that instead.
+ *
  * @author Emanuel Rabina
  */
 public class XmlElementDecorator implements Decorator {
 
-	protected final IModelFactory modelFactory;
+    protected final IModelFactory modelFactory;
 
-	/**
-	 * Constructor, sets up the element decorator context.
-	 * 
-	 * @param modelFactory
-	 */
-	public XmlElementDecorator(IModelFactory modelFactory) {
-		this.modelFactory = modelFactory;
-	}
+    /**
+     * Constructor, sets up the element decorator context.
+     *
+     * @param modelFactory
+     */
+    public XmlElementDecorator(IModelFactory modelFactory) {
+        this.modelFactory = modelFactory;
+    }
 
-	/**
-	 * Decorates the target element with the source element.  This step only
-	 * merges the element attributes.  The body decoration is handled later on by
-	 * fragment processors.
-	 * 
-	 * @param targetElementModel
-	 * @param targetElementTemplate
-	 * @param sourceElementModel
-	 * @param sourceElementTemplate
-	 */
-	@Override
-	public void decorate(IModel targetElementModel, String targetElementTemplate,
-		IModel sourceElementModel, String sourceElementTemplate) {
-		new AttributeMerger(modelFactory).merge(targetElementModel, sourceElementModel);
-	}
+    /**
+     * Decorates the target element with the source element. This step only
+     * merges the element attributes. The body decoration is handled later on by
+     * fragment processors.
+     *
+     * @param targetElementModel
+     * @param targetElementTemplate
+     * @param sourceElementModel
+     * @param sourceElementTemplate
+     */
+    @Override
+    public void decorate(IModel targetElementModel, String targetElementTemplate,
+            IModel sourceElementModel, String sourceElementTemplate) {
+        new AttributeMerger(modelFactory).merge(targetElementModel, sourceElementModel);
+    }
 
 }

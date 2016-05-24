@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nz.net.ultraq.thymeleaf.expressions;
 
 import org.thymeleaf.context.ITemplateContext;
@@ -21,36 +20,36 @@ import org.thymeleaf.standard.expression.StandardExpressions;
 
 /**
  * Simple utility that hides the Thymeleaf scaffolding required to process
- * (parse and execute) an expression.  Used for the very basic expressions used
+ * (parse and execute) an expression. Used for the very basic expressions used
  * with the layout dialect that always result in a template or fragment name.
- * 
+ *
  * @author Emanuel Rabina
  */
 public class ExpressionProcessor {
 
-	private final ITemplateContext context;
+    private final ITemplateContext context;
 
-	/**
-	 * Constructor, sets the execution context.
-	 * 
-	 * @param context
-	 */
-	public ExpressionProcessor(ITemplateContext context) {
-		this.context = context;
-	}
+    /**
+     * Constructor, sets the execution context.
+     *
+     * @param context
+     */
+    public ExpressionProcessor(ITemplateContext context) {
+        this.context = context;
+    }
 
-	/**
-	 * Process an expression given to the layout dialect, returning the string
-	 * that names a template or a fragment.
-	 * 
-	 * @param expression
-	 * @return Template or fragment name string.
-	 */
-	public String process(String expression) {
-		return StandardExpressions.getExpressionParser(context.getConfiguration())
-			.parseExpression(context, expression)
-			.execute(context)
-			.toString();
-	}
+    /**
+     * Process an expression given to the layout dialect, returning the string
+     * that names a template or a fragment.
+     *
+     * @param expression
+     * @return Template or fragment name string.
+     */
+    public String process(String expression) {
+        return StandardExpressions.getExpressionParser(context.getConfiguration())
+                .parseExpression(context, expression)
+                .execute(context)
+                .toString();
+    }
 
 }

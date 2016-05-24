@@ -26,37 +26,37 @@ import org.thymeleaf.model.IModelFactory;
  */
 public class ElementMerger implements ModelMerger {
 
-	private final IModelFactory modelFactory;
+    private final IModelFactory modelFactory;
 
-	/**
-	 * Constructor, sets up the attribute merger tools.
-	 *
-	 * @param modelFactory
-	 */
-	public ElementMerger(IModelFactory modelFactory) {
-		this.modelFactory = modelFactory;
-	}
+    /**
+     * Constructor, sets up the attribute merger tools.
+     *
+     * @param modelFactory
+     */
+    public ElementMerger(IModelFactory modelFactory) {
+        this.modelFactory = modelFactory;
+    }
 
-	/**
-	 * Replace the content of the target element, with the content of the source
-	 * element.
-	 *
-	 * @param targetModel
-	 * @param sourceModel
-	 */
-	@Override
-	public void merge(IModel targetModel, IModel sourceModel) {
-		// Because we're basically replacing targetModel with sourceModel, we'll
-		// lose the attributes in the target.  So, create a copy of those attributes
-		// for that merge after.
-		IModel targetInitialRootElement = modelFactory.createModel(targetModel.get(0));
+    /**
+     * Replace the content of the target element, with the content of the source
+     * element.
+     *
+     * @param targetModel
+     * @param sourceModel
+     */
+    @Override
+    public void merge(IModel targetModel, IModel sourceModel) {
+        // Because we're basically replacing targetModel with sourceModel, we'll
+        // lose the attributes in the target.  So, create a copy of those attributes
+        // for that merge after.
+        IModel targetInitialRootElement = modelFactory.createModel(targetModel.get(0));
 
-		// TODO: Shouldn't all this be done with the structureHandler?  I should
-		//       make another code branch that does that, and then I can compare.
-		// Replace the target model with the source model
-		MetaClass.replaceModel(targetModel, sourceModel);
+        // TODO: Shouldn't all this be done with the structureHandler?  I should
+        //       make another code branch that does that, and then I can compare.
+        // Replace the target model with the source model
+        MetaClass.replaceModel(targetModel, sourceModel);
 
-		new AttributeMerger(modelFactory).merge(targetModel, targetInitialRootElement);
-	}
+        new AttributeMerger(modelFactory).merge(targetModel, targetInitialRootElement);
+    }
 
 }

@@ -27,15 +27,15 @@ import org.thymeleaf.model.IModel;
  */
 public class AppendingStrategy implements SortingStrategy {
 
-	/**
-	 * Returns the position at the end of the {@code <head>} section.
-	 *
-	 * @param headModel
-	 * @return The end of the head model.
-	 */
-	@Override
-	public int findPositionForModel(IModel headModel, IModel childModel) {
-		return !MetaClass.isWhitespace(childModel) ? headModel.size() - 2 : -1;
-	}
+    /**
+     * Returns the position at the end of the {@code <head>} section.
+     *
+     * @param headModel
+     * @return The end of the head model.
+     */
+    @Override
+    public int findPositionForModel(IModel headModel, IModel childModel) {
+        return !MetaClass.isWhitespace(childModel) ? headModel.size() - 2 : -1;
+    }
 
 }

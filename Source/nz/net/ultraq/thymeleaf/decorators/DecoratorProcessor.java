@@ -45,89 +45,89 @@ import org.thymeleaf.templatemode.TemplateMode;
  */
 public class DecoratorProcessor extends AbstractAttributeModelProcessor {
 
-	public static final String PROCESSOR_NAME = "decorator";
-	public static final int PROCESSOR_PRECEDENCE = 0;
+    public static final String PROCESSOR_NAME = "decorator";
+    public static final int PROCESSOR_PRECEDENCE = 0;
 
-	private final SortingStrategy sortingStrategy;
+    private final SortingStrategy sortingStrategy;
 
-	/**
-	 * Constructor, configure this processor to work on the 'decorator'
-	 * attribute and to use the given sorting strategy.
-	 *
-	 * @param templateMode
-	 * @param dialectPrefix
-	 * @param sortingStrategy
-	 */
-	public DecoratorProcessor(TemplateMode templateMode, String dialectPrefix, SortingStrategy sortingStrategy) {
-		super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);
+    /**
+     * Constructor, configure this processor to work on the 'decorator'
+     * attribute and to use the given sorting strategy.
+     *
+     * @param templateMode
+     * @param dialectPrefix
+     * @param sortingStrategy
+     */
+    public DecoratorProcessor(TemplateMode templateMode, String dialectPrefix, SortingStrategy sortingStrategy) {
+        super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);
 
-		this.sortingStrategy = sortingStrategy;
-	}
+        this.sortingStrategy = sortingStrategy;
+    }
 
-	/**
-	 * Locates the decorator page specified by the layout attribute and applies
-	 * it to the current page being processed.
-	 *
-	 * @param context
-	 * @param model
-	 * @param attributeName
-	 * @param attributeValue
-	 * @param structureHandler
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
-			String attributeValue, IElementModelStructureHandler structureHandler) {
+    /**
+     * Locates the decorator page specified by the layout attribute and applies
+     * it to the current page being processed.
+     *
+     * @param context
+     * @param model
+     * @param attributeName
+     * @param attributeValue
+     * @param structureHandler
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
+            String attributeValue, IElementModelStructureHandler structureHandler) {
 
-		// Ensure the decorator attribute is in the root element of the document
-		if (context.getElementStack().size() != 1) {
-			throw new IllegalArgumentException("layout:decorator attribute must appear in the root element of your template");
-		}
+        // Ensure the decorator attribute is in the root element of the document
+        if (context.getElementStack().size() != 1) {
+            throw new IllegalArgumentException("layout:decorator attribute must appear in the root element of your template");
+        }
 
-		IModelFactory modelFactory = context.getModelFactory();
-		String contentTemplateName = context.getTemplateData().getTemplate();
-		String decoratorTemplateName = new ExpressionProcessor(context).process(attributeValue);
+        IModelFactory modelFactory = context.getModelFactory();
+        String contentTemplateName = context.getTemplateData().getTemplate();
+        String decoratorTemplateName = new ExpressionProcessor(context).process(attributeValue);
 
-		// Locate the template to 'redirect' processing to by completely replacing
-		// the current document with it
-		ModelFinder modelFinder = new ModelFinder(context, getTemplateMode());
-		IModel decoratorTemplate = modelFinder.findTemplate(decoratorTemplateName);
+        // Locate the template to 'redirect' processing to by completely replacing
+        // the current document with it
+        ModelFinder modelFinder = new ModelFinder(context, getTemplateMode());
+        IModel decoratorTemplate = modelFinder.findTemplate(decoratorTemplateName);
 
-		// Gather all fragment parts from this page to apply to the new document
-		// after decoration has taken place
-		Map<String, TemplateModel> pageFragments = new FragmentFinder(modelFinder, getDialectPrefix())
-				.findFragments(contentTemplateName, model);
+        // Gather all fragment parts from this page to apply to the new document
+        // after decoration has taken place
+        Map<String, TemplateModel> pageFragments = new FragmentFinder(modelFinder, getDialectPrefix())
+                .findFragments(contentTemplateName, model);
 
-		// Choose the decorator to use based on template mode, then apply it
-		Decorator decorator
-				= getTemplateMode() == TemplateMode.HTML ? new HtmlDocumentDecorator(modelFactory, modelFinder, sortingStrategy)
-						: getTemplateMode() == TemplateMode.XML ? new XmlDocumentDecorator(modelFactory, modelFinder)
-								: null;
-		if (decorator == null) {
-			throw new IllegalArgumentException("Layout dialect cannot be applied to the " + getTemplateMode() + " template mode, "
-					+ "only HTML and XML template modes are currently supported ");
-		}
-		decorator.decorate(decoratorTemplate, decoratorTemplateName, model, contentTemplateName);
+        // Choose the decorator to use based on template mode, then apply it
+        Decorator decorator
+                = getTemplateMode() == TemplateMode.HTML ? new HtmlDocumentDecorator(modelFactory, modelFinder, sortingStrategy)
+                        : getTemplateMode() == TemplateMode.XML ? new XmlDocumentDecorator(modelFactory, modelFinder)
+                                : null;
+        if (decorator == null) {
+            throw new IllegalArgumentException("Layout dialect cannot be applied to the " + getTemplateMode() + " template mode, "
+                    + "only HTML and XML template modes are currently supported ");
+        }
+        decorator.decorate(decoratorTemplate, decoratorTemplateName, model, contentTemplateName);
 
-		// TODO: The modified decorator template includes anything outside the root
-		//       element, which we don't want for the next step.  Strip those events
-		//       out for now,  but for future I should find a better way to merge
-		//       documents.
-		while (!(MetaClass.first(decoratorTemplate) instanceof IOpenElementTag)) {
-			MetaClass.removeFirst(decoratorTemplate);
-		}
-		while (!(MetaClass.last(decoratorTemplate) instanceof ICloseElementTag)) {
-			MetaClass.removeLast(decoratorTemplate);
-		}
+        // TODO: The modified decorator template includes anything outside the root
+        //       element, which we don't want for the next step.  Strip those events
+        //       out for now,  but for future I should find a better way to merge
+        //       documents.
+        while (!(MetaClass.first(decoratorTemplate) instanceof IOpenElementTag)) {
+            MetaClass.removeFirst(decoratorTemplate);
+        }
+        while (!(MetaClass.last(decoratorTemplate) instanceof ICloseElementTag)) {
+            MetaClass.removeLast(decoratorTemplate);
+        }
 
-		// TODO: Should probably return a new object so this doesn't look so
-		//       confusing, ie: why am I changing the source model when it's the
-		//       decorator model we are targeting???  See the point about
-		//       immutability in https://github.com/ultraq/thymeleaf-layout-dialect/issues/102
-		MetaClass.replaceModel(model, decoratorTemplate);
+        // TODO: Should probably return a new object so this doesn't look so
+        //       confusing, ie: why am I changing the source model when it's the
+        //       decorator model we are targeting???  See the point about
+        //       immutability in https://github.com/ultraq/thymeleaf-layout-dialect/issues/102
+        MetaClass.replaceModel(model, decoratorTemplate);
 
-		// Save layout fragments for use later by layout:fragment processors
-		FragmentMap.setForNode(context, structureHandler, (Map) pageFragments);
-	}
+        // Save layout fragments for use later by layout:fragment processors
+        FragmentMap.setForNode(context, structureHandler, (Map) pageFragments);
+    }
 
 }

@@ -32,55 +32,55 @@ import org.thymeleaf.standard.processor.StandardWithTagProcessor;
  */
 public class AttributeMerger implements ModelMerger {
 
-	private final IModelFactory modelFactory;
+    private final IModelFactory modelFactory;
 
-	/**
-	 * Constructor, sets up the attribute merger tools.
-	 *
-	 * @param modelFactory
-	 */
-	public AttributeMerger(IModelFactory modelFactory) {
-		this.modelFactory = modelFactory;
-	}
+    /**
+     * Constructor, sets up the attribute merger tools.
+     *
+     * @param modelFactory
+     */
+    public AttributeMerger(IModelFactory modelFactory) {
+        this.modelFactory = modelFactory;
+    }
 
-	/**
-	 * Merge the attributes of the source element with those of the target
-	 * element. This is basically a copy of all attributes in the source model
-	 * with those in the target model, overwriting any attributes that have the
-	 * same name, except for the case of {@code th:with} where variable
-	 * declarations are preserved, only overwriting same-named declarations.
-	 *
-	 * @param sourceModel
-	 * @param targetModel
-	 */
-	@Override
-	public void merge(IModel targetModel, IModel sourceModel) {
-		if (!MetaClass.asBoolean(targetModel) || !MetaClass.asBoolean(sourceModel)) {
-			return;
-		}
+    /**
+     * Merge the attributes of the source element with those of the target
+     * element. This is basically a copy of all attributes in the source model
+     * with those in the target model, overwriting any attributes that have the
+     * same name, except for the case of {@code th:with} where variable
+     * declarations are preserved, only overwriting same-named declarations.
+     *
+     * @param sourceModel
+     * @param targetModel
+     */
+    @Override
+    public void merge(IModel targetModel, IModel sourceModel) {
+        if (!MetaClass.asBoolean(targetModel) || !MetaClass.asBoolean(sourceModel)) {
+            return;
+        }
 
-		// Merge attributes from the source model's root event to the target model's root event
-		Arrays.stream(((IProcessableElementTag) sourceModel.get(0)).getAllAttributes())
-				// Don't include layout:fragment processors
-				.filter(sourceAttribute -> {
-					return !MetaClass.equalsName(sourceAttribute, LayoutDialect.DIALECT_PREFIX, FragmentProcessor.PROCESSOR_NAME);
-				})
-				.forEach(sourceAttribute -> {
-					IProcessableElementTag targetEvent = (IProcessableElementTag) targetModel.get(0);
-					String mergedAttributeValue;
+        // Merge attributes from the source model's root event to the target model's root event
+        Arrays.stream(((IProcessableElementTag) sourceModel.get(0)).getAllAttributes())
+                // Don't include layout:fragment processors
+                .filter(sourceAttribute -> {
+                    return !MetaClass.equalsName(sourceAttribute, LayoutDialect.DIALECT_PREFIX, FragmentProcessor.PROCESSOR_NAME);
+                })
+                .forEach(sourceAttribute -> {
+                    IProcessableElementTag targetEvent = (IProcessableElementTag) targetModel.get(0);
+                    String mergedAttributeValue;
 
-					// Merge th:with attributes
-					if (MetaClass.equalsName(sourceAttribute, StandardDialect.PREFIX, StandardWithTagProcessor.ATTR_NAME)) {
-						mergedAttributeValue = new VariableDeclarationMerger().merge(sourceAttribute.getValue(),
-								targetEvent.getAttributeValue(StandardDialect.PREFIX, StandardWithTagProcessor.ATTR_NAME));
-					} else { // Copy every other attribute straight
-						mergedAttributeValue = sourceAttribute.getValue();
-					}
+                    // Merge th:with attributes
+                    if (MetaClass.equalsName(sourceAttribute, StandardDialect.PREFIX, StandardWithTagProcessor.ATTR_NAME)) {
+                        mergedAttributeValue = new VariableDeclarationMerger().merge(sourceAttribute.getValue(),
+                                targetEvent.getAttributeValue(StandardDialect.PREFIX, StandardWithTagProcessor.ATTR_NAME));
+                    } else { // Copy every other attribute straight
+                        mergedAttributeValue = sourceAttribute.getValue();
+                    }
 
-					targetModel.replace(0, modelFactory.replaceAttribute(targetEvent,
-							MetaClass.getAttributeName(sourceAttribute), sourceAttribute.getAttributeCompleteName(),
-							mergedAttributeValue));
-				});
-	}
+                    targetModel.replace(0, modelFactory.replaceAttribute(targetEvent,
+                            MetaClass.getAttributeName(sourceAttribute), sourceAttribute.getAttributeCompleteName(),
+                            mergedAttributeValue));
+                });
+    }
 
 }

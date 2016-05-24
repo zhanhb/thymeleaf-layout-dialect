@@ -31,60 +31,60 @@ import org.thymeleaf.model.ITemplateEvent;
  */
 public class HtmlHeadDecorator extends XmlElementDecorator {
 
-	private final SortingStrategy sortingStrategy;
+    private final SortingStrategy sortingStrategy;
 
-	/**
-	 * Constructor, sets up the element decorator context.
-	 *
-	 * @param modelFactory
-	 * @param sortingStrategy
-	 */
-	public HtmlHeadDecorator(IModelFactory modelFactory, SortingStrategy sortingStrategy) {
-		super(modelFactory);
-		this.sortingStrategy = sortingStrategy;
-	}
+    /**
+     * Constructor, sets up the element decorator context.
+     *
+     * @param modelFactory
+     * @param sortingStrategy
+     */
+    public HtmlHeadDecorator(IModelFactory modelFactory, SortingStrategy sortingStrategy) {
+        super(modelFactory);
+        this.sortingStrategy = sortingStrategy;
+    }
 
-	/**
-	 * Decorate the {@code <head>} part.
-	 *
-	 * @param targetHeadModel
-	 * @param targetHeadTemplate
-	 * @param sourceHeadModel
-	 * @param sourceHeadTemplate
-	 */
-	@Override
-	public void decorate(IModel targetHeadModel, String targetHeadTemplate,
-			IModel sourceHeadModel, String sourceHeadTemplate) {
+    /**
+     * Decorate the {@code <head>} part.
+     *
+     * @param targetHeadModel
+     * @param targetHeadTemplate
+     * @param sourceHeadModel
+     * @param sourceHeadTemplate
+     */
+    @Override
+    public void decorate(IModel targetHeadModel, String targetHeadTemplate,
+            IModel sourceHeadModel, String sourceHeadTemplate) {
 
-		// Try to ensure there is a head as a result of decoration, applying the
-		// source head, or just using what is in the target
-		if (!MetaClass.asBoolean(targetHeadModel)) {
-			if (MetaClass.asBoolean(sourceHeadModel)) {
-				MetaClass.replaceModel(targetHeadModel, sourceHeadModel);
-			}
-			return;
-		}
+        // Try to ensure there is a head as a result of decoration, applying the
+        // source head, or just using what is in the target
+        if (!MetaClass.asBoolean(targetHeadModel)) {
+            if (MetaClass.asBoolean(sourceHeadModel)) {
+                MetaClass.replaceModel(targetHeadModel, sourceHeadModel);
+            }
+            return;
+        }
 
-		// Replace the target title with the source one if present
-		Predicate<ITemplateEvent> titleEventIndexFinder = event -> {
-			return event instanceof IOpenElementTag && "title".equals(((IOpenElementTag) event).getElementCompleteName());
-		};
+        // Replace the target title with the source one if present
+        Predicate<ITemplateEvent> titleEventIndexFinder = event -> {
+            return event instanceof IOpenElementTag && "title".equals(((IOpenElementTag) event).getElementCompleteName());
+        };
 
-		IModel sourceTitle;
-		int sourceTitleIndex = MetaClass.findIndexOf(sourceHeadModel, titleEventIndexFinder);
-		if (sourceTitleIndex != -1) {
-			sourceTitle = MetaClass.getModel(sourceHeadModel, sourceTitleIndex);
-			MetaClass.removeModelWithWhitespace(sourceHeadModel, sourceTitleIndex);
+        IModel sourceTitle;
+        int sourceTitleIndex = MetaClass.findIndexOf(sourceHeadModel, titleEventIndexFinder);
+        if (sourceTitleIndex != -1) {
+            sourceTitle = MetaClass.getModel(sourceHeadModel, sourceTitleIndex);
+            MetaClass.removeModelWithWhitespace(sourceHeadModel, sourceTitleIndex);
 
-			int targetTitleIndex = MetaClass.findIndexOf(targetHeadModel, titleEventIndexFinder);
-			if (targetTitleIndex != -1) {
-				MetaClass.removeModelWithWhitespace(targetHeadModel, targetTitleIndex);
-			}
+            int targetTitleIndex = MetaClass.findIndexOf(targetHeadModel, titleEventIndexFinder);
+            if (targetTitleIndex != -1) {
+                MetaClass.removeModelWithWhitespace(targetHeadModel, targetTitleIndex);
+            }
 
-			MetaClass.insertModelWithWhitespace(targetHeadModel, 1, sourceTitle);
-		}
+            MetaClass.insertModelWithWhitespace(targetHeadModel, 1, sourceTitle);
+        }
 
-		// TODO: complicated title replacement
+        // TODO: complicated title replacement
 /*
 		// Copy the content and decorator <title>s
 		// TODO: Surely the code below can be simplified?  The 2 conditional
@@ -117,20 +117,20 @@ public class HtmlHeadDecorator extends XmlElementDecorator {
 		def resultTitle = new Element('title')
 		resultTitle.setAttribute("${DIALECT_PREFIX_LAYOUT}:${PROCESSOR_NAME}", titlePattern)
 		titleContainer.addChild(resultTitle)
-		 */
-		// Merge the source <head> elements with the target <head> elements using
-		// the current merging strategy, placing the resulting title at the
-		// beginning of it
-		if (MetaClass.asBoolean(sourceHeadModel)) {
-			MetaClass.modelIterator(sourceHeadModel).forEachRemaining(sourceHeadSubModel -> {
-				int position = sortingStrategy.findPositionForModel(targetHeadModel, sourceHeadSubModel);
-				if (position != -1) {
-					MetaClass.insertModelWithWhitespace(targetHeadModel, position, sourceHeadSubModel);
-				}
-			});
-		}
+         */
+        // Merge the source <head> elements with the target <head> elements using
+        // the current merging strategy, placing the resulting title at the
+        // beginning of it
+        if (MetaClass.asBoolean(sourceHeadModel)) {
+            MetaClass.modelIterator(sourceHeadModel).forEachRemaining(sourceHeadSubModel -> {
+                int position = sortingStrategy.findPositionForModel(targetHeadModel, sourceHeadSubModel);
+                if (position != -1) {
+                    MetaClass.insertModelWithWhitespace(targetHeadModel, position, sourceHeadSubModel);
+                }
+            });
+        }
 
-		super.decorate(targetHeadModel, targetHeadTemplate, sourceHeadModel, sourceHeadTemplate);
-	}
+        super.decorate(targetHeadModel, targetHeadTemplate, sourceHeadModel, sourceHeadTemplate);
+    }
 
 }

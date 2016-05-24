@@ -28,69 +28,69 @@ import org.thymeleaf.util.StringUtils;
  */
 public class VariableDeclarationMerger {
 
-	/**
-	 * Create variable declaration objects out of the declaration string.
-	 *
-	 * @param declarationString
-	 * @return A list of variable declaration objects that make up the
-	 * declaration string.
-	 */
-	private static List<VariableDeclaration> deriveDeclarations(String declarationString) {
-		String[] attributeTokens = declarationString.split(",");
-		ArrayList<VariableDeclaration> arrayList = new ArrayList<VariableDeclaration>(attributeTokens.length);
-		for (String attributeToken : attributeTokens) {
-			arrayList.add(new VariableDeclaration(attributeToken));
-		}
-		return arrayList;
-	}
+    /**
+     * Create variable declaration objects out of the declaration string.
+     *
+     * @param declarationString
+     * @return A list of variable declaration objects that make up the
+     * declaration string.
+     */
+    private static List<VariableDeclaration> deriveDeclarations(String declarationString) {
+        String[] attributeTokens = declarationString.split(",");
+        ArrayList<VariableDeclaration> arrayList = new ArrayList<VariableDeclaration>(attributeTokens.length);
+        for (String attributeToken : attributeTokens) {
+            arrayList.add(new VariableDeclaration(attributeToken));
+        }
+        return arrayList;
+    }
 
-	/**
-	 * Merge {@code th:with} attributes so that names from the source value
-	 * overwrite the same names in the target value.
-	 *
-	 * @param target
-	 * @param source
-	 * @return
-	 */
-	public String merge(String target, String source) {
-		if (StringUtils.isEmpty(target)) {
-			return source;
-		}
-		if (StringUtils.isEmpty(source)) {
-			return target;
-		}
-		List<VariableDeclaration> targetDeclarations = deriveDeclarations(target);
-		List<VariableDeclaration> sourceDeclarations = deriveDeclarations(source);
+    /**
+     * Merge {@code th:with} attributes so that names from the source value
+     * overwrite the same names in the target value.
+     *
+     * @param target
+     * @param source
+     * @return
+     */
+    public String merge(String target, String source) {
+        if (StringUtils.isEmpty(target)) {
+            return source;
+        }
+        if (StringUtils.isEmpty(source)) {
+            return target;
+        }
+        List<VariableDeclaration> targetDeclarations = deriveDeclarations(target);
+        List<VariableDeclaration> sourceDeclarations = deriveDeclarations(source);
 
-		List<VariableDeclaration> newDeclarations = new ArrayList<VariableDeclaration>(targetDeclarations.size() + sourceDeclarations.size());
-		for (VariableDeclaration targetDeclaration : targetDeclarations) {
-			VariableDeclaration override = null;
-			String name = targetDeclaration.getName();
-			for (VariableDeclaration sourceDeclaration : sourceDeclarations) {
-				if (name == null ? sourceDeclaration.getName() == null : name.equals(sourceDeclaration.getName())) {
-					override = sourceDeclaration;
-					break;
-				}
-			}
-			if (override != null) {
-				sourceDeclarations.remove(override);
-				newDeclarations.add(override);
-			} else {
-				newDeclarations.add(targetDeclaration);
-			}
-		}
+        List<VariableDeclaration> newDeclarations = new ArrayList<VariableDeclaration>(targetDeclarations.size() + sourceDeclarations.size());
+        for (VariableDeclaration targetDeclaration : targetDeclarations) {
+            VariableDeclaration override = null;
+            String name = targetDeclaration.getName();
+            for (VariableDeclaration sourceDeclaration : sourceDeclarations) {
+                if (name == null ? sourceDeclaration.getName() == null : name.equals(sourceDeclaration.getName())) {
+                    override = sourceDeclaration;
+                    break;
+                }
+            }
+            if (override != null) {
+                sourceDeclarations.remove(override);
+                newDeclarations.add(override);
+            } else {
+                newDeclarations.add(targetDeclaration);
+            }
+        }
 
-		newDeclarations.addAll(sourceDeclarations);
+        newDeclarations.addAll(sourceDeclarations);
 
-		if (newDeclarations.isEmpty()) {
-			return "";
-		}
-		StringBuilder sb = new StringBuilder(source.length() + target.length())
-				.append(newDeclarations.get(0));
-		for (int i = 1, size = newDeclarations.size(); i < size; i++) {
-			sb.append(',').append(newDeclarations.get(i));
-		}
-		return sb.toString();
-	}
+        if (newDeclarations.isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder(source.length() + target.length())
+                .append(newDeclarations.get(0));
+        for (int i = 1, size = newDeclarations.size(); i < size; i++) {
+            sb.append(',').append(newDeclarations.get(i));
+        }
+        return sb.toString();
+    }
 
 }

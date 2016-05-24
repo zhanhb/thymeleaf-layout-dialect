@@ -32,33 +32,33 @@ import org.thymeleaf.templatemode.TemplateMode;
  */
 public class ReplaceProcessor extends AbstractAttributeModelProcessor {
 
-	public static final String PROCESSOR_NAME = "replace";
-	public static final int PROCESSOR_PRECEDENCE = 0;
+    public static final String PROCESSOR_NAME = "replace";
+    public static final int PROCESSOR_PRECEDENCE = 0;
 
-	/**
-	 * Constructor, set this processor to work on the 'replace' attribute.
-	 *
-	 * @param templateMode
-	 * @param dialectPrefix
-	 */
-	public ReplaceProcessor(TemplateMode templateMode, String dialectPrefix) {
-		super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);
-	}
+    /**
+     * Constructor, set this processor to work on the 'replace' attribute.
+     *
+     * @param templateMode
+     * @param dialectPrefix
+     */
+    public ReplaceProcessor(TemplateMode templateMode, String dialectPrefix) {
+        super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);
+    }
 
-	/**
-	 * Locates a page fragment and includes it in the current template.
-	 *
-	 * @param context
-	 * @param model
-	 * @param attributeName
-	 * @param attributeValue
-	 * @param structureHandler
-	 */
-	@Override
-	protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
-			String attributeValue, IElementModelStructureHandler structureHandler) {
+    /**
+     * Locates a page fragment and includes it in the current template.
+     *
+     * @param context
+     * @param model
+     * @param attributeName
+     * @param attributeValue
+     * @param structureHandler
+     */
+    @Override
+    protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
+            String attributeValue, IElementModelStructureHandler structureHandler) {
 
-		// Locate the page and fragment to include
+        // Locate the page and fragment to include
 /*		def replaceFragments = new FragmentFinder(arguments)
 				.findFragments(element.getAttributeValue(attributeName))
 
@@ -78,7 +78,7 @@ public class ReplaceProcessor extends AbstractAttributeModelProcessor {
 
 		element.removeAttribute(attributeName)
 		return ProcessorResult.OK
-		 */
-	}
+         */
+    }
 
 }

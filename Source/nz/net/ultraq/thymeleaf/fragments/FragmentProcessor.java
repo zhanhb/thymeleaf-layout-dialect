@@ -35,52 +35,52 @@ import org.thymeleaf.templatemode.TemplateMode;
  */
 public class FragmentProcessor extends AbstractAttributeModelProcessor {
 
-	private static final Logger logger = LoggerFactory.getLogger(FragmentProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(FragmentProcessor.class);
 
-	public static final String PROCESSOR_NAME = "fragment";
-	public static final int PROCESSOR_PRECEDENCE = 1;
+    public static final String PROCESSOR_NAME = "fragment";
+    public static final int PROCESSOR_PRECEDENCE = 1;
 
-	/**
-	 * Constructor, sets this processor to work on the 'fragment' attribute.
-	 *
-	 * @param templateMode
-	 * @param dialectPrefix
-	 */
-	public FragmentProcessor(TemplateMode templateMode, String dialectPrefix) {
-		super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);
-	}
+    /**
+     * Constructor, sets this processor to work on the 'fragment' attribute.
+     *
+     * @param templateMode
+     * @param dialectPrefix
+     */
+    public FragmentProcessor(TemplateMode templateMode, String dialectPrefix) {
+        super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);
+    }
 
-	/**
-	 * Includes or replaces the content of fragments into the corresponding
-	 * fragment placeholder.
-	 *
-	 * @param context
-	 * @param model
-	 * @param attributeName
-	 * @param attributeValue
-	 * @param structureHandler
-	 */
-	@Override
-	protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
-			String attributeValue, IElementModelStructureHandler structureHandler) {
+    /**
+     * Includes or replaces the content of fragments into the corresponding
+     * fragment placeholder.
+     *
+     * @param context
+     * @param model
+     * @param attributeName
+     * @param attributeValue
+     * @param structureHandler
+     */
+    @Override
+    protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
+            String attributeValue, IElementModelStructureHandler structureHandler) {
 
-		// Emit a warning if found in the <head> section
-		if (getTemplateMode() == TemplateMode.HTML) {
-			if (context.getElementStack().stream().anyMatch(element -> "head".equals(element.getElementCompleteName()))) {
-				logger.warn("You don't need to put the layout:fragment attribute into the <head> "
-						+ "section - the decoration process will automatically copy the <head> "
-						+ "section of your content templates into your layout page.");
-			}
-		}
+        // Emit a warning if found in the <head> section
+        if (getTemplateMode() == TemplateMode.HTML) {
+            if (context.getElementStack().stream().anyMatch(element -> "head".equals(element.getElementCompleteName()))) {
+                logger.warn("You don't need to put the layout:fragment attribute into the <head> "
+                        + "section - the decoration process will automatically copy the <head> "
+                        + "section of your content templates into your layout page.");
+            }
+        }
 
-		// Locate the fragment that corresponds to this decorator/include fragment
-		String fragmentName = new ExpressionProcessor(context).process(attributeValue);
-		IModel fragment = FragmentMap.get(context).get(fragmentName);
+        // Locate the fragment that corresponds to this decorator/include fragment
+        String fragmentName = new ExpressionProcessor(context).process(attributeValue);
+        IModel fragment = FragmentMap.get(context).get(fragmentName);
 
-		// Replace this model with the fragment
-		if (MetaClass.asBoolean(fragment)) {
-			new ElementMerger(context.getModelFactory()).merge(model, fragment);
-		}
-	}
+        // Replace this model with the fragment
+        if (MetaClass.asBoolean(fragment)) {
+            new ElementMerger(context.getModelFactory()).merge(model, fragment);
+        }
+    }
 
 }
