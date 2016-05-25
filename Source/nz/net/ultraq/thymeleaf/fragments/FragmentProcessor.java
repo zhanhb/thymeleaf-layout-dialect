@@ -74,7 +74,7 @@ public class FragmentProcessor extends AbstractAttributeModelProcessor {
         }
 
         // Locate the fragment that corresponds to this decorator/include fragment
-        String fragmentName = new ExpressionProcessor(context).process(attributeValue);
+        String fragmentName = new ExpressionProcessor(context).processAsString(attributeValue);
         IModel fragment = FragmentMap.get(context).get(fragmentName);
 
         // Replace this model with the fragment

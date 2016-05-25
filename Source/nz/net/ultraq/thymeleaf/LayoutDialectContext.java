@@ -25,6 +25,7 @@ import org.thymeleaf.context.IEngineContext;
  *
  * @author Emanuel Rabina
  */
+@SuppressWarnings({"serial", "CloneableImplementsClone"})
 public class LayoutDialectContext extends HashMap<String, Object> {
 
     private static final String CONTEXT_KEY = "layout";

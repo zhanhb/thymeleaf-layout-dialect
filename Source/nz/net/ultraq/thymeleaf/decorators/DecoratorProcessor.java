@@ -86,7 +86,7 @@ public class DecoratorProcessor extends AbstractAttributeModelProcessor {
 
         IModelFactory modelFactory = context.getModelFactory();
         String contentTemplateName = context.getTemplateData().getTemplate();
-        String decoratorTemplateName = new ExpressionProcessor(context).process(attributeValue);
+        String decoratorTemplateName = new ExpressionProcessor(context).processAsString(attributeValue);
 
         // Locate the template to 'redirect' processing to by completely replacing
         // the current document with it
@@ -95,8 +95,7 @@ public class DecoratorProcessor extends AbstractAttributeModelProcessor {
 
         // Gather all fragment parts from this page to apply to the new document
         // after decoration has taken place
-        Map<String, TemplateModel> pageFragments = new FragmentFinder(modelFinder, getDialectPrefix())
-                .findFragments(contentTemplateName, model);
+        Map<String, TemplateModel> pageFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);
 
         // Choose the decorator to use based on template mode, then apply it
         Decorator decorator
@@ -111,7 +110,7 @@ public class DecoratorProcessor extends AbstractAttributeModelProcessor {
 
         // TODO: The modified decorator template includes anything outside the root
         //       element, which we don't want for the next step.  Strip those events
-        //       out for now,  but for future I should find a better way to merge
+        //       out for now, but for future I should find a better way to merge
         //       documents.
         while (!(MetaClass.first(decoratorTemplate) instanceof IOpenElementTag)) {
             MetaClass.removeFirst(decoratorTemplate);

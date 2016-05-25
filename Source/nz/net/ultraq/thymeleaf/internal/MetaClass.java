@@ -2,6 +2,8 @@ package nz.net.ultraq.thymeleaf.internal;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import nz.net.ultraq.thymeleaf.models.ModelIterator;
@@ -10,6 +12,7 @@ import org.thymeleaf.model.IAttribute;
 import org.thymeleaf.model.ICloseElementTag;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IOpenElementTag;
+import org.thymeleaf.model.IStandaloneElementTag;
 import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.model.IText;
 
@@ -42,6 +45,77 @@ public class MetaClass {
         for (int i = 0; i < delegate.size(); i++) {
             closure.accept(delegate.get(i));
         }
+    }
+
+    /**
+     * Compare 2 models, returning {@code true} if all of the model's events are
+     * equal.
+     *
+     * @param delegate
+     * @param other
+     * @return {@code true} if this model is the same as the other one.
+     */
+    public static boolean equals(IModel delegate, Object other) {
+        if (other instanceof IModel) {
+            IModel iModel = (IModel) other;
+            if (delegate.size() == iModel.size()) {
+                return everyWithIndex(delegate, (event, index) -> {
+                    return event == iModel.get(index);
+                });
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Compare 2 models, returning {@code true} if all of the model's events
+     * non-whitespace events are equal.
+     *
+     * @param delegate
+     * @param other
+     * @return {@code true} if this model is the same (barring whitespace) as
+     * the other one.
+     */
+    public static boolean equalsIgnoreWhitespace(IModel delegate, IModel other) {
+        int thisEventIndex = 0;
+        int otherEventIndex = 0;
+
+        while (thisEventIndex < delegate.size() || otherEventIndex < other.size()) {
+            ITemplateEvent thisEvent = delegate.get(thisEventIndex);
+            ITemplateEvent otherEvent = other.get(otherEventIndex);
+            if (isWhitespace(thisEvent)) {
+                thisEventIndex++;
+                continue;
+            } else if (isWhitespace(otherEvent)) {
+                otherEventIndex++;
+                continue;
+            }
+            if (thisEvent != otherEvent) {
+                return false;
+            }
+            thisEventIndex++;
+            otherEventIndex++;
+        }
+
+        return thisEventIndex == delegate.size() && otherEventIndex == other.size();
+
+    }
+
+    /**
+     * Return {@code true} only if all the events in the model return
+     * {@code true} for the given closure.
+     *
+     * @param delegate
+     * @param closure
+     * @return {@code true} if every event satisfies the closure.
+     */
+    public static boolean everyWithIndex(IModel delegate, BiPredicate<? super ITemplateEvent, ? super Integer> closure) {
+        for (int i = 0; i < delegate.size(); i++) {
+            if (!closure.test(delegate.get(i), i)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -237,6 +311,46 @@ public class MetaClass {
     }
 
     /**
+     * Compares this open tag with another.
+     *
+     * @param delegate
+     * @param other
+     * @return {@code true} if this tag has the same name and attributes as the
+     * other element.
+     */
+    public static boolean equals(IOpenElementTag delegate, Object other) {
+        return other instanceof IOpenElementTag
+                && Objects.equals(delegate.getElementCompleteName(), ((IOpenElementTag) other).getElementCompleteName())
+                && Objects.equals(delegate.getAttributeMap(), ((IOpenElementTag) other).getAttributeMap());
+    }
+
+    /**
+     * Compares this close tag with another.
+     *
+     * @param delegate
+     * @param other
+     * @return {@code true} if this tag has the same name as the other element.
+     */
+    public static boolean equals(ICloseElementTag delegate, Object other) {
+        return other instanceof ICloseElementTag
+                && Objects.equals(delegate.getElementCompleteName(), ((ICloseElementTag) other).getElementCompleteName());
+    }
+
+    /**
+     * Compares this standalone tag with another.
+     *
+     * @param delegate
+     * @param other
+     * @return {@code true} if this tag has the same name and attributes as the
+     * other element.
+     */
+    public static boolean equals(IStandaloneElementTag delegate, Object other) {
+        return other instanceof IStandaloneElementTag
+                && Objects.equals(delegate.getElementCompleteName(), ((IStandaloneElementTag) other).getElementCompleteName())
+                && Objects.equals(delegate.getAttributeMap(), ((IStandaloneElementTag) other).getAttributeMap());
+    }
+
+    /**
      * Returns whether or not an attribute is an attribute processor of the
      * given name, checks both prefix:processor and data-prefix-processor
      * variants.
@@ -260,6 +374,17 @@ public class MetaClass {
      */
     public static AttributeName getAttributeName(IAttribute delegate) {
         return delegate.getAttributeDefinition().getAttributeName();
+    }
+
+    /**
+     * Compares this text with another.
+     *
+     * @param delegate
+     * @param other
+     * @return {@code true} if the text content matches.
+     */
+    public static boolean equals(IText delegate, Object other) {
+        return other instanceof IText && Objects.equals(delegate.getText(), ((IText) other).getText());
     }
 
     /**
