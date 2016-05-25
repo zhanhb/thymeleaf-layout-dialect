@@ -18,7 +18,11 @@ package nz.net.ultraq.thymeleaf.internal;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.util.AbstractMap;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  *
@@ -26,26 +30,36 @@ import java.util.concurrent.ConcurrentHashMap;
  * @param <K>
  * @param <V>
  */
-public class ConcurrentWeakIdentityHashMap<K, V> {
+public class ConcurrentWeakIdentityHashMap<K, V> extends AbstractMap<K, V>
+        implements ConcurrentMap<K, V> {
 
-    private ConcurrentHashMap<Reference<? extends K>, V> map;
-    private ReferenceQueue<K> queue;
+    private final ConcurrentHashMap<Reference<? extends K>, V> map;
+    private final ReferenceQueue<K> queue = new ReferenceQueue<>();
 
-    public ConcurrentWeakIdentityHashMap(int size) {
-        this.map = new ConcurrentHashMap<>(size);
-        this.queue = new ReferenceQueue<>();
+    public ConcurrentWeakIdentityHashMap(int initialCapacity) {
+        this.map = new ConcurrentHashMap<>(initialCapacity);
     }
 
-    public V get(K key) {
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    public ConcurrentWeakIdentityHashMap() {
+        this.map = new ConcurrentHashMap<>();
+    }
+
+    @Override
+    public V get(Object key) {
+        Objects.requireNonNull(key);
         purgeKeys();
-        return map.get(new Key<>(key));
+        return map.get(new Key<>(key, null));
     }
 
+    @Override
     public V put(K key, V value) {
+        Objects.requireNonNull(key);
         purgeKeys();
         return map.put(new Key<>(key, queue), value);
     }
 
+    @Override
     public int size() {
         purgeKeys();
         return map.size();
@@ -59,14 +73,56 @@ public class ConcurrentWeakIdentityHashMap<K, V> {
         }
     }
 
+    @Override
+    public Set<Entry<K, V>> entrySet() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public V putIfAbsent(K key, V value) {
+        Objects.requireNonNull(key);
+        purgeKeys();
+        return map.putIfAbsent(new Key<>(key, queue), value);
+    }
+
+    @Override
+    public boolean remove(Object key, Object value) {
+        Objects.requireNonNull(key);
+        purgeKeys();
+        return map.remove(new Key<>(key, null), value);
+    }
+
+    @Override
+    public boolean replace(K key, V oldValue, V newValue) {
+        Objects.requireNonNull(key);
+        purgeKeys();
+        return map.replace(new Key<>(key, null), oldValue, newValue);
+    }
+
+    @Override
+    public V replace(K key, V value) {
+        Objects.requireNonNull(key);
+        purgeKeys();
+        return map.replace(new Key<>(key, null), value);
+    }
+
+    @Override
+    public boolean containsKey(Object key) {
+        Objects.requireNonNull(key);
+        purgeKeys();
+        return map.containsKey(new Key<>(key, null));
+    }
+
+    @Override
+    @SuppressWarnings("empty-statement")
+    public void clear() {
+        while (queue.poll() != null);
+        map.clear();
+    }
+
     private static class Key<T> extends WeakReference<T> {
 
         private final int hash;
-
-        Key(T t) {
-            super(t);
-            hash = System.identityHashCode(t);
-        }
 
         Key(T t, ReferenceQueue<T> queue) {
             super(t, queue);

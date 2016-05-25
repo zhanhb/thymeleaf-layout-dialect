@@ -12,3 +12,4 @@
 # IntelliJ IDEA files/directories
 /.idea
 *.iml
+/nbproject/

@@ -15,10 +15,10 @@
  */
 package nz.net.ultraq.thymeleaf.models;
 
-import java.util.Arrays;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import org.thymeleaf.model.IAttribute;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.model.IProcessableElementTag;
@@ -60,27 +60,26 @@ public class AttributeMerger implements ModelMerger {
         }
 
         // Merge attributes from the source model's root event to the target model's root event
-        Arrays.stream(((IProcessableElementTag) sourceModel.get(0)).getAllAttributes())
-                // Don't include layout:fragment processors
-                .filter(sourceAttribute -> {
-                    return !MetaClass.equalsName(sourceAttribute, LayoutDialect.DIALECT_PREFIX, FragmentProcessor.PROCESSOR_NAME);
-                })
-                .forEach(sourceAttribute -> {
-                    IProcessableElementTag targetEvent = (IProcessableElementTag) targetModel.get(0);
-                    String mergedAttributeValue;
+        for (IAttribute sourceAttribute : ((IProcessableElementTag) sourceModel.get(0)).getAllAttributes()) {
+            // Don't include layout:fragment processors
+            if (!MetaClass.equalsName(sourceAttribute, LayoutDialect.DIALECT_PREFIX, FragmentProcessor.PROCESSOR_NAME)) {
+                continue;
+            }
+            IProcessableElementTag targetEvent = (IProcessableElementTag) targetModel.get(0);
+            String mergedAttributeValue;
 
-                    // Merge th:with attributes
-                    if (MetaClass.equalsName(sourceAttribute, StandardDialect.PREFIX, StandardWithTagProcessor.ATTR_NAME)) {
-                        mergedAttributeValue = new VariableDeclarationMerger().merge(sourceAttribute.getValue(),
-                                targetEvent.getAttributeValue(StandardDialect.PREFIX, StandardWithTagProcessor.ATTR_NAME));
-                    } else { // Copy every other attribute straight
-                        mergedAttributeValue = sourceAttribute.getValue();
-                    }
+            // Merge th:with attributes
+            if (MetaClass.equalsName(sourceAttribute, StandardDialect.PREFIX, StandardWithTagProcessor.ATTR_NAME)) {
+                mergedAttributeValue = new VariableDeclarationMerger().merge(sourceAttribute.getValue(),
+                        targetEvent.getAttributeValue(StandardDialect.PREFIX, StandardWithTagProcessor.ATTR_NAME));
+            } else { // Copy every other attribute straight
+                mergedAttributeValue = sourceAttribute.getValue();
+            }
 
-                    targetModel.replace(0, modelFactory.replaceAttribute(targetEvent,
-                            MetaClass.getAttributeName(sourceAttribute), sourceAttribute.getAttributeCompleteName(),
-                            mergedAttributeValue));
-                });
+            targetModel.replace(0, modelFactory.replaceAttribute(targetEvent,
+                    MetaClass.getAttributeName(sourceAttribute), sourceAttribute.getAttributeCompleteName(),
+                    mergedAttributeValue));
+        }
     }
 
 }

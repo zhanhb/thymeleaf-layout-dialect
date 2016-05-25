@@ -1,6 +1,7 @@
 package nz.net.ultraq.thymeleaf.internal;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import nz.net.ultraq.thymeleaf.models.ModelIterator;
@@ -18,7 +19,7 @@ import org.thymeleaf.model.IText;
  */
 public class MetaClass {
 
-    private static final ConcurrentWeakIdentityHashMap<IModel, Integer> map = new ConcurrentWeakIdentityHashMap<>(200);
+    private static final Map<IModel, Integer> map = new ConcurrentWeakIdentityHashMap<>(200);
 
     /**
      * Set that a model evaluates to 'false' if it has no events.

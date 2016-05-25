@@ -15,7 +15,6 @@
  */
 package nz.net.ultraq.thymeleaf.decorators.html;
 
-import java.util.function.Predicate;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlElementDecorator;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
@@ -30,6 +29,18 @@ import org.thymeleaf.model.ITemplateEvent;
  * @author Emanuel Rabina
  */
 public class HtmlHeadDecorator extends XmlElementDecorator {
+
+    private static int finderTitleEventIndex(IModel sourceHeadModel) {
+        for (int i = 0; i < sourceHeadModel.size(); i++) {
+            ITemplateEvent event = sourceHeadModel.get(i);
+            boolean result = event instanceof IOpenElementTag
+                    && "title".equals(((IOpenElementTag) event).getElementCompleteName());
+            if (result) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
     private final SortingStrategy sortingStrategy;
 
@@ -66,17 +77,13 @@ public class HtmlHeadDecorator extends XmlElementDecorator {
         }
 
         // Replace the target title with the source one if present
-        Predicate<ITemplateEvent> titleEventIndexFinder = event -> {
-            return event instanceof IOpenElementTag && "title".equals(((IOpenElementTag) event).getElementCompleteName());
-        };
-
         IModel sourceTitle;
-        int sourceTitleIndex = MetaClass.findIndexOf(sourceHeadModel, titleEventIndexFinder);
+        int sourceTitleIndex = finderTitleEventIndex(sourceHeadModel);
         if (sourceTitleIndex != -1) {
             sourceTitle = MetaClass.getModel(sourceHeadModel, sourceTitleIndex);
             MetaClass.removeModelWithWhitespace(sourceHeadModel, sourceTitleIndex);
 
-            int targetTitleIndex = MetaClass.findIndexOf(targetHeadModel, titleEventIndexFinder);
+            int targetTitleIndex = finderTitleEventIndex(targetHeadModel);
             if (targetTitleIndex != -1) {
                 MetaClass.removeModelWithWhitespace(targetHeadModel, targetTitleIndex);
             }
