@@ -17,6 +17,7 @@
 package nz.net.ultraq.thymeleaf.tests.models
 
 import nz.net.ultraq.thymeleaf.LayoutDialect
+import nz.net.ultraq.thymeleaf.internal.MetaClass
 import nz.net.ultraq.thymeleaf.models.AttributeMerger
 import nz.net.ultraq.thymeleaf.models.ModelBuilder
 
@@ -80,7 +81,7 @@ class AttributeMergerTests {
 		// TODO: This should be an assertEquals, but somehow it's not using the
 		//       metaclass unless I use ==.  Change if I get a chance to add
 		//       equals() methods to the model and event classes themselves.
-		assertTrue(target == expected)
+		assertTrue(MetaClass.equals(target, expected))
 	}
 
 	/**
@@ -111,6 +112,6 @@ class AttributeMergerTests {
 		// TODO: This should be an assertEquals, but somehow it's not using the
 		//       metaclass unless I use ==.  Change if I get a chance to add
 		//       equals() methods to the model and event classes themselves.
-		assertTrue(target == expected)
+		assertTrue(MetaClass.equals(target, expected))
 	}
 }

@@ -36,6 +36,45 @@ import org.thymeleaf.model.ITemplateEvent;
 public class GroupingStrategy implements SortingStrategy {
 
     /**
+     * Figure out the enum for the given model.
+     *
+     * @param model
+     * @return Matching enum to describe the model.
+     */
+    private static int findMatchingType(IModel model) {
+        final int COMMENT = 1;
+        final int META = 2;
+        final int SCRIPT = 3;
+        final int STYLE = 4;
+        final int STYLESHEET = 5;
+        final int OTHER = 6;
+
+        ITemplateEvent event = MetaClass.first(model);
+
+        if (event instanceof IComment) {
+            return COMMENT;
+        }
+        if (event instanceof IElementTag) {
+            String elementCompleteName = ((IElementTag) event).getElementCompleteName();
+            if (event instanceof IProcessableElementTag && "meta".equals(elementCompleteName)) {
+                return META;
+            }
+            if (event instanceof IOpenElementTag && "script".equals(elementCompleteName)) {
+                return SCRIPT;
+            }
+            if (event instanceof IOpenElementTag && "style".equals(elementCompleteName)) {
+                return STYLE;
+            }
+            if (event instanceof IProcessableElementTag && "link".equals(elementCompleteName)
+                    && "stylesheet".equals(((IProcessableElementTag) event).getAttributeValue("rel"))) {
+                return STYLESHEET;
+            }
+            return OTHER;
+        }
+        return 0;
+    }
+
+    /**
      * Returns the index of the last set of elements that are of the same 'type'
      * as the content node. eg: groups scripts with scripts, stylesheets with
      * stylesheets, and so on.
@@ -51,7 +90,7 @@ public class GroupingStrategy implements SortingStrategy {
             return -1;
         }
 
-        HeadEventTypes type = HeadEventTypes.findMatchingType(childModel);
+        int type = findMatchingType(childModel);
         Iterator<IModel> it = MetaClass.modelIterator(headModel);
 
         ArrayList<IModel> list = new ArrayList<>();
@@ -61,57 +100,11 @@ public class GroupingStrategy implements SortingStrategy {
         ListIterator<IModel> listIterator = list.listIterator(list.size());
         while (listIterator.hasPrevious()) {
             IModel headSubModel = listIterator.previous();
-            if (type == HeadEventTypes.findMatchingType(headSubModel)) {
+            if (type == findMatchingType(headSubModel)) {
                 return MetaClass.getEndIndex(headSubModel);
             }
         }
         throw new NullPointerException();
-    }
-
-    /**
-     * Enum for the types of elements in the {@code <head>} section that we
-     * might need to sort.
-     */
-    private static enum HeadEventTypes {
-
-        COMMENT,
-        META,
-        SCRIPT,
-        STYLE,
-        STYLESHEET,
-        OTHER;
-
-        /**
-         * Figure out the enum for the given model.
-         *
-         * @param model
-         * @return Matching enum to describe the model.
-         */
-        private static HeadEventTypes findMatchingType(IModel model) {
-            ITemplateEvent event = MetaClass.first(model);
-
-            if (event instanceof IComment) {
-                return COMMENT;
-            }
-            if (event instanceof IElementTag) {
-                String elementCompleteName = ((IElementTag) event).getElementCompleteName();
-                if (event instanceof IProcessableElementTag && "meta".equals(elementCompleteName)) {
-                    return META;
-                }
-                if (event instanceof IOpenElementTag && "script".equals(elementCompleteName)) {
-                    return SCRIPT;
-                }
-                if (event instanceof IOpenElementTag && "style".equals(elementCompleteName)) {
-                    return STYLE;
-                }
-                if (event instanceof IProcessableElementTag && "link".equals(elementCompleteName)
-                        && "stylesheet".equals(((IProcessableElementTag) event).getAttributeValue("rel"))) {
-                    return STYLESHEET;
-                }
-                return OTHER;
-            }
-            return null;
-        }
     }
 
 }

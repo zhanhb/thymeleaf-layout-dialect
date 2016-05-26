@@ -60,11 +60,24 @@ public class MetaClass {
             IModel iModel = (IModel) other;
             if (delegate.size() == iModel.size()) {
                 return everyWithIndex(delegate, (event, index) -> {
-                    return event == iModel.get(index);
+                    return equals(event, iModel.get(index));
                 });
             }
         }
         return false;
+    }
+
+    private static boolean equals(ITemplateEvent event, Object other) {
+        if (event instanceof IOpenElementTag) {
+            return equals(((IOpenElementTag) event), other);
+        } else if (event instanceof ICloseElementTag) {
+            return equals(((ICloseElementTag) event), other);
+        } else if (event instanceof IStandaloneElementTag) {
+            return equals(((IStandaloneElementTag) event), other);
+        } else if (event instanceof IText) {
+            return equals(((IText) event), other);
+        }
+        return event.equals(other);
     }
 
     /**
