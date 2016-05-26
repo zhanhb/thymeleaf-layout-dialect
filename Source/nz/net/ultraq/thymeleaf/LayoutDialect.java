@@ -66,7 +66,7 @@ public class LayoutDialect extends AbstractProcessorDialect {
         //       dialect prefix, so I'll need to do something about that later.
         //       https://github.com/ultraq/thymeleaf-layout-dialect/issues/103
 
-        return new LinkedHashSet<>(Arrays.asList(
+        return new LinkedHashSet<>(Arrays.<IProcessor>asList(
                 // Processors available in the HTML template mode
                 new StandardXmlNsTagProcessor(TemplateMode.HTML, dialectPrefix),
                 new DecoratorProcessor(TemplateMode.HTML, dialectPrefix, sortingStrategy),

@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -66,10 +67,13 @@ public class FragmentProcessor extends AbstractAttributeModelProcessor {
 
         // Emit a warning if found in the <head> section
         if (getTemplateMode() == TemplateMode.HTML) {
-            if (context.getElementStack().stream().anyMatch(element -> "head".equals(element.getElementCompleteName()))) {
-                logger.warn("You don't need to put the layout:fragment attribute into the <head> "
-                        + "section - the decoration process will automatically copy the <head> "
-                        + "section of your content templates into your layout page.");
+            for (IProcessableElementTag element : context.getElementStack()) {
+                if ("head".equals(element.getElementCompleteName())) {
+                    logger.warn("You don't need to put the layout:fragment attribute into the <head> "
+                            + "section - the decoration process will automatically copy the <head> "
+                            + "section of your content templates into your layout page.");
+                    break;
+                }
             }
         }
 

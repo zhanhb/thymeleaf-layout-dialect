@@ -15,6 +15,7 @@
  */
 package nz.net.ultraq.thymeleaf.decorators.html;
 
+import java.util.Iterator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlElementDecorator;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
@@ -133,12 +134,14 @@ public class HtmlHeadDecorator extends XmlElementDecorator {
         // the current merging strategy, placing the resulting title at the
         // beginning of it
         if (MetaClass.asBoolean(sourceHeadModel)) {
-            MetaClass.modelIterator(sourceHeadModel).forEachRemaining(sourceHeadSubModel -> {
+            Iterator<IModel> it = MetaClass.modelIterator(sourceHeadModel);
+            while(it.hasNext()){
+                IModel sourceHeadSubModel = it.next();
                 int position = sortingStrategy.findPositionForModel(targetHeadModel, sourceHeadSubModel);
                 if (position != -1) {
                     MetaClass.insertModelWithWhitespace(targetHeadModel, position, sourceHeadSubModel);
                 }
-            });
+            }
         }
 
         super.decorate(targetHeadModel, targetHeadTemplate, sourceHeadModel, sourceHeadTemplate);

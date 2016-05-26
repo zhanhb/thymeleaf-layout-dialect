@@ -22,6 +22,7 @@ import nz.net.ultraq.thymeleaf.models.ModelFinder;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.model.IOpenElementTag;
+import org.thymeleaf.model.ITemplateEvent;
 
 /**
  * A decorator made to work over an XML document.
@@ -72,7 +73,14 @@ public class XmlDocumentDecorator implements Decorator {
         //}
         // Find the root element of the target document to merge
         // TODO: Way of obtaining a model from within a model
-        IOpenElementTag targetDocumentRootElement = (IOpenElementTag) MetaClass.find(sourceDocumentModel, targetDocumentEvent -> targetDocumentEvent instanceof IOpenElementTag);
+        IOpenElementTag targetDocumentRootElement = null;
+        for (int i = 0; i < sourceDocumentModel.size(); i++) {
+            ITemplateEvent targetDocumentEvent = sourceDocumentModel.get(i);
+            if (targetDocumentEvent instanceof IOpenElementTag) {
+                targetDocumentRootElement = (IOpenElementTag) targetDocumentEvent;
+                break;
+            }
+        }
         IModel targetDocumentRootModel = modelFinder.find(targetDocumentTemplate, targetDocumentRootElement.getElementCompleteName());
 
         // Bring the decorator into the content page (which is the one being processed)

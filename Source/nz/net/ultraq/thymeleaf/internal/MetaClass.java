@@ -3,9 +3,6 @@ package nz.net.ultraq.thymeleaf.internal;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.BiPredicate;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 import nz.net.ultraq.thymeleaf.models.ModelIterator;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.model.IAttribute;
@@ -35,19 +32,6 @@ public class MetaClass {
     }
 
     /**
-     * Iterate through each event in the model. This is similar to what the
-     * {@code accept} method does.
-     *
-     * @param delegate
-     * @param closure
-     */
-    public static void each(IModel delegate, Consumer<? super ITemplateEvent> closure) {
-        for (int i = 0; i < delegate.size(); i++) {
-            closure.accept(delegate.get(i));
-        }
-    }
-
-    /**
      * Compare 2 models, returning {@code true} if all of the model's events are
      * equal.
      *
@@ -59,9 +43,12 @@ public class MetaClass {
         if (other instanceof IModel) {
             IModel iModel = (IModel) other;
             if (delegate.size() == iModel.size()) {
-                return everyWithIndex(delegate, (event, index) -> {
-                    return equals(event, iModel.get(index));
-                });
+                for (int i = 0; i < delegate.size(); i++) {
+                    if (!equals(delegate.get(i), iModel.get(i))) {
+                        return false;
+                    }
+                }
+                return true;
             }
         }
         return false;
@@ -112,63 +99,6 @@ public class MetaClass {
 
         return thisEventIndex == delegate.size() && otherEventIndex == other.size();
 
-    }
-
-    /**
-     * Return {@code true} only if all the events in the model return
-     * {@code true} for the given closure.
-     *
-     * @param delegate
-     * @param closure
-     * @return {@code true} if every event satisfies the closure.
-     */
-    public static boolean everyWithIndex(IModel delegate, BiPredicate<? super ITemplateEvent, ? super Integer> closure) {
-        for (int i = 0; i < delegate.size(); i++) {
-            if (!closure.test(delegate.get(i), i)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Returns the first event in the model that meets the criteria of the given
-     * closure.
-     *
-     * @param delegate
-     * @param closure
-     * @return The first event to match the closure criteria, or {@code null} if
-     * nothing matched.
-     */
-    public static ITemplateEvent find(IModel delegate, Predicate<? super ITemplateEvent> closure) {
-        for (int i = 0; i < delegate.size(); i++) {
-            ITemplateEvent event = delegate.get(i);
-            boolean result = closure.test(event);
-            if (result) {
-                return event;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns the index of the first event in the model that meets the criteria
-     * of the given closure.
-     *
-     * @param delegate
-     * @param closure
-     * @return The first event index to match the closure criteria, or
-     * {@code null} if nothing matched.
-     */
-    public static int findIndexOf(IModel delegate, Predicate<? super ITemplateEvent> closure) {
-        for (int i = 0; i < delegate.size(); i++) {
-            ITemplateEvent event = delegate.get(i);
-            boolean result = closure.test(event);
-            if (result) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     /**
