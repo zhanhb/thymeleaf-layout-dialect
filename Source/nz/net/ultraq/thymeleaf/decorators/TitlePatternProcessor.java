@@ -54,6 +54,24 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
         super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);
     }
 
+    //private String getTitle(Element element) {
+    //    if (element != null) {
+    //        Node node = element.getFirstChild();
+    //        if (node instanceof AbstractTextNode) {
+    //            return ((AbstractTextNode) node).getContent();
+    //        }
+    //    }
+    //    return null;
+    //}
+    //
+    //private Element findTitleType(List<Element> titleElements, String titleType) {
+    //    for (Element titleElement : titleElements) {
+    //        if (titleType.equals(titleElement.getNodeProperty(TITLE_TYPE))) {
+    //            return titleElement;
+    //        }
+    //    }
+    //    return null;
+    //}
     /**
      * {@inheritDoc}
      */
@@ -62,48 +80,43 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
             AttributeName attributeName, String attributeValue, IElementTagStructureHandler structureHandler) {
 
         // Ensure this attribute is only on the <title> element
-/*		if (element.normalizedName != 'title') {
-			throw new IllegalArgumentException("${attributeName} processor should only appear in a <title> element")
-		}
+        /*if (!"title".equals(element.getNormalizedName())) {
+            throw new IllegalArgumentException(attributeName + " processor should only appear in a <title> element");
+        }
 
-		// Retrieve title values from the expanded <title> sections within this
-		// processing container (if any)
-		def titlePattern   = element.getAttributeValue(attributeName)
-		def titleContainer = element.parent
-		def titleElements  = titleContainer?.elementChildren ?: []
-		element.removeAttribute(attributeName)
+        // Retrieve title values from the expanded <title> sections within this
+        // processing container (if any)
+        String titlePattern = element.getAttributeValue(attributeName);
+        NestableNode titleContainer = element.getParent();
+        List<Element> titleElements = titleContainer != null ? titleContainer.getElementChildren() : Collections.<Element>emptyList();
+        element.removeAttribute(attributeName);
 
-		def findTitleType = { titleType ->
-			return { childElement ->
-				childElement.getNodeProperty(TITLE_TYPE) == titleType
-			}
-		}
-		def decoratorTitleElement = titleElements.find(findTitleType(TITLE_TYPE_DECORATOR))
-		def decoratorTitle        = decoratorTitleElement?.firstChild?.content
-		def contentTitleElement   = titleElements.find(findTitleType(TITLE_TYPE_CONTENT))
-		def contentTitle          = contentTitleElement?.firstChild?.content
+        Element decoratorTitleElement = findTitleType(titleElements, TITLE_TYPE_DECORATOR);
+        String decoratorTitle = getTitle(decoratorTitleElement);
+        Element contentTitleElement = findTitleType(titleElements, TITLE_TYPE_CONTENT);
+        String contentTitle = getTitle(contentTitleElement);
 
-		def attributeMerger = new AttributeMerger()
-		attributeMerger.merge(element, decoratorTitleElement)
-		attributeMerger.merge(element, contentTitleElement)
+        AttributeMerger attributeMerger = new AttributeMerger();
+        attributeMerger.merge(element, decoratorTitleElement);
+        attributeMerger.merge(element, contentTitleElement);
 
-		def title = titlePattern && decoratorTitle && contentTitle ?
-			titlePattern
-				.replace(PARAM_TITLE_DECORATOR, decoratorTitle)
-				.replace(PARAM_TITLE_CONTENT, contentTitle) :
-			contentTitle ?: decoratorTitle ?: ''
+        String title = !StringUtils.isEmpty(titlePattern) && !StringUtils.isEmpty(decoratorTitle) && !StringUtils.isEmpty(contentTitle)
+                ? titlePattern
+                .replace(PARAM_TITLE_DECORATOR, decoratorTitle)
+                .replace(PARAM_TITLE_CONTENT, contentTitle)
+                : StringUtils.isEmpty(contentTitle) ? decoratorTitle != null ? decoratorTitle : "" : contentTitle;
 
-		// If there's a title, bring it up
-		if (title) {
-			element.addChild(new Text(title))
-			titleContainer.parent.insertAfter(titleContainer, element.cloneNode(null, false))
-			LayoutDialectContext.forContext(arguments.context) << [(RESULTING_TITLE): title]
-		}
+        // If there's a title, bring it up
+        if (!StringUtils.isEmpty(title)) {
+            element.addChild(new Text(title));
+            titleContainer.getParent().insertAfter(titleContainer, element.cloneNode(null, false));
+            LayoutDialectContext.forContext(arguments.getContext()).put(RESULTING_TITLE, title);
+        }
 
-		// Remove the processing section
-		titleContainer.parent.removeChild(titleContainer)
+        // Remove the processing section
+        titleContainer.getParent().removeChild(titleContainer);
 
-		return ProcessorResult.OK
+        return ProcessorResult.OK;
          */
     }
 

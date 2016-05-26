@@ -1,12 +1,12 @@
-/*
+/* 
  * Copyright 2013, Emanuel Rabina (http://www.ultraq.net.nz/)
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -59,25 +59,25 @@ public class ReplaceProcessor extends AbstractAttributeModelProcessor {
             String attributeValue, IElementModelStructureHandler structureHandler) {
 
         // Locate the page and fragment to include
-/*		def replaceFragments = new FragmentFinder(arguments)
-				.findFragments(element.getAttributeValue(attributeName))
+        /*List<Node> replaceFragments = new FragmentFinder(arguments)
+                .findFragments(element.getAttributeValue(attributeName));
 
-		// Gather all fragment parts within the replace element
-		def elementFragments = new FragmentMapper().map(element.elementChildren)
+        // Gather all fragment parts within the replace element
+        Map<String, Element> elementFragments = new FragmentMapper().map(element.getElementChildren());
 
-		// Replace the children of this element with those of the replace page
-		// fragments, scoping any fragment parts to the immediate children
-		element.clearChildren()
-		if (replaceFragments) {
-			replaceFragments.each { replaceFragment ->
-				element.addChild(replaceFragment)
-				FragmentMap.setForNode(arguments, replaceFragment, elementFragments)
-			}
-		}
-		element.parent.extractChild(element)
+        // Replace the children of this element with those of the replace page
+        // fragments, scoping any fragment parts to the immediate children
+        element.clearChildren();
+        if (replaceFragments != null) {
+            for (Node replaceFragment : replaceFragments) {
+                element.addChild(replaceFragment);
+                FragmentMap.updateForNode(arguments, replaceFragment, elementFragments);
+            }
+        }
+        element.getParent().extractChild(element);
 
-		element.removeAttribute(attributeName)
-		return ProcessorResult.OK
+        element.removeAttribute(attributeName);
+        return ProcessorResult.OK;
          */
     }
 

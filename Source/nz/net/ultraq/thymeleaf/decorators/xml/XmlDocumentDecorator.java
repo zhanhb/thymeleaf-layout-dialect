@@ -53,26 +53,23 @@ public class XmlDocumentDecorator implements Decorator {
 
         // TODO
         // Copy text outside of the root element, keeping whitespace copied to a minimum
-//		def beforeHtml = true
-//		def allowNext = false
-//		def lastNode = contentXml
-//		decoratorDocument.children.each { externalNode ->
-//			if (externalNode == decoratorXml) {
-//				beforeHtml = false
-//				allowNext = true
-//				return
-//			}
-//			if (externalNode instanceof Comment || allowNext) {
-//				if (beforeHtml) {
-//					contentDocument.insertBefore(contentXml, externalNode)
-//				}
-//				else {
-//					contentDocument.insertAfter(lastNode, externalNode)
-//					lastNode = externalNode
-//				}
-//				allowNext = externalNode instanceof Comment
-//			}
-//		}
+        //boolean beforeHtml = true;
+        //boolean allowNext = false;
+        //Node lastNode = contentXml;
+        //for (Node externalNode : decoratorDocument.getChildren()) {
+        //    if (externalNode == decoratorXml) {
+        //        beforeHtml = false;
+        //        allowNext = true;
+        //    } else if (externalNode instanceof Comment || allowNext) {
+        //        if (beforeHtml) {
+        //            contentDocument.insertBefore(contentXml, externalNode);
+        //        } else {
+        //            contentDocument.insertAfter(lastNode, externalNode);
+        //            lastNode = externalNode;
+        //        }
+        //        allowNext = externalNode instanceof Comment;
+        //    }
+        //}
         // Find the root element of the target document to merge
         // TODO: Way of obtaining a model from within a model
         IOpenElementTag targetDocumentRootElement = (IOpenElementTag) MetaClass.find(sourceDocumentModel, targetDocumentEvent -> targetDocumentEvent instanceof IOpenElementTag);

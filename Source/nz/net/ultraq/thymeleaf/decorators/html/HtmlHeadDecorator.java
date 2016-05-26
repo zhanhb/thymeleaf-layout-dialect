@@ -55,6 +55,29 @@ public class HtmlHeadDecorator extends XmlElementDecorator {
         this.sortingStrategy = sortingStrategy;
     }
 
+    //@SuppressWarnings("null")
+    //private void titleExtraction(Element headElement, String titleType, Element titleContainer, String[] titlePattern) {
+    //    Element existingContainer = headElement != null ? MetaClass.findElement(headElement, "title-container") : null;
+    //    if (existingContainer != null) {
+    //        List<Node> children = existingContainer.getChildren();
+    //        Node titleElement = children.isEmpty() ? null : children.get(children.size() - 1);
+    //        String attributeValue = MetaClass.getAttributeValue((Element) titleElement, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_TITLEPATTERN);
+    //        titlePattern[0] = !StringUtils.isEmpty(attributeValue) ? attributeValue : titlePattern[0];
+    //        titleElement.setNodeProperty(TITLE_TYPE, titleType);
+    //        MetaClass.removeChildWithWhitespace(headElement, existingContainer);
+    //        titleContainer.addChild(existingContainer);
+    //    } else {
+    //        Element titleElement = headElement != null ? MetaClass.findElement(headElement, "title") : null;
+    //        if (titleElement != null) {
+    //            String attributeValue = MetaClass.getAttributeValue(titleElement, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_TITLEPATTERN);
+    //            titlePattern[0] = !StringUtils.isEmpty(attributeValue) ? attributeValue : titlePattern[0];
+    //            titleElement.setNodeProperty(TITLE_TYPE, titleType);
+    //            MetaClass.removeAttribute(titleElement, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_TITLEPATTERN);
+    //            MetaClass.removeChildWithWhitespace(headElement, titleElement);
+    //            titleContainer.addChild(titleElement);
+    //        }
+    //    }
+    //}
     /**
      * Decorate the {@code <head>} part.
      *
@@ -93,37 +116,18 @@ public class HtmlHeadDecorator extends XmlElementDecorator {
 
         // TODO: complicated title replacement
 /*
-		// Copy the content and decorator <title>s
-		// TODO: Surely the code below can be simplified?  The 2 conditional
-		//       blocks are doing almost the same thing.
-		def titleContainer = new Element('title-container')
-		def titlePattern = null
-		def titleExtraction = { headElement, titleType ->
-			def existingContainer = headElement?.findElement('title-container')
-			if (existingContainer) {
-				def titleElement = existingContainer.children.last()
-				titlePattern = titleElement.getAttributeValue(DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME) ?: titlePattern
-				titleElement.setNodeProperty(TITLE_TYPE, titleType)
-				headElement.removeChildWithWhitespace(existingContainer)
-				titleContainer.addChild(existingContainer)
-			}
-			else {
-				def titleElement = headElement?.findElement('title')
-				if (titleElement) {
-					titlePattern = titleElement.getAttributeValue(DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME) ?: titlePattern
-					titleElement.setNodeProperty(TITLE_TYPE, titleType)
-					titleElement.removeAttribute(DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME)
-					headElement.removeChildWithWhitespace(titleElement)
-					titleContainer.addChild(titleElement)
-				}
-			}
-		}
-		titleExtraction(decoratorHead, TITLE_TYPE_DECORATOR)
-		titleExtraction(contentHead, TITLE_TYPE_CONTENT)
+        // Copy the content and decorator <title>s
+        // TODO: Surely the code below can be simplified?  The 2 conditional
+        //       blocks are doing almost the same thing.
+        Element titleContainer = new Element("title-container");
+        String[] titlePattern = {null};
 
-		def resultTitle = new Element('title')
-		resultTitle.setAttribute("${DIALECT_PREFIX_LAYOUT}:${PROCESSOR_NAME}", titlePattern)
-		titleContainer.addChild(resultTitle)
+        titleExtraction(decoratorHead, TITLE_TYPE_DECORATOR, titleContainer, titlePattern);
+        titleExtraction(contentHead, TITLE_TYPE_CONTENT, titleContainer, titlePattern);
+
+        Element resultTitle = new Element("title");
+        resultTitle.setAttribute(DIALECT_PREFIX_LAYOUT + ":" + PROCESSOR_NAME_TITLEPATTERN, titlePattern[0]);
+        titleContainer.addChild(resultTitle);
          */
         // Merge the source <head> elements with the target <head> elements using
         // the current merging strategy, placing the resulting title at the

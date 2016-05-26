@@ -15,7 +15,6 @@
  */
 package nz.net.ultraq.thymeleaf;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -41,14 +40,6 @@ public class LayoutDialect extends AbstractProcessorDialect {
     public static final String DIALECT_NAME = "Layout";
     public static final String DIALECT_PREFIX = "layout";
     public static final int DIALECT_PRECEDENCE = 10;
-
-    static {
-        try {
-            Class.forName("nz.net.ultraq.thymeleaf.models.ModelExtensions").getMethod("apply").invoke(null);
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            throw new ExceptionInInitializerError(ex);
-        }
-    }
 
     private final SortingStrategy sortingStrategy;
 
