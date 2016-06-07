@@ -1,12 +1,12 @@
-/*
+/* 
  * Copyright 2013, Emanuel Rabina (http://www.ultraq.net.nz/)
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,10 +15,11 @@
  */
 package nz.net.ultraq.thymeleaf.decorators.html;
 
+import java.util.function.Predicate;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
-import nz.net.ultraq.thymeleaf.models.ModelFinder;
 import org.thymeleaf.model.ICloseElementTag;
 import org.thymeleaf.model.IElementTag;
 import org.thymeleaf.model.IModel;
@@ -36,19 +37,16 @@ import org.thymeleaf.model.ITemplateEvent;
 public class HtmlDocumentDecorator implements Decorator {
 
     private final IModelFactory modelFactory;
-    private final ModelFinder modelFinder;
     private final SortingStrategy sortingStrategy;
 
     /**
      * Constructor, apply the given sorting strategy to the decorator.
      *
      * @param modelFactory
-     * @param modelFinder
      * @param sortingStrategy
      */
-    public HtmlDocumentDecorator(IModelFactory modelFactory, ModelFinder modelFinder, SortingStrategy sortingStrategy) {
+    public HtmlDocumentDecorator(IModelFactory modelFactory, SortingStrategy sortingStrategy) {
         this.modelFactory = modelFactory;
-        this.modelFinder = modelFinder;
         this.sortingStrategy = sortingStrategy;
     }
 
@@ -56,21 +54,18 @@ public class HtmlDocumentDecorator implements Decorator {
      * Decorate an entire HTML page.
      *
      * @param targetDocumentModel
-     * @param targetDocumentTemplate
      * @param sourceDocumentModel
-     * @param sourceDocumentTemplate
      */
     @Override
-    public void decorate(IModel targetDocumentModel, String targetDocumentTemplate,
-            IModel sourceDocumentModel, String sourceDocumentTemplate) {
-        // TODO: Expand the model finder to locate models within models so I
-        //       don't have to go through the template manager.  I think it'll
-        //       also reduce the need for me to pass these template names around.
+    public void decorate(IModel targetDocumentModel, IModel sourceDocumentModel) {
+        Predicate<ITemplateEvent> headModelFinder = event -> {
+            return event instanceof IOpenElementTag && "head".equals(((IElementTag) event).getElementCompleteName());
+        };
 
-        IModel targetHeadModel = modelFinder.find(targetDocumentTemplate, "head");
+        IModel targetHeadModel = MetaClass.findModel(targetDocumentModel, headModelFinder);
         new HtmlHeadDecorator(modelFactory, sortingStrategy).decorate(
-                targetHeadModel, targetDocumentTemplate,
-                modelFinder.find(sourceDocumentTemplate, "head"), sourceDocumentTemplate
+                targetHeadModel,
+                MetaClass.findModel(sourceDocumentModel, headModelFinder)
         );
 
         // Replace the head element and events with the decorated one
@@ -79,7 +74,7 @@ public class HtmlDocumentDecorator implements Decorator {
         int headIndex = -1;
         for (int i = 0; i < targetDocumentModel.size(); i++) {
             ITemplateEvent event = targetDocumentModel.get(i);
-            if (event instanceof IOpenElementTag && "head".equals(((IOpenElementTag) event).getElementCompleteName())) {
+            if (event instanceof IOpenElementTag && "head".equals(((IElementTag) event).getElementCompleteName())) {
                 headIndex = i;
                 break;
             }
@@ -88,16 +83,19 @@ public class HtmlDocumentDecorator implements Decorator {
             while (true) {
                 ITemplateEvent lastEvent = targetDocumentModel.get(headIndex);
                 targetDocumentModel.remove(headIndex);
-                if (lastEvent instanceof ICloseElementTag && "head".equals(((ICloseElementTag) lastEvent).getElementCompleteName())) {
+                if (lastEvent instanceof ICloseElementTag && "head".equals(((IElementTag) lastEvent).getElementCompleteName())) {
                     break;
                 }
             }
             targetDocumentModel.insertModel(headIndex, targetHeadModel);
         }
 
+        Predicate<ITemplateEvent> bodyModelFinder = event -> {
+            return event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName());
+        };
         new HtmlBodyDecorator(modelFactory).decorate(
-                modelFinder.find(targetDocumentTemplate, "body"), targetDocumentTemplate,
-                modelFinder.find(sourceDocumentTemplate, "body"), sourceDocumentTemplate
+                MetaClass.findModel(targetDocumentModel, bodyModelFinder),
+                MetaClass.findModel(sourceDocumentModel, bodyModelFinder)
         );
 
         // TODO
@@ -108,21 +106,13 @@ public class HtmlDocumentDecorator implements Decorator {
 //			contentDocument.docType = decoratorDocument.docType
 //		}
         // Find the root element of the target document to merge
-        // TODO: Way of obtaining a model from within a model
-        int rootElementEventIndex = -1;
-        for (int i = 0; i < targetDocumentModel.size(); i++) {
-            ITemplateEvent targetDocumentEvent = targetDocumentModel.get(i);
-            if (targetDocumentEvent instanceof IOpenElementTag) {
-                rootElementEventIndex = i;
-                break;
-            }
-        }
-        IModel targetDocumentRootModel = modelFinder.find(targetDocumentTemplate,
-                ((IElementTag) targetDocumentModel.get(rootElementEventIndex)).getElementCompleteName());
+        IModel targetDocumentRootModel = MetaClass.findModel(targetDocumentModel, targetDocumentEvent -> {
+            return targetDocumentEvent instanceof IOpenElementTag;
+        });
 
         // Bring the decorator into the content page (which is the one being processed)
         new AttributeMerger(modelFactory).merge(targetDocumentRootModel, sourceDocumentModel);
-        targetDocumentModel.replace(rootElementEventIndex, targetDocumentRootModel.get(0));
+        targetDocumentModel.replace((Integer) MetaClass.getMetaClass(targetDocumentRootModel).get("index"), targetDocumentRootModel.get(0));
     }
 
 }

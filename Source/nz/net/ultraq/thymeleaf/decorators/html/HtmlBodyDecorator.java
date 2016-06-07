@@ -40,19 +40,16 @@ public class HtmlBodyDecorator extends XmlElementDecorator {
      * Decorate the {@code <body>} part.
      *
      * @param targetBodyModel
-     * @param targetBodyTemplate
      * @param sourceBodyModel
-     * @param sourceBodyTemplate
      */
     @Override
-    public void decorate(IModel targetBodyModel, String targetBodyTemplate,
-            IModel sourceBodyModel, String sourceBodyTemplate) {
+    public void decorate(IModel targetBodyModel, IModel sourceBodyModel) {
 
         // Try to ensure there is a body as a result of decoration, applying the
         // source body, or just using what is in the target
         if (MetaClass.asBoolean(sourceBodyModel)) {
             if (MetaClass.asBoolean(targetBodyModel)) {
-                super.decorate(targetBodyModel, targetBodyTemplate, sourceBodyModel, sourceBodyTemplate);
+                super.decorate(targetBodyModel, sourceBodyModel);
             } else {
                 MetaClass.replaceModel(targetBodyModel, sourceBodyModel);
             }

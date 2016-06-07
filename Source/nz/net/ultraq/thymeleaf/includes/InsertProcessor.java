@@ -1,5 +1,5 @@
 /* 
- * Copyright 2013, Emanuel Rabina (http://www.ultraq.net.nz/)
+ * Copyright 2016, Emanuel Rabina (http://www.ultraq.net.nz/)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,30 +31,30 @@ import org.thymeleaf.standard.expression.FragmentExpression;
 import org.thymeleaf.templatemode.TemplateMode;
 
 /**
- * Similar to Thymeleaf's {@code th:replace}, but allows the passing of entire
+ * Similar to Thymeleaf's {@code th:insert}, but allows the passing of entire
  * element fragments to the included template. Useful if you have some HTML that
  * you want to reuse, but whose contents are too complex to determine or
  * construct with context variables alone.
  *
  * @author Emanuel Rabina
  */
-public class ReplaceProcessor extends AbstractAttributeModelProcessor {
+public class InsertProcessor extends AbstractAttributeModelProcessor {
 
-    public static final String PROCESSOR_NAME = "replace";
+    public static final String PROCESSOR_NAME = "insert";
     public static final int PROCESSOR_PRECEDENCE = 0;
 
     /**
-     * Constructor, set this processor to work on the 'replace' attribute.
+     * Constructor, sets this processor to work on the 'insert' attribute.
      *
      * @param templateMode
      * @param dialectPrefix
      */
-    public ReplaceProcessor(TemplateMode templateMode, String dialectPrefix) {
+    public InsertProcessor(TemplateMode templateMode, String dialectPrefix) {
         super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);
     }
 
     /**
-     * Locates a page fragment and uses it to replace the current element.
+     * Locates a page fragment and inserts it in the current template.
      *
      * @param context
      * @param model
@@ -66,22 +66,24 @@ public class ReplaceProcessor extends AbstractAttributeModelProcessor {
     protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
             String attributeValue, IElementModelStructureHandler structureHandler) {
 
-        // Locate the page and fragment to use for replacement
+        // Locate the page and fragment to insert
         FragmentExpression fragmentExpression = (FragmentExpression) new ExpressionProcessor(context).parse(attributeValue);
-        TemplateModel fragmentForReplacement = new TemplateModelFinder(context, getTemplateMode()).findFragment(
+
+        TemplateModel fragmentToInsert = new TemplateModelFinder(context, getTemplateMode()).findFragment(
                 fragmentExpression.getTemplateName().toString(), fragmentExpression.getFragmentSelector().toString(),
                 getDialectPrefix());
 
-        // Gather all fragment parts within the include element, scoping them to this element
+        // Gather all fragment parts within this element, scoping them to this element
         Map<String, IModel> includeFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);
         FragmentMap.setForNode(context, structureHandler, includeFragments);
 
         // Keep track of what template is being processed?  Thymeleaf does this for
         // its include processor, so I'm just doing the same here.
-        structureHandler.setTemplateData(fragmentForReplacement.getTemplateData());
+        structureHandler.setTemplateData(fragmentToInsert.getTemplateData());
 
-        // Replace this element with the located fragment
-        MetaClass.replaceModel(model, fragmentForReplacement.cloneModel());
+        // Replace the children of this element with those of the to-be-inserted page fragment
+        MetaClass.clearChildren(model);
+        model.insertModel(1, fragmentToInsert.cloneModel());
     }
 
 }

@@ -38,19 +38,22 @@ class GradualLayoutTestExecutor extends JUnitTestExecutor {
 	]
 
 	/**
-	 * Return just the example Thymeleaf testing file.
+	 * Return a subset of all the test files for trying out Thymeleaf 3.
 	 * 
-	 * @return List of just the example test file.
+	 * @return Specific Thymeleaf 3 test files.
 	 */
 	@Parameterized.Parameters(name = '{0}')
 	static List<String> listGroupingLayoutDialectTests() {
 
 		return [
+			'nz/net/ultraq/thymeleaf/tests/decorators/Decorator-BodyOnlyLayout-BodyOnlyContent.thtest',
 			'nz/net/ultraq/thymeleaf/tests/decorators/html/Head-ConditionalComments.thtest',
 			'nz/net/ultraq/thymeleaf/tests/decorators/html/Head-TitleReplacement.thtest',
 			'nz/net/ultraq/thymeleaf/tests/decorators/strategies/AppendingStrategy.thtest',
 			'nz/net/ultraq/thymeleaf/tests/decorators/xml/Document-XmlDecoration.thtest',
-			'nz/net/ultraq/thymeleaf/tests/decorators/Decorator-BodyOnlyLayout-BodyOnlyContent.thtest'
+			'nz/net/ultraq/thymeleaf/tests/includes/Include-Basic.thtest',
+			'nz/net/ultraq/thymeleaf/tests/includes/Insert-Basic.thtest',
+			'nz/net/ultraq/thymeleaf/tests/includes/Replace-Basic.thtest'
 		]
 	}
 }

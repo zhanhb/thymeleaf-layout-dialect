@@ -22,10 +22,9 @@ import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
 import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
-import nz.net.ultraq.thymeleaf.models.ModelFinder;
+import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
-import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.model.ICloseElementTag;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
@@ -60,7 +59,6 @@ public class DecoratorProcessor extends AbstractAttributeModelProcessor {
      */
     public DecoratorProcessor(TemplateMode templateMode, String dialectPrefix, SortingStrategy sortingStrategy) {
         super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);
-
         this.sortingStrategy = sortingStrategy;
     }
 
@@ -75,38 +73,32 @@ public class DecoratorProcessor extends AbstractAttributeModelProcessor {
      * @param structureHandler
      */
     @Override
-    @SuppressWarnings("unchecked")
     protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
             String attributeValue, IElementModelStructureHandler structureHandler) {
-
         // Ensure the decorator attribute is in the root element of the document
         if (context.getElementStack().size() != 1) {
             throw new IllegalArgumentException("layout:decorator attribute must appear in the root element of your template");
         }
 
-        IModelFactory modelFactory = context.getModelFactory();
-        String contentTemplateName = context.getTemplateData().getTemplate();
-        String decoratorTemplateName = new ExpressionProcessor(context).processAsString(attributeValue);
-
         // Locate the template to 'redirect' processing to by completely replacing
         // the current document with it
-        ModelFinder modelFinder = new ModelFinder(context, getTemplateMode());
-        IModel decoratorTemplate = modelFinder.findTemplate(decoratorTemplateName);
+        String decoratorTemplateName = new ExpressionProcessor(context).processAsString(attributeValue);
+        IModel decoratorTemplate = new TemplateModelFinder(context, getTemplateMode())
+                .findTemplate(decoratorTemplateName)
+                .cloneModel();
 
-        // Gather all fragment parts from this page to apply to the new document
-        // after decoration has taken place
-        Map<String, TemplateModel> pageFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);
+        Map<String, IModel> pageFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);
 
         // Choose the decorator to use based on template mode, then apply it
-        Decorator decorator
-                = getTemplateMode() == TemplateMode.HTML ? new HtmlDocumentDecorator(modelFactory, modelFinder, sortingStrategy)
-                        : getTemplateMode() == TemplateMode.XML ? new XmlDocumentDecorator(modelFactory, modelFinder)
-                                : null;
+        IModelFactory modelFactory = context.getModelFactory();
+        TemplateMode templateMode = getTemplateMode();
+        Decorator decorator = templateMode == TemplateMode.HTML ? new HtmlDocumentDecorator(modelFactory, sortingStrategy)
+                : templateMode == TemplateMode.XML ? new XmlDocumentDecorator(modelFactory) : null;
         if (decorator == null) {
-            throw new IllegalArgumentException("Layout dialect cannot be applied to the " + getTemplateMode() + " template mode, "
-                    + "only HTML and XML template modes are currently supported ");
+            throw new IllegalArgumentException("Layout dialect cannot be applied to the " + templateMode + " template mode, "
+                    + "only HTML and XML template modes are currently supported");
         }
-        decorator.decorate(decoratorTemplate, decoratorTemplateName, model, contentTemplateName);
+        decorator.decorate(decoratorTemplate, model);
 
         // TODO: The modified decorator template includes anything outside the root
         //       element, which we don't want for the next step.  Strip those events
@@ -126,7 +118,7 @@ public class DecoratorProcessor extends AbstractAttributeModelProcessor {
         MetaClass.replaceModel(model, decoratorTemplate);
 
         // Save layout fragments for use later by layout:fragment processors
-        FragmentMap.setForNode(context, structureHandler, (Map) pageFragments);
+        FragmentMap.setForNode(context, structureHandler, pageFragments);
     }
 
 }

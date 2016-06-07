@@ -1,35 +1,44 @@
-/* 
- * Copyright 2013, Emanuel Rabina (http://www.ultraq.net.nz/)
- * 
+/*
+ * Copyright 2016, Emanuel Rabina (http://www.ultraq.net.nz/)
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nz.net.ultraq.thymeleaf.decorators;
+package nz.net.ultraq.thymeleaf.models;
 
-import org.thymeleaf.model.IModel;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
- * The contract for all decorators.
+ * An iterator that does nothing.
  *
  * @author Emanuel Rabina
+ * @param <T>
  */
-public interface Decorator {
+public class NullIterator<T> implements Iterator<T> {
 
-    /**
-     * Decorate the target model with the contents of the source model.
-     *
-     * @param targetModel The target model to be decorated.
-     * @param sourceModel The source model to use for decorating.
-     */
-    void decorate(IModel targetModel, IModel sourceModel);
+    @Override
+    public boolean hasNext() {
+        return false;
+    }
+
+    @Override
+    public T next() {
+        throw new NoSuchElementException();
+    }
+
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException();
+    }
 
 }

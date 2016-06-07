@@ -36,6 +36,7 @@ import static org.junit.Assert.*
  */
 class AttributeMergerTests {
 
+	private static ModelBuilder modelBuilder
 	private static IModelFactory modelFactory
 
 	/**
@@ -50,6 +51,7 @@ class AttributeMergerTests {
 			]
 		)
 		modelFactory = templateEngine.configuration.getModelFactory(TemplateMode.HTML)
+		modelBuilder = new ModelBuilder(modelFactory, templateEngine.configuration.elementDefinitions, TemplateMode.HTML)
 	}
 
 	/**
@@ -59,28 +61,17 @@ class AttributeMergerTests {
 	@Test
 	void addAttributes() {
 
-		def modelBuilder = new ModelBuilder(modelFactory)
-
-//		<div layout-test:attribute-merger="target" id="test-element"></div>
 		def source = modelBuilder.build {
 			div(id: 'test-element')
 		}
-
-//		<div class="container"></div>
 		def target = modelBuilder.build {
 			div(class: 'container')
 		}
-
-//		<div class="container" id="test-element"></div>
 		def expected = modelBuilder.build {
 			div(class: 'container', id: 'test-element')
 		}
 
 		new AttributeMerger(modelFactory).merge(target, source)
-
-		// TODO: This should be an assertEquals, but somehow it's not using the
-		//       metaclass unless I use ==.  Change if I get a chance to add
-		//       equals() methods to the model and event classes themselves.
 		assertTrue(MetaClass.equals(target, expected))
 	}
 
@@ -90,28 +81,17 @@ class AttributeMergerTests {
 	@Test
 	void mergeAttributes() {
 
-		def modelBuilder = new ModelBuilder(modelFactory)
-
-//		<div layout-test:attribute-merger="target" class="roflcopter"></div>
 		def source = modelBuilder.build {
 			div(class: 'roflcopter')
 		}
-
-//		<div class="container"></div>
 		def target = modelBuilder.build {
 			div(class: 'container')
 		}
-
-//		<div class="roflcopter"></div>
 		def expected = modelBuilder.build {
 			div(class: 'roflcopter')
 		}
 
 		new AttributeMerger(modelFactory).merge(target, source)
-
-		// TODO: This should be an assertEquals, but somehow it's not using the
-		//       metaclass unless I use ==.  Change if I get a chance to add
-		//       equals() methods to the model and event classes themselves.
 		assertTrue(MetaClass.equals(target, expected))
 	}
 }

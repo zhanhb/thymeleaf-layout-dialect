@@ -1,12 +1,12 @@
-/* 
+/*
  * Copyright 2012, Emanuel Rabina (http://www.ultraq.net.nz/)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,11 +15,23 @@
  */
 package nz.net.ultraq.thymeleaf.includes;
 
+import java.util.Iterator;
+import java.util.Map;
+import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
+import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
+import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
+import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
+import org.thymeleaf.standard.expression.FragmentExpression;
 import org.thymeleaf.templatemode.TemplateMode;
 
 /**
@@ -29,8 +41,12 @@ import org.thymeleaf.templatemode.TemplateMode;
  * construct with context variables alone.
  *
  * @author Emanuel Rabina
+ * @deprecated Use {@link InsertProcessor} ({@code layout:insert}) instead.
  */
+@Deprecated
 public class IncludeProcessor extends AbstractAttributeModelProcessor {
+
+    private static final Logger logger = LoggerFactory.getLogger(IncludeProcessor.class);
 
     public static final String PROCESSOR_NAME = "include";
     public static final int PROCESSOR_PRECEDENCE = 0;
@@ -58,34 +74,32 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
     protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
             String attributeValue, IElementModelStructureHandler structureHandler) {
 
-        // Locate the page and fragment to include
-        /*List<Node> includeFragments = new FragmentFinder(arguments)
-                .findFragments(element.getAttributeValue(attributeName));
+        logger.warn("The layout:include/data-layout-include processor is deprecated and will be "
+                + "removed in the next major version of the layout dialect.  Use the "
+                + "layout:insert/data-layout-insert processor instead.");
 
-        // Gather all fragment parts within the include element, scoping them to
-        // this element
-        Map<String, Element> elementFragments = new FragmentMapper().map(element.getElementChildren());
-        FragmentMap.setForNode(arguments, element, elementFragments);
+        // Locate the page and fragment for inclusion
+        FragmentExpression fragmentExpression = (FragmentExpression) new ExpressionProcessor(context).parse(attributeValue);
 
-        // Replace the children of this element with those of the include page
-        // fragments.  The 'container' element is copied from how Thymeleaf does
-        // it's include processor, which is to maintain internal structures like
-        // local variables
-        element.clearChildren();
-        if (includeFragments != null && !includeFragments.isEmpty()) {
-            Element containerElement = new Element("container");
-            for (Node includeFragment : includeFragments) {
-                containerElement.addChild(includeFragment);
-                containerElement.extractChild(includeFragment);
-            }
-            for (Node extractedChild : containerElement.getChildren()) {
-                element.addChild(extractedChild);
-            }
+        TemplateModel fragmentForInclusion = new TemplateModelFinder(context, getTemplateMode()).findFragment(
+                fragmentExpression.getTemplateName().toString(), fragmentExpression.getFragmentSelector().toString(),
+                getDialectPrefix());
+
+        // Gather all fragment parts within the include element, scoping them to this element
+        Map<String, IModel> includeFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);
+        FragmentMap.setForNode(context, structureHandler, includeFragments);
+
+        // Keep track of what template is being processed?  Thymeleaf does this for
+        // its include processor, so I'm just doing the same here.
+        structureHandler.setTemplateData(fragmentForInclusion.getTemplateData());
+
+        // Replace the children of this element with the children of the included page fragment
+        MetaClass.clearChildren(model);
+
+        for (Iterator<ITemplateEvent> it = MetaClass.childEventIterator(fragmentForInclusion.cloneModel()); it.hasNext();) {
+            ITemplateEvent fragmentChildEvent = it.next();
+            model.insert(model.size() - 1, fragmentChildEvent);
         }
-
-        element.removeAttribute(attributeName);
-        return ProcessorResult.OK;
-         */
     }
 
 }

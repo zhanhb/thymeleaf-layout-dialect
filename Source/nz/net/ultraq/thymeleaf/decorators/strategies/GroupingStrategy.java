@@ -91,7 +91,7 @@ public class GroupingStrategy implements SortingStrategy {
         }
 
         int type = findMatchingType(childModel);
-        Iterator<IModel> it = MetaClass.modelIterator(headModel);
+        Iterator<IModel> it = MetaClass.childModelIterator(headModel);
 
         ArrayList<IModel> list = new ArrayList<>();
         while (it.hasNext()) {
@@ -101,7 +101,7 @@ public class GroupingStrategy implements SortingStrategy {
         while (listIterator.hasPrevious()) {
             IModel headSubModel = listIterator.previous();
             if (type == findMatchingType(headSubModel)) {
-                return MetaClass.getEndIndex(headSubModel);
+                return (Integer) MetaClass.getMetaClass(headSubModel).get("endIndex");
             }
         }
         throw new NullPointerException();

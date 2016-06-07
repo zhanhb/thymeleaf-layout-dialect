@@ -1,12 +1,12 @@
-/*
+/* 
  * Copyright 2016, Emanuel Rabina (http://www.ultraq.net.nz/)
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +16,7 @@
 package nz.net.ultraq.thymeleaf.expressions;
 
 import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.standard.expression.IStandardExpression;
 import org.thymeleaf.standard.expression.StandardExpressions;
 
 /**
@@ -38,22 +39,31 @@ public class ExpressionProcessor {
     }
 
     /**
-     * Process an expression, returning either an expression or object that best
-     * matches the expression being processed.
+     * Parses an expression, returning the matching expression type.
      *
      * @param expression
-     * @return The expression object for the expression type.
+     * @return Matching expression type.
      */
-    public Object process(String expression) {
+    public IStandardExpression parse(String expression) {
         return StandardExpressions.getExpressionParser(context.getConfiguration())
-                .parseExpression(context, expression)
-                .execute(context);
+                .parseExpression(context, expression);
     }
 
     /**
-     * Process an expression and return the result as a string. Useful for
-     * expressions that expect a simple result, such as a template or fragment
-     * name.
+     * Parses and executes an expression, returning the result of the expression
+     * having been parsed and executed.
+     *
+     * @param expression
+     * @return The result of the expression being executed.
+     */
+    public Object process(String expression) {
+        return parse(expression).execute(context);
+    }
+
+    /**
+     * Parse and execute an expression, returning the result as a string. Useful
+     * for expressions that expect a simple result, such as a template or
+     * fragment name.
      *
      * @param expression
      * @return The expression as a string.

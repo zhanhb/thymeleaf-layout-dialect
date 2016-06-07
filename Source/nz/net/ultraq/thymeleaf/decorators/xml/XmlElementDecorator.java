@@ -47,13 +47,10 @@ public class XmlElementDecorator implements Decorator {
      * fragment processors.
      *
      * @param targetElementModel
-     * @param targetElementTemplate
      * @param sourceElementModel
-     * @param sourceElementTemplate
      */
     @Override
-    public void decorate(IModel targetElementModel, String targetElementTemplate,
-            IModel sourceElementModel, String sourceElementTemplate) {
+    public void decorate(IModel targetElementModel, IModel sourceElementModel) {
         new AttributeMerger(modelFactory).merge(targetElementModel, sourceElementModel);
     }
 

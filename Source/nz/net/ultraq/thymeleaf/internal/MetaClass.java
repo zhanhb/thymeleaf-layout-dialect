@@ -1,25 +1,55 @@
+/* 
+ * Copyright 2016, Emanuel Rabina (http://www.ultraq.net.nz/)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nz.net.ultraq.thymeleaf.internal;
 
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import nz.net.ultraq.thymeleaf.models.ModelIterator;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import nz.net.ultraq.thymeleaf.models.ChildEventIterator;
+import nz.net.ultraq.thymeleaf.models.ChildModelIterator;
+import nz.net.ultraq.thymeleaf.models.NullIterator;
 import org.thymeleaf.engine.AttributeName;
+import org.thymeleaf.engine.HTMLElementDefinition;
+import org.thymeleaf.engine.HTMLElementType;
+import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.model.IAttribute;
 import org.thymeleaf.model.ICloseElementTag;
+import org.thymeleaf.model.IElementTag;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IOpenElementTag;
+import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.model.IStandaloneElementTag;
 import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.model.IText;
+import org.thymeleaf.templatemode.TemplateMode;
 
 /**
+ * Additional methods applied to the Thymeleaf model classes via Groovy
+ * meta-programming.
  *
  * @author zhanhb
  */
 public class MetaClass {
 
-    private static final Map<IModel, Integer> map = new ConcurrentWeakIdentityHashMap<>(200);
+    private static final ConcurrentMap<Object, Map<String, Object>> map = new ConcurrentWeakIdentityHashMap<>(200);
 
     /**
      * Set that a model evaluates to 'false' if it has no events.
@@ -29,6 +59,65 @@ public class MetaClass {
      */
     public static boolean asBoolean(IModel delegate) {
         return delegate != null && delegate.size() > 0;
+    }
+
+    /**
+     * If this model represents an element, then this method returns an iterator
+     * over those child events.
+     *
+     * @param delegate
+     * @return An iterator over this model's child events, or an empty iterator
+     * for all other model types.
+     */
+    public static Iterator<ITemplateEvent> childEventIterator(IModel delegate) {
+        return isElement(delegate) ? new ChildEventIterator(delegate) : new NullIterator<>();
+    }
+
+    /**
+     * If this model represents an element, then this method returns an iterator
+     * over any potential child items as models of their own.
+     *
+     * @param delegate
+     * @return New model iterator.
+     */
+    public static Iterator<IModel> childModelIterator(IModel delegate) {
+        return isElement(delegate) ? new ChildModelIterator(delegate) : new NullIterator<>();
+    }
+
+    /**
+     * Clears all the events from the model.
+     *
+     * @param delegate
+     */
+    public static void clear(IModel delegate) {
+        delegate.reset();
+    }
+
+    /**
+     * If the model represents an element open to close tags, then this method
+     * removes all of the inner events. Otherwise, it does nothing.
+     *
+     * @param delegate
+     */
+    public static void clearChildren(IModel delegate) {
+        if (isElement(delegate)) {
+            while (delegate.size() > 2) {
+                delegate.remove(1);
+            }
+        }
+    }
+
+    /**
+     * Iterate through each event in the model. This is similar to what the
+     * {@code accept} method does.
+     *
+     * @param delegate
+     * @param closure
+     */
+    public static void each(IModel delegate, Consumer<? super ITemplateEvent> closure) {
+        for (int i = 0; i < delegate.size(); i++) {
+            closure.accept(delegate.get(i));
+        }
     }
 
     /**
@@ -90,7 +179,7 @@ public class MetaClass {
                 otherEventIndex++;
                 continue;
             }
-            if (thisEvent != otherEvent) {
+            if (!equals(thisEvent, otherEvent)) {
                 return false;
             }
             thisEventIndex++;
@@ -99,6 +188,97 @@ public class MetaClass {
 
         return thisEventIndex == delegate.size() && otherEventIndex == other.size();
 
+    }
+
+    /**
+     * Return {@code true} only if all the events in the model return
+     * {@code true} for the given closure.
+     *
+     * @param delegate
+     * @param closure
+     * @return {@code true} if every event satisfies the closure.
+     */
+    public static boolean everyWithIndex(IModel delegate, BiFunction<? super ITemplateEvent, ? super Integer, Boolean> closure) {
+        for (int i = 0; i < delegate.size(); i++) {
+            if (!closure.apply(delegate.get(i), i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns the first event in the model that meets the criteria of the given
+     * closure.
+     *
+     * Models returned via this method are also aware of their position in the
+     * event queue of the parent model, accessible via their {@code index}
+     * property.
+     *
+     * @param delegate
+     * @param closure
+     * @return The first event to match the closure criteria, or {@code null} if
+     * nothing matched.
+     */
+    public static ITemplateEvent find(IModel delegate, Predicate<? super ITemplateEvent> closure) {
+        for (int i = 0; i < delegate.size(); i++) {
+            ITemplateEvent event = delegate.get(i);
+            boolean result = closure.test(event);
+            if (result) {
+                getMetaClass(event).put("index", i);
+                return event;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the first instance of a model that meets the given closure
+     * criteria.
+     *
+     * Models returned via this method are also aware of their position in the
+     * event queue of the parent model, accessible via their {@code index}
+     * property.
+     *
+     * @param delegate
+     * @param closure
+     * @return A model over the event that matches the closure criteria, or
+     * {@code null} if nothing matched.
+     */
+    public static IModel findModel(IModel delegate, Predicate<? super ITemplateEvent> closure) {
+        ITemplateEvent event = find(delegate, closure);
+        if (event != null) {
+            int index = (Integer) getMetaClass(event).get("index");
+            IModel model = getModel(delegate, index);
+            getMetaClass(model).put("index", index);
+            return model;
+        }
+        return null;
+    }
+
+    /**
+     * Returns the first event in the model that meets the criteria of the given
+     * closure.
+     *
+     * Models returned via this method are also aware of their position in the
+     * event queue of the parent model, accessible via their {@code index}
+     * property.
+     *
+     * @param delegate
+     * @param closure
+     * @return The first event to match the closure criteria, or {@code null} if
+     * nothing matched.
+     */
+    public static ITemplateEvent findWithIndex(IModel delegate, BiFunction<? super ITemplateEvent, ? super Integer, Boolean> closure) {
+        for (int i = 0; i < delegate.size(); i++) {
+            ITemplateEvent event = delegate.get(i);
+            boolean result = closure.apply(event, i);
+            if (result) {
+                getMetaClass(event).put("index", i);
+                return event;
+            }
+        }
+        return null;
     }
 
     /**
@@ -142,13 +322,45 @@ public class MetaClass {
      * @param model
      */
     public static void insertModelWithWhitespace(IModel delegate, int pos, IModel model) {
-        IModel whitespace = getModel(delegate, pos);  // Assumes that whitespace exists at the insertion point
+        IModel whitespace = getModel(delegate, pos); // Assumes that whitespace exists at the insertion point
         if (isWhitespace(whitespace)) {
             delegate.insertModel(pos, model);
             delegate.insertModel(pos, whitespace);
         } else {
             delegate.insertModel(pos, model);
         }
+    }
+
+    /**
+     * Inserts an event, creating a whitespace event before it so that it
+     * appears in line with all the existing events.
+     *
+     * @param delegate
+     * @param pos
+     * @param event
+     */
+    public static void insertWithWhitespace(IModel delegate, int pos, ITemplateEvent event) {
+        IModel whitespace = getModel(delegate, pos); // Assumes that whitespace exists at the insertion point
+        if (isWhitespace(whitespace)) {
+            delegate.insert(pos, event);
+            delegate.insertModel(pos, whitespace);
+        } else {
+            // TODO
+            // delegate.insert(event);
+            throw new Error(delegate.getClass().getName());
+        }
+    }
+
+    /**
+     * Returns whether or not this model represents an element with potential
+     * child elements.
+     *
+     * @param delegate
+     * @return {@code true} if the first event in this model is an opening tag
+     * and the last event is the matching closing tag.
+     */
+    public static boolean isElement(IModel delegate) {
+        return first(delegate) instanceof IOpenElementTag && last(delegate) instanceof ICloseElementTag;
     }
 
     /**
@@ -170,16 +382,6 @@ public class MetaClass {
      */
     public static ITemplateEvent last(IModel delegate) {
         return delegate.get(delegate.size() - 1);
-    }
-
-    /**
-     * Returns a new model iterator over this model.
-     *
-     * @param delegate
-     * @return New model iterator.
-     */
-    public static Iterator<IModel> modelIterator(IModel delegate) {
-        return new ModelIterator(delegate);
     }
 
     /**
@@ -244,6 +446,18 @@ public class MetaClass {
     }
 
     /**
+     * Shortcut to the template name found on the template data object. Only
+     * works if the template was resolved via a name, rather than a string (eg:
+     * anonymous template), in which case this can return the entire template!
+     *
+     * @param delegate
+     * @return Template name.
+     */
+    public static String getTemplate(TemplateModel delegate) {
+        return delegate.getTemplateData().getTemplate();
+    }
+
+    /**
      * Returns whether or not this event represents collapsible whitespace.
      *
      * @param delegate
@@ -263,8 +477,8 @@ public class MetaClass {
      */
     public static boolean equals(IOpenElementTag delegate, Object other) {
         return other instanceof IOpenElementTag
-                && Objects.equals(delegate.getElementCompleteName(), ((IOpenElementTag) other).getElementCompleteName())
-                && Objects.equals(delegate.getAttributeMap(), ((IOpenElementTag) other).getAttributeMap());
+                && Objects.equals(delegate.getElementCompleteName(), ((IElementTag) other).getElementCompleteName())
+                && Objects.equals(delegate.getAttributeMap(), ((IProcessableElementTag) other).getAttributeMap());
     }
 
     /**
@@ -276,7 +490,7 @@ public class MetaClass {
      */
     public static boolean equals(ICloseElementTag delegate, Object other) {
         return other instanceof ICloseElementTag
-                && Objects.equals(delegate.getElementCompleteName(), ((ICloseElementTag) other).getElementCompleteName());
+                && Objects.equals(delegate.getElementCompleteName(), ((IElementTag) other).getElementCompleteName());
     }
 
     /**
@@ -289,8 +503,8 @@ public class MetaClass {
      */
     public static boolean equals(IStandaloneElementTag delegate, Object other) {
         return other instanceof IStandaloneElementTag
-                && Objects.equals(delegate.getElementCompleteName(), ((IStandaloneElementTag) other).getElementCompleteName())
-                && Objects.equals(delegate.getAttributeMap(), ((IStandaloneElementTag) other).getAttributeMap());
+                && Objects.equals(delegate.getElementCompleteName(), ((IElementTag) other).getElementCompleteName())
+                && Objects.equals(delegate.getAttributeMap(), ((IProcessableElementTag) other).getAttributeMap());
     }
 
     /**
@@ -363,10 +577,16 @@ public class MetaClass {
                     level++;
                 }
                 if (event instanceof ICloseElementTag) {
-                    if (level == 0) {
+                    ICloseElementTag tag = (ICloseElementTag) event;
+                    if (tag.getTemplateMode() == TemplateMode.HTML && ((HTMLElementDefinition) tag.getElementDefinition()).getType() == HTMLElementType.VOID) {
+                        // Do nothing.  This is to capture closing tags for HTML void
+                        // elements which shouldn't be specified according to the HTML spec.
+                        // https://html.spec.whatwg.org/multipage/syntax.html#void-elements
+                    } else if (level == 0) {
                         break;
+                    } else {
+                        level--;
                     }
-                    level--;
                 }
             }
             return eventIndex - index;
@@ -375,12 +595,8 @@ public class MetaClass {
         return 1;
     }
 
-    public static Integer getEndIndex(IModel model) {
-        return map.get(model);
-    }
-
-    public static void setEndIndex(IModel model, int endIndex) {
-        map.put(model, endIndex);
+    public static Map<String, Object> getMetaClass(Object model) {
+        return map.computeIfAbsent(model, key -> new LinkedHashMap<>());
     }
 
     private MetaClass() {
