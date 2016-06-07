@@ -20,6 +20,7 @@ import java.util.function.Predicate;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlElementDecorator;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import nz.net.ultraq.thymeleaf.internal.MetaProvider;
 import org.thymeleaf.model.IElementTag;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
@@ -97,11 +98,11 @@ public class HtmlHeadDecorator extends XmlElementDecorator {
 
         IModel sourceTitle = MetaClass.findModel(sourceHeadModel, titleEventIndexFinder);
         if (MetaClass.asBoolean(sourceTitle)) {
-            MetaClass.removeModelWithWhitespace(sourceHeadModel, (Integer) MetaClass.getMetaClass(sourceTitle).get("index"));
+            MetaClass.removeModelWithWhitespace(sourceHeadModel, MetaProvider.INSTANCE.getProperty(sourceTitle, "index"));
 
             IModel targetTitle = MetaClass.findModel(targetHeadModel, titleEventIndexFinder);
             if (MetaClass.asBoolean(targetTitle)) {
-                MetaClass.removeModelWithWhitespace(targetHeadModel, (Integer) MetaClass.getMetaClass(sourceTitle).get("index"));
+                MetaClass.removeModelWithWhitespace(targetHeadModel, MetaProvider.INSTANCE.getProperty(sourceTitle, "index"));
             }
 
             MetaClass.insertModelWithWhitespace(targetHeadModel, 1, sourceTitle);

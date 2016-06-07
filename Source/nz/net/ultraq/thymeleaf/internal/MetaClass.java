@@ -16,10 +16,7 @@
 package nz.net.ultraq.thymeleaf.internal;
 
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -48,8 +45,6 @@ import org.thymeleaf.templatemode.TemplateMode;
  * @author zhanhb
  */
 public class MetaClass {
-
-    private static final ConcurrentMap<Object, Map<String, Object>> map = new ConcurrentWeakIdentityHashMap<>(200);
 
     /**
      * Set that a model evaluates to 'false' if it has no events.
@@ -225,7 +220,7 @@ public class MetaClass {
             ITemplateEvent event = delegate.get(i);
             boolean result = closure.test(event);
             if (result) {
-                getMetaClass(event).put("index", i);
+                MetaProvider.INSTANCE.setProperty(event, "index", i);
                 return event;
             }
         }
@@ -248,9 +243,9 @@ public class MetaClass {
     public static IModel findModel(IModel delegate, Predicate<? super ITemplateEvent> closure) {
         ITemplateEvent event = find(delegate, closure);
         if (event != null) {
-            int index = (Integer) getMetaClass(event).get("index");
+            int index = MetaProvider.INSTANCE.getProperty(event, "index");
             IModel model = getModel(delegate, index);
-            getMetaClass(model).put("index", index);
+            MetaProvider.INSTANCE.setProperty(model, "index", index);
             return model;
         }
         return null;
@@ -274,7 +269,7 @@ public class MetaClass {
             ITemplateEvent event = delegate.get(i);
             boolean result = closure.apply(event, i);
             if (result) {
-                getMetaClass(event).put("index", i);
+                MetaProvider.INSTANCE.setProperty(event, "index", i);
                 return event;
             }
         }
@@ -593,10 +588,6 @@ public class MetaClass {
         }
 
         return 1;
-    }
-
-    public static Map<String, Object> getMetaClass(Object model) {
-        return map.computeIfAbsent(model, key -> new LinkedHashMap<>());
     }
 
     private MetaClass() {

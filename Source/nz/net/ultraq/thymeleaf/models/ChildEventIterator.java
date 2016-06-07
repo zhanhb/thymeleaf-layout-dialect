@@ -16,7 +16,7 @@
 package nz.net.ultraq.thymeleaf.models;
 
 import java.util.Iterator;
-import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import nz.net.ultraq.thymeleaf.internal.MetaProvider;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.ITemplateEvent;
 
@@ -62,7 +62,7 @@ public class ChildEventIterator implements Iterator<ITemplateEvent> {
     @Override
     public ITemplateEvent next() {
         ITemplateEvent event = parent.get(currentIndex);
-        MetaClass.getMetaClass(event).put("index", currentIndex++);
+        MetaProvider.INSTANCE.setProperty(event, "index", currentIndex++);
         return event;
     }
 

@@ -119,6 +119,12 @@
             <version>3.0.0.RELEASE</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.8</version>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <build>

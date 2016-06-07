@@ -19,6 +19,7 @@ import java.util.function.Predicate;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import nz.net.ultraq.thymeleaf.internal.MetaProvider;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
 import org.thymeleaf.model.ICloseElementTag;
 import org.thymeleaf.model.IElementTag;
@@ -112,7 +113,7 @@ public class HtmlDocumentDecorator implements Decorator {
 
         // Bring the decorator into the content page (which is the one being processed)
         new AttributeMerger(modelFactory).merge(targetDocumentRootModel, sourceDocumentModel);
-        targetDocumentModel.replace((Integer) MetaClass.getMetaClass(targetDocumentRootModel).get("index"), targetDocumentRootModel.get(0));
+        targetDocumentModel.replace(MetaProvider.INSTANCE.getProperty(targetDocumentRootModel, "index"), targetDocumentRootModel.get(0));
     }
 
 }

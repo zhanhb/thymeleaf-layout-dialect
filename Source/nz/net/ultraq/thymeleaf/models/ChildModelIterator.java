@@ -17,6 +17,7 @@ package nz.net.ultraq.thymeleaf.models;
 
 import java.util.Iterator;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import nz.net.ultraq.thymeleaf.internal.MetaProvider;
 import org.thymeleaf.model.IModel;
 
 /**
@@ -63,9 +64,9 @@ public class ChildModelIterator implements Iterator<IModel> {
     public IModel next() {
         IModel subModel = MetaClass.getModel(parent, currentIndex);
 
-        MetaClass.getMetaClass(subModel).put("startIndex", currentIndex);
+        MetaProvider.INSTANCE.setProperty(subModel, "startIndex", currentIndex);
         currentIndex += subModel.size();
-        MetaClass.getMetaClass(subModel).put("endIndex", currentIndex);
+        MetaProvider.INSTANCE.setProperty(subModel, "endIndex", currentIndex);
 
         return subModel;
     }

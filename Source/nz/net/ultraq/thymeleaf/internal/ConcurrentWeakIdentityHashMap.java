@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentMap;
  * @param <K>
  * @param <V>
  */
-public class ConcurrentWeakIdentityHashMap<K, V> extends AbstractMap<K, V>
+class ConcurrentWeakIdentityHashMap<K, V> extends AbstractMap<K, V>
         implements ConcurrentMap<K, V> {
 
     private final ConcurrentMap<Reference<? extends K>, V> map;

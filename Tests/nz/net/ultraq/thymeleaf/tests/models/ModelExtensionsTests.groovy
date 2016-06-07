@@ -79,18 +79,18 @@ class ModelExtensionsTests {
 
 		def nextModel = childModelIterator.next()
 		assertTrue(MetaClass.equalsIgnoreWhitespace(nextModel, pModel1))
-		assertEquals(1, MetaClass.getMetaClass(nextModel).startIndex)
-		assertEquals(4, MetaClass.getMetaClass(nextModel).endIndex)
+		assertEquals(1, nextModel.startIndex)
+		assertEquals(4, nextModel.endIndex)
 
 		nextModel = childModelIterator.next()
 		assertTrue(MetaClass.equalsIgnoreWhitespace(nextModel, hrModel))
-		assertEquals(4, MetaClass.getMetaClass(nextModel).startIndex)
-		assertEquals(5, MetaClass.getMetaClass(nextModel).endIndex)
+		assertEquals(4, nextModel.startIndex)
+		assertEquals(5, nextModel.endIndex)
 
 		nextModel = childModelIterator.next()
 		assertTrue(MetaClass.equalsIgnoreWhitespace(nextModel, pModel2))
-		assertEquals(5, MetaClass.getMetaClass(nextModel).startIndex)
-		assertEquals(8, MetaClass.getMetaClass(nextModel).endIndex)
+		assertEquals(5, nextModel.startIndex)
+		assertEquals(8, nextModel.endIndex)
 
 		assertFalse(childModelIterator.hasNext())
 	}
