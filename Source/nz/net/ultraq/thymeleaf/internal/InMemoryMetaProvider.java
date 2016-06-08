@@ -63,9 +63,18 @@ class InMemoryMetaProvider extends MetaProvider {
         getMap(object).remove(key);
     }
 
-
+    @SuppressWarnings("NestedAssignment")
     private Map<String, Object> getMap(Object object) {
-        return map.computeIfAbsent(object, key -> new LinkedHashMap<>(4));
+        Map<String, Object> value;
+        LinkedHashMap<String, Object> tmp;
+
+        if ((value = map.get(object)) == null
+                && (value = map.putIfAbsent(object,
+                        tmp = new LinkedHashMap<>(4))) == null) {
+            value = tmp;
+        }
+
+        return value;
     }
 
 }

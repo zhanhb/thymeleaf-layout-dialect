@@ -25,7 +25,7 @@ import org.codehaus.groovy.runtime.callsite.CallSiteArray;
  */
 class GroovyMetaProvider extends MetaProvider {
 
-    private static final CallSite[] callSites
+    private static final CallSite[] CALL_SITES
             = new CallSiteArray(GroovyMetaProvider.class,
                     new String[]{"getAt", "putAt", "metaClass"}).array;
 
@@ -33,15 +33,14 @@ class GroovyMetaProvider extends MetaProvider {
     @SuppressWarnings("unchecked")
     @SneakyThrows
     public <T> T getProperty(Object object, String key) {
-        CallSite[] var3 = callSites;
-        return (T) var3[0].call(object, key);
+        return (T) CALL_SITES[0].call(object, key);
     }
 
     @Override
     @SneakyThrows
     public void setProperty(Object object, String key, Object value) {
-        CallSite[] var4 = callSites;
-        var4[1].call(var4[2].callGetProperty(object), key, value);
+        CallSite[] vallSites = CALL_SITES;
+        vallSites[1].call(vallSites[2].callGetProperty(object), key, value);
     }
 
 }

@@ -15,9 +15,9 @@
  */
 package nz.net.ultraq.thymeleaf.decorators.html;
 
-import java.util.function.Predicate;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
+import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.internal.MetaProvider;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
@@ -59,7 +59,7 @@ public class HtmlDocumentDecorator implements Decorator {
      */
     @Override
     public void decorate(IModel targetDocumentModel, IModel sourceDocumentModel) {
-        Predicate<ITemplateEvent> headModelFinder = event -> {
+        ITemplateEventPredicate headModelFinder = event -> {
             return event instanceof IOpenElementTag && "head".equals(((IElementTag) event).getElementCompleteName());
         };
 
@@ -91,7 +91,7 @@ public class HtmlDocumentDecorator implements Decorator {
             targetDocumentModel.insertModel(headIndex, targetHeadModel);
         }
 
-        Predicate<ITemplateEvent> bodyModelFinder = event -> {
+        ITemplateEventPredicate bodyModelFinder = event -> {
             return event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName());
         };
         new HtmlBodyDecorator(modelFactory).decorate(

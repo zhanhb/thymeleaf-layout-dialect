@@ -16,16 +16,15 @@
 package nz.net.ultraq.thymeleaf.decorators.html;
 
 import java.util.Iterator;
-import java.util.function.Predicate;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlElementDecorator;
+import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.internal.MetaProvider;
 import org.thymeleaf.model.IElementTag;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.model.IOpenElementTag;
-import org.thymeleaf.model.ITemplateEvent;
 
 /**
  * A decorator specific to processing an HTML {@code <head>} element.
@@ -92,7 +91,7 @@ public class HtmlHeadDecorator extends XmlElementDecorator {
         }
 
         // Replace the target title with the source one if present
-        Predicate<ITemplateEvent> titleEventIndexFinder = event -> {
+        ITemplateEventPredicate titleEventIndexFinder = event -> {
             return event instanceof IOpenElementTag && "title".equals(((IElementTag) event).getElementCompleteName());
         };
 

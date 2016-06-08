@@ -17,9 +17,6 @@ package nz.net.ultraq.thymeleaf.internal;
 
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 import nz.net.ultraq.thymeleaf.models.ChildEventIterator;
 import nz.net.ultraq.thymeleaf.models.ChildModelIterator;
 import nz.net.ultraq.thymeleaf.models.NullIterator;
@@ -109,7 +106,7 @@ public class MetaClass {
      * @param delegate
      * @param closure
      */
-    public static void each(IModel delegate, Consumer<? super ITemplateEvent> closure) {
+    public static void each(IModel delegate, ITemplateEventConsumer closure) {
         for (int i = 0; i < delegate.size(); i++) {
             closure.accept(delegate.get(i));
         }
@@ -193,9 +190,9 @@ public class MetaClass {
      * @param closure
      * @return {@code true} if every event satisfies the closure.
      */
-    public static boolean everyWithIndex(IModel delegate, BiFunction<? super ITemplateEvent, ? super Integer, Boolean> closure) {
+    public static boolean everyWithIndex(IModel delegate, ITemplateEventIntPredicate closure) {
         for (int i = 0; i < delegate.size(); i++) {
-            if (!closure.apply(delegate.get(i), i)) {
+            if (!closure.test(delegate.get(i), i)) {
                 return false;
             }
         }
@@ -215,7 +212,7 @@ public class MetaClass {
      * @return The first event to match the closure criteria, or {@code null} if
      * nothing matched.
      */
-    public static ITemplateEvent find(IModel delegate, Predicate<? super ITemplateEvent> closure) {
+    public static ITemplateEvent find(IModel delegate, ITemplateEventPredicate closure) {
         for (int i = 0; i < delegate.size(); i++) {
             ITemplateEvent event = delegate.get(i);
             boolean result = closure.test(event);
@@ -240,7 +237,7 @@ public class MetaClass {
      * @return A model over the event that matches the closure criteria, or
      * {@code null} if nothing matched.
      */
-    public static IModel findModel(IModel delegate, Predicate<? super ITemplateEvent> closure) {
+    public static IModel findModel(IModel delegate, ITemplateEventPredicate closure) {
         ITemplateEvent event = find(delegate, closure);
         if (event != null) {
             int index = MetaProvider.INSTANCE.getProperty(event, "index");
@@ -264,10 +261,10 @@ public class MetaClass {
      * @return The first event to match the closure criteria, or {@code null} if
      * nothing matched.
      */
-    public static ITemplateEvent findWithIndex(IModel delegate, BiFunction<? super ITemplateEvent, ? super Integer, Boolean> closure) {
+    public static ITemplateEvent findWithIndex(IModel delegate, ITemplateEventIntPredicate closure) {
         for (int i = 0; i < delegate.size(); i++) {
             ITemplateEvent event = delegate.get(i);
-            boolean result = closure.apply(event, i);
+            boolean result = closure.test(event, i);
             if (result) {
                 MetaProvider.INSTANCE.setProperty(event, "index", i);
                 return event;
