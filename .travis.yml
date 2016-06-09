@@ -4,7 +4,7 @@ cache:
     - $HOME/.m2
 jdk:
  - oraclejdk8
-
-# No need to run tasks for dependencies
-install:
- - true
+install: true
+script:
+  - mvn install -Dmaven.javadoc.skip=true
+  - jdk_switcher use oraclejdk7 && mvn -Djava.version=1.7 surefire:test

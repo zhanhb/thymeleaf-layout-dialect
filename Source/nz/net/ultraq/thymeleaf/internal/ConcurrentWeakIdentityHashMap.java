@@ -41,12 +41,12 @@ class ConcurrentWeakIdentityHashMap<K, V> extends AbstractMap<K, V>
     private final ReferenceQueue<K> queue = new ReferenceQueue<>();
     private transient Set<Map.Entry<K, V>> es;
 
-    public ConcurrentWeakIdentityHashMap(int initialCapacity) {
+    ConcurrentWeakIdentityHashMap(int initialCapacity) {
         this.map = new ConcurrentHashMap<>(initialCapacity);
     }
 
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    public ConcurrentWeakIdentityHashMap() {
+    ConcurrentWeakIdentityHashMap() {
         this.map = new ConcurrentHashMap<>();
     }
 

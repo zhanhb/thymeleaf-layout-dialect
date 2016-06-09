@@ -19,18 +19,18 @@ package nz.net.ultraq.thymeleaf.internal;
  *
  * @author zhanhb
  */
-@SuppressWarnings({"BroadCatchBlock", "TooBroadCatch", "UseSpecificCatch"})
 public abstract class MetaProvider {
 
-    public static final MetaProvider INSTANCE = isPresent("groovy.lang.GroovyObject")
-            ? new GroovyMetaProvider() : new InMemoryMetaProvider();
+    public static final MetaProvider INSTANCE = createInstance();
 
-    private static boolean isPresent(String className) {
+    @SuppressWarnings({"BroadCatchBlock", "TooBroadCatch", "UseSpecificCatch"})
+    private static MetaProvider createInstance() {
         try {
-            Class.forName(className, true, MetaProvider.class.getClassLoader());
-            return true;
+            Class<?> cl = groovy.lang.GroovyObject.class;
+            Class.forName(cl.getName(), true, cl.getClassLoader());
+            return new GroovyMetaProvider();
         } catch (Throwable ex) {
-            return false;
+            return new InMemoryMetaProvider();
         }
     }
 
