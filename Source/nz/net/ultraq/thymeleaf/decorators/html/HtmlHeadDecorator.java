@@ -91,9 +91,9 @@ public class HtmlHeadDecorator extends XmlElementDecorator {
         }
 
         // Replace the target title with the source one if present
-        ITemplateEventPredicate titleEventIndexFinder = event -> {
-            return event instanceof IOpenElementTag && "title".equals(((IElementTag) event).getElementCompleteName());
-        };
+        ITemplateEventPredicate titleEventIndexFinder = event
+                -> event instanceof IOpenElementTag
+                && "title".equals(((IElementTag) event).getElementCompleteName());
 
         IModel sourceTitle = MetaClass.findModel(sourceHeadModel, titleEventIndexFinder);
         if (MetaClass.asBoolean(sourceTitle)) {

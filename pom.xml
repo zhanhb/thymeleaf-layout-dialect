@@ -89,6 +89,16 @@
         <thymeleaf.version>3.0.0.RELEASE</thymeleaf.version>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>${javassist.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>net.sourceforge.nekohtml</groupId>
@@ -239,6 +249,9 @@
                         <include>**/*Executor.class</include>
                         <include>**/*ExecutorGrouping.class</include>
                     </includes>
+                    <excludes>
+                        <exclude>**/Abstract*.class</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
             <plugin>

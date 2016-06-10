@@ -15,7 +15,9 @@
  */
 package nz.net.ultraq.thymeleaf.internal;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentMap;
@@ -44,11 +46,21 @@ class InMemoryMetaProvider extends MetaProvider {
         T value = unwrapper(getMap(object).get(key));
         if (value == null) {
             // assert object != null
-            Object wrappered = getMap(object.getClass()).get(key);
-            if (wrappered == null) {
-                throw new NoSuchElementException();
+            List<Object> list = new ArrayList<>(8);
+            Class<?> clazz = object.getClass();
+
+            list.add(object);
+            while (clazz != null) {
+                Object wrappered = getMap(clazz).get(key);
+                if (wrappered != null) {
+                    for (Object o : list) {
+                        getMap(o).put(key, wrappered);
+                    }
+                    return unwrapper(wrappered);
+                }
+                clazz = clazz.getSuperclass();
             }
-            return unwrapper(wrappered);
+            throw new NoSuchElementException();
         }
         return value;
     }
@@ -65,16 +77,11 @@ class InMemoryMetaProvider extends MetaProvider {
 
     @SuppressWarnings("NestedAssignment")
     private Map<String, Object> getMap(Object object) {
-        Map<String, Object> value;
-        LinkedHashMap<String, Object> tmp;
-
-        if ((value = map.get(object)) == null
-                && (value = map.putIfAbsent(object,
-                        tmp = new LinkedHashMap<>(4))) == null) {
-            value = tmp;
-        }
-
-        return value;
+        Map<String, Object> oldValue, newValue;
+        return ((oldValue = map.get(object)) == null
+                && (oldValue = map.putIfAbsent(object,
+                        newValue = new LinkedHashMap<>(4))) == null)
+                        ? newValue : oldValue;
     }
 
 }
