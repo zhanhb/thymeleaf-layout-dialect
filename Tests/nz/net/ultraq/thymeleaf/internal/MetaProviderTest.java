@@ -15,6 +15,8 @@
  */
 package nz.net.ultraq.thymeleaf.internal;
 
+import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,6 +28,8 @@ import static org.junit.Assert.*;
  */
 public class MetaProviderTest {
 
+    private static final AtomicInteger COUNTER = new AtomicInteger();
+
     private MetaProvider provider1, provider2;
 
     @Before
@@ -34,15 +38,18 @@ public class MetaProviderTest {
         provider2 = new InMemoryMetaProvider();
     }
 
+    private String nextKey() {
+        return MetaProviderTest.class.getName() + COUNTER.incrementAndGet();
+    }
+
     @Test
     public void test() {
-        String key = "abc";
-        String value = "123";
-        test(provider1, key, value);
-        test(provider2, key, value);
-
-        test(provider1, key, null);
-        test(provider2, key, null);
+        test((provider, key) -> {
+            test(provider, key, "123");
+        });
+        test((provider, key) -> {
+            test(provider, key, null);
+        });
     }
 
     private void test(MetaProvider provider, String key, String value) {
@@ -52,14 +59,12 @@ public class MetaProviderTest {
 
     @Test
     public void testClass() {
-        String key = "test1";
-        String value = "456";
-        testClass(provider1, key, null);
-        testClass(provider2, key, null);
-
-        key += 1;
-        testClass(provider1, key, value);
-        testClass(provider2, key, value);
+        test((provider, key) -> {
+            testClass(provider, key, "456");
+        });
+        test((provider, key) -> {
+            testClass(provider, key, null);
+        });
     }
 
     private void testClass(MetaProvider provider, String key, String value) {
@@ -69,37 +74,117 @@ public class MetaProviderTest {
 
     @Test
     public void testInherit() {
-        String key = "test6";
-        String value = "0";
-        for (MetaProvider provider : new MetaProvider[]{provider1, provider2}) {
+        final String value = "0";
+        test((provider, key) -> {
             provider.setProperty(T.class, key, value);
             provider.setProperty(Class.class, key, value + 1);
             assertEquals(provider.toString(), value + 1, provider.getProperty(S.class, key));
-        }
-
-        key += 1;
-        for (MetaProvider provider : new MetaProvider[]{provider1, provider2}) {
+        });
+        test((provider, key) -> {
             provider.setProperty(Class.class, key, value);
             assertEquals(provider.toString(), value, provider.getProperty(S.class, key));
-        }
+        });
     }
 
     @Test
-    public void testException() {
-        for (MetaProvider provider : new MetaProvider[]{provider1, provider2}) {
+    public void testInheritException() {
+        test((provider, key) -> {
+            provider.setProperty(T.class, key, "0");
             try {
-                provider.getProperty(new Object(), "test7");
+                provider.getProperty(S.class, key);
                 fail();
             } catch (RuntimeException ex) {
                 // ok
             }
+        });
+    }
+
+    @Test
+    public void testException() {
+        test((provider, key) -> {
+            try {
+                provider.getProperty(new Object(), key);
+                fail();
+            } catch (RuntimeException ex) {
+                // ok
+            }
+        });
+    }
+
+    @Test
+    public void testNullObject() {
+        test((provider, key) -> {
+            try {
+                provider.getProperty(null, key);
+                fail();
+            } catch (NullPointerException ex) {
+                // ok
+            }
+        });
+    }
+
+    @Test
+    public void testNullKey() {
+        test((provider, key) -> {
+            try {
+                provider.getProperty(key, null);
+                fail();
+            } catch (RuntimeException ex) {
+                // ok
+            }
+        });
+    }
+
+    @Test
+    public void testEnsureCached() {
+        final String value = "ensure cached";
+        test((provider, key) -> {
+            provider.setProperty(Object.class, key, value);
+            provider.getProperty(new S(), key);
+            provider.setProperty(Object.class, key, null);
+            assertEquals(provider.toString(), value, provider.getProperty(new S(), key));
+            assertEquals(provider.toString(), value, provider.getProperty(new T(), key));
+            assertNull(provider.getProperty(new Object(), key));
+        });
+        test((provider, key) -> {
+            provider.setProperty(Object.class, key, value);
+            provider.setProperty(Object.class, key, null);
+            assertNull(provider.getProperty(new S(), key));
+            assertNull(provider.getProperty(new T(), key));
+            assertNull(provider.getProperty(new Object(), key));
+        });
+    }
+
+    @Test
+    public void testInterface() {
+        test((provider, key) -> {
+            provider.setProperty(Serializable.class, key, "1");
+            provider.setProperty(T.class, key, "2");
+            assertEquals(provider.toString(), "2", provider.getProperty(new S(), key));
+        });
+        test((provider, key) -> {
+            provider.setProperty(Serializable.class, key, "1");
+            assertEquals(provider.toString(), "1", provider.getProperty(new S(), key));
+        });
+    }
+
+    private void test(Action action) {
+        String key = nextKey();
+        for (MetaProvider provider : new MetaProvider[]{provider1, provider2}) {
+            action.run(provider, key);
         }
     }
 
     private static class T {
     }
 
-    private static class S extends T {
+    private static class S extends T implements Serializable {
+    }
+
+    private static interface Action {
+
+        void run(MetaProvider provider, String key);
+
     }
 
 }

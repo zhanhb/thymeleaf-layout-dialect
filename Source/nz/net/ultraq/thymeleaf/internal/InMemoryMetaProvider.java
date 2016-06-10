@@ -51,6 +51,7 @@ class InMemoryMetaProvider extends MetaProvider {
 
             list.add(object);
             while (clazz != null) {
+                list.add(clazz);
                 Object wrappered = getMap(clazz).get(key);
                 if (wrappered != null) {
                     for (Object o : list) {
@@ -59,6 +60,14 @@ class InMemoryMetaProvider extends MetaProvider {
                     return unwrapper(wrappered);
                 }
                 clazz = clazz.getSuperclass();
+            }
+            for (Class<?> aInterface : object.getClass().getInterfaces()) {
+                Object wrappered = getMap(aInterface).get(key);
+                if (wrappered != null) {
+                    getMap(object).put(key, wrappered);
+                    getMap(object.getClass()).put(key, wrappered);
+                    return unwrapper(wrappered);
+                }
             }
             throw new NoSuchElementException();
         }

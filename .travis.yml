@@ -1,4 +1,6 @@
 language: java
+before_cache:
+  - rm -rf $HOME/.m2/repository/com/github/zhanhb/thymeleaf-layout-dialect
 cache:
   directories:
     - $HOME/.m2
