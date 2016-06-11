@@ -37,7 +37,7 @@ import java.util.concurrent.ConcurrentMap;
 class ConcurrentWeakIdentityHashMap<K, V> extends AbstractMap<K, V>
         implements ConcurrentMap<K, V> {
 
-    private final ConcurrentMap<Reference<? extends K>, V> map;
+    private final ConcurrentMap<Key<K>, V> map;
     private final ReferenceQueue<K> queue = new ReferenceQueue<>();
     private transient Set<Map.Entry<K, V>> es;
 
@@ -52,15 +52,12 @@ class ConcurrentWeakIdentityHashMap<K, V> extends AbstractMap<K, V>
 
     @Override
     public V get(Object key) {
-        Objects.requireNonNull(key);
         purgeKeys();
         return map.get(new Key<>(key, null));
     }
 
     @Override
     public V put(K key, V value) {
-        Objects.requireNonNull(key);
-        Objects.requireNonNull(value);
         purgeKeys();
         return map.put(new Key<>(key, queue), value);
     }
@@ -71,7 +68,7 @@ class ConcurrentWeakIdentityHashMap<K, V> extends AbstractMap<K, V>
         return map.size();
     }
 
-    @SuppressWarnings("NestedAssignment")
+    @SuppressWarnings({"NestedAssignment", "element-type-mismatch"})
     private void purgeKeys() {
         Reference<? extends K> reference;
         while ((reference = queue.poll()) != null) {
@@ -80,57 +77,43 @@ class ConcurrentWeakIdentityHashMap<K, V> extends AbstractMap<K, V>
     }
 
     @Override
+    @SuppressWarnings("NestedAssignment")
     public Set<Map.Entry<K, V>> entrySet() {
-        Set<Map.Entry<K, V>> entrySet = this.es;
-        if (entrySet == null) {
-            entrySet = new EntrySet();
-            es = entrySet;
-        }
-        return entrySet;
+        Set<Map.Entry<K, V>> entrySet;
+        return ((entrySet = this.es) == null) ? es = new EntrySet() : entrySet;
     }
 
     @Override
     public V putIfAbsent(K key, V value) {
-        Objects.requireNonNull(key);
-        Objects.requireNonNull(value);
         purgeKeys();
         return map.putIfAbsent(new Key<>(key, queue), value);
     }
 
     @Override
     public V remove(Object key) {
-        Objects.requireNonNull(key);
         return map.remove(new Key<>(key, null));
     }
 
     @Override
     public boolean remove(Object key, Object value) {
-        Objects.requireNonNull(key);
-        Objects.requireNonNull(value);
         purgeKeys();
         return map.remove(new Key<>(key, null), value);
     }
 
     @Override
     public boolean replace(K key, V oldValue, V newValue) {
-        Objects.requireNonNull(key);
-        Objects.requireNonNull(oldValue);
-        Objects.requireNonNull(newValue);
         purgeKeys();
         return map.replace(new Key<>(key, null), oldValue, newValue);
     }
 
     @Override
     public V replace(K key, V value) {
-        Objects.requireNonNull(key);
-        Objects.requireNonNull(value);
         purgeKeys();
         return map.replace(new Key<>(key, null), value);
     }
 
     @Override
     public boolean containsKey(Object key) {
-        Objects.requireNonNull(key);
         purgeKeys();
         return map.containsKey(new Key<>(key, null));
     }
@@ -143,15 +126,9 @@ class ConcurrentWeakIdentityHashMap<K, V> extends AbstractMap<K, V>
     }
 
     @Override
-    public boolean isEmpty() {
-        purgeKeys();
-        return map.isEmpty();
-    }
-
-    @Override
     public boolean containsValue(Object value) {
-        Objects.requireNonNull(value);
-        return super.containsValue(value);
+        purgeKeys();
+        return map.containsValue(value);
     }
 
     private static class Key<T> extends WeakReference<T> {
@@ -160,7 +137,7 @@ class ConcurrentWeakIdentityHashMap<K, V> extends AbstractMap<K, V>
 
         Key(T t, ReferenceQueue<T> queue) {
             super(t, queue);
-            hash = System.identityHashCode(t);
+            hash = System.identityHashCode(Objects.requireNonNull(t));
         }
 
         @Override
@@ -177,10 +154,10 @@ class ConcurrentWeakIdentityHashMap<K, V> extends AbstractMap<K, V>
 
     private class Iter implements Iterator<Map.Entry<K, V>> {
 
-        private final Iterator<Map.Entry<Reference<? extends K>, V>> it;
+        private final Iterator<Map.Entry<Key<K>, V>> it;
         private Map.Entry<K, V> nextValue;
 
-        Iter(Iterator<Map.Entry<Reference<? extends K>, V>> it) {
+        Iter(Iterator<Map.Entry<Key<K>, V>> it) {
             this.it = it;
         }
 
@@ -189,11 +166,9 @@ class ConcurrentWeakIdentityHashMap<K, V> extends AbstractMap<K, V>
             if (nextValue != null) {
                 return true;
             }
-            Map.Entry<? extends Reference<? extends K>, V> entry;
-            K key;
             while (it.hasNext()) {
-                entry = it.next();
-                key = entry.getKey().get();
+                Map.Entry<Key<K>, V> entry = it.next();
+                K key = entry.getKey().get();
                 if (key != null) {
                     nextValue = new Entry(key, entry.getValue());
                     return true;
@@ -240,11 +215,6 @@ class ConcurrentWeakIdentityHashMap<K, V> extends AbstractMap<K, V>
         }
 
         @Override
-        public boolean isEmpty() {
-            return ConcurrentWeakIdentityHashMap.this.isEmpty();
-        }
-
-        @Override
         @SuppressWarnings("element-type-mismatch")
         public boolean contains(Object o) {
             if (!(o instanceof Map.Entry)) {
@@ -264,32 +234,18 @@ class ConcurrentWeakIdentityHashMap<K, V> extends AbstractMap<K, V>
         }
     }
 
-    private class Entry implements Map.Entry<K, V> {
+    private class Entry extends AbstractMap.SimpleEntry<K, V> {
 
-        private final K key;
-        private V value;
+        private static final long serialVersionUID = 1L;
 
         Entry(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        @Override
-        public K getKey() {
-            return key;
-        }
-
-        @Override
-        public V getValue() {
-            return value;
+            super(key, value);
         }
 
         @Override
         public V setValue(V value) {
-            ConcurrentWeakIdentityHashMap.this.put(key, value);
-            V v = this.value;
-            this.value = value;
-            return v;
+            ConcurrentWeakIdentityHashMap.this.put(getKey(), value);
+            return super.setValue(value);
         }
 
         @Override
@@ -303,8 +259,8 @@ class ConcurrentWeakIdentityHashMap<K, V> extends AbstractMap<K, V>
 
         @Override
         public int hashCode() {
-            return System.identityHashCode(this.key)
-                    ^ System.identityHashCode(this.value);
+            return System.identityHashCode(getKey())
+                    ^ System.identityHashCode(getValue());
         }
     }
 

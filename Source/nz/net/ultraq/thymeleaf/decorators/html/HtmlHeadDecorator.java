@@ -46,29 +46,6 @@ public class HtmlHeadDecorator extends XmlElementDecorator {
         this.sortingStrategy = sortingStrategy;
     }
 
-    //@SuppressWarnings("null")
-    //private void titleExtraction(Element headElement, String titleType, Element titleContainer, String[] titlePattern) {
-    //    Element existingContainer = headElement != null ? MetaClass.findElement(headElement, "title-container") : null;
-    //    if (existingContainer != null) {
-    //        List<Node> children = existingContainer.getChildren();
-    //        Node titleElement = children.isEmpty() ? null : children.get(children.size() - 1);
-    //        String attributeValue = MetaClass.getAttributeValue((Element) titleElement, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_TITLEPATTERN);
-    //        titlePattern[0] = !StringUtils.isEmpty(attributeValue) ? attributeValue : titlePattern[0];
-    //        titleElement.setNodeProperty(TITLE_TYPE, titleType);
-    //        MetaClass.removeChildWithWhitespace(headElement, existingContainer);
-    //        titleContainer.addChild(existingContainer);
-    //    } else {
-    //        Element titleElement = headElement != null ? MetaClass.findElement(headElement, "title") : null;
-    //        if (titleElement != null) {
-    //            String attributeValue = MetaClass.getAttributeValue(titleElement, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_TITLEPATTERN);
-    //            titlePattern[0] = !StringUtils.isEmpty(attributeValue) ? attributeValue : titlePattern[0];
-    //            titleElement.setNodeProperty(TITLE_TYPE, titleType);
-    //            MetaClass.removeAttribute(titleElement, DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_TITLEPATTERN);
-    //            MetaClass.removeChildWithWhitespace(headElement, titleElement);
-    //            titleContainer.addChild(titleElement);
-    //        }
-    //    }
-    //}
     /**
      * Decorate the {@code <head>} part.
      *

@@ -17,7 +17,6 @@ package nz.net.ultraq.thymeleaf.internal;
 
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -30,17 +29,7 @@ public class MetaProviderTest {
 
     private static final AtomicInteger COUNTER = new AtomicInteger();
 
-    private MetaProvider provider1, provider2;
-
-    @Before
-    public void setUp() {
-        provider1 = new GroovyMetaProvider();
-        provider2 = new InMemoryMetaProvider();
-    }
-
-    private String nextKey() {
-        return MetaProviderTest.class.getName() + COUNTER.incrementAndGet();
-    }
+    private MetaProvider provider1 = new GroovyMetaProvider(), provider2 = new InMemoryMetaProvider();
 
     @Test
     public void test() {
@@ -169,7 +158,7 @@ public class MetaProviderTest {
     }
 
     private void test(Action action) {
-        String key = nextKey();
+        String key = MetaProviderTest.class.getName() + COUNTER.incrementAndGet();
         for (MetaProvider provider : new MetaProvider[]{provider1, provider2}) {
             action.run(provider, key);
         }

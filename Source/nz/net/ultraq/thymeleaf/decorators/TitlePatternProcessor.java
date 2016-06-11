@@ -54,24 +54,6 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
         super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);
     }
 
-    //private String getTitle(Element element) {
-    //    if (element != null) {
-    //        Node node = element.getFirstChild();
-    //        if (node instanceof AbstractTextNode) {
-    //            return ((AbstractTextNode) node).getContent();
-    //        }
-    //    }
-    //    return null;
-    //}
-    //
-    //private Element findTitleType(List<Element> titleElements, String titleType) {
-    //    for (Element titleElement : titleElements) {
-    //        if (titleType.equals(titleElement.getNodeProperty(TITLE_TYPE))) {
-    //            return titleElement;
-    //        }
-    //    }
-    //    return null;
-    //}
     /**
      * {@inheritDoc}
      */

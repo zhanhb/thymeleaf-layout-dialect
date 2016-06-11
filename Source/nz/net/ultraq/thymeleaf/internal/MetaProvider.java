@@ -38,8 +38,4 @@ public abstract class MetaProvider {
 
     public abstract void setProperty(Object object, String key, Object value);
 
-    public void removeProperty(Object object, String key) {
-        setProperty(object, key, null);
-    }
-
 }
