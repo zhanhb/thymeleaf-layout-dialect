@@ -80,7 +80,6 @@
         <groovy.version>2.4.7</groovy.version>
         <java.version>1.8</java.version>
         <javassist.version>3.20.0-GA</javassist.version>
-        <lombok.version>1.16.8</lombok.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <nekohtml.version>1.9.21</nekohtml.version>
@@ -116,12 +115,6 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
             <version>${groovy.version}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
