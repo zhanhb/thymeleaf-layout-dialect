@@ -249,31 +249,6 @@ public class MetaClass {
     }
 
     /**
-     * Returns the first event in the model that meets the criteria of the given
-     * closure.
-     *
-     * Models returned via this method are also aware of their position in the
-     * event queue of the parent model, accessible via their {@code index}
-     * property.
-     *
-     * @param delegate
-     * @param closure
-     * @return The first event to match the closure criteria, or {@code null} if
-     * nothing matched.
-     */
-    public static ITemplateEvent findWithIndex(IModel delegate, ITemplateEventIntPredicate closure) {
-        for (int i = 0; i < delegate.size(); i++) {
-            ITemplateEvent event = delegate.get(i);
-            boolean result = closure.test(event, i);
-            if (result) {
-                MetaProvider.INSTANCE.setProperty(event, "index", i);
-                return event;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Returns the first event on the model.
      *
      * @param delegate
@@ -320,26 +295,6 @@ public class MetaClass {
             delegate.insertModel(pos, whitespace);
         } else {
             delegate.insertModel(pos, model);
-        }
-    }
-
-    /**
-     * Inserts an event, creating a whitespace event before it so that it
-     * appears in line with all the existing events.
-     *
-     * @param delegate
-     * @param pos
-     * @param event
-     */
-    public static void insertWithWhitespace(IModel delegate, int pos, ITemplateEvent event) {
-        IModel whitespace = getModel(delegate, pos); // Assumes that whitespace exists at the insertion point
-        if (isWhitespace(whitespace)) {
-            delegate.insert(pos, event);
-            delegate.insertModel(pos, whitespace);
-        } else {
-            // TODO
-            // delegate.insert(event);
-            throw new Error(delegate.getClass().getName());
         }
     }
 

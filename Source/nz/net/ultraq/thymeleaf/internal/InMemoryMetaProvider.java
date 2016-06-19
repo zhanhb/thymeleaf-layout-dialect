@@ -20,7 +20,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  *
@@ -39,7 +38,7 @@ class InMemoryMetaProvider extends MetaProvider {
         return value == NULL ? null : (T) value;
     }
 
-    private final ConcurrentMap<Object, Map<String, Object>> map = new ConcurrentWeakIdentityHashMap<>(200);
+    private final ConcurrentWeakIdentityHashMap<Object, Map<String, Object>> map = new ConcurrentWeakIdentityHashMap<>(200);
 
     @Override
     public <T> T getProperty(Object object, String key) {

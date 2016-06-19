@@ -102,10 +102,12 @@ public class GroupingStrategy implements SortingStrategy {
         while (listIterator.hasPrevious()) {
             IModel headSubModel = listIterator.previous();
             if (type == findMatchingType(headSubModel)) {
-                return MetaProvider.INSTANCE.getProperty(headSubModel, "endIndex");
+                if (MetaClass.asBoolean(headModel)) {
+                    return MetaProvider.INSTANCE.getProperty(headSubModel, "endIndex");
+                }
+                break;
             }
         }
-        // TODO maybe different actions
         return 1;
     }
 

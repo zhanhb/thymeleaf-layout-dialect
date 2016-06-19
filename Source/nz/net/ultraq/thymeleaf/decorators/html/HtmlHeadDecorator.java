@@ -56,10 +56,7 @@ public class HtmlHeadDecorator implements Decorator {
             return null;
         }
         ITemplateEvent event = MetaClass.first(titleModel);
-        if (event == null) {
-            return null;
-        }
-        return ((IProcessableElementTag) event).getAttribute(LayoutDialect.DIALECT_PREFIX, TitlePatternProcessor.PROCESSOR_NAME);
+        return event != null ? ((IProcessableElementTag) event).getAttribute(LayoutDialect.DIALECT_PREFIX, TitlePatternProcessor.PROCESSOR_NAME) : null;
     }
 
     private static String titleValueRetriever(IModel titleModel) {
@@ -68,10 +65,7 @@ public class HtmlHeadDecorator implements Decorator {
         if (!StringUtils.isEmpty(layout)) {
             return layout;
         }
-        if (titleModel.size() > 2) {
-            return "'" + ((IText) titleModel.get(1)).getText() + "'";
-        }
-        return null;
+        return titleModel.size() > 2 ? "'" + ((IText) titleModel.get(1)).getText() + "'" : null;
     }
 
     private final ITemplateContext context;
@@ -113,15 +107,15 @@ public class HtmlHeadDecorator implements Decorator {
             MetaClass.removeModelWithWhitespace(targetHeadModel, MetaProvider.INSTANCE.getProperty(targetTitle, "index"));
         }
 
-        IAttribute titlePatternProcessor;
-        if ((titlePatternProcessor = titlePatternProcessorRetriever(sourceTitle)) == null) {
+        IAttribute titlePatternProcessor = titlePatternProcessorRetriever(sourceTitle);
+        if (titlePatternProcessor == null) {
             titlePatternProcessor = titlePatternProcessorRetriever(targetTitle);
         }
         IModel resultTitle;
         if (titlePatternProcessor != null) {
             String contentTitle = titleValueRetriever(sourceTitle);
             String decoratorTitle = titleValueRetriever(targetTitle);
-            Map<String, Object> map = new LinkedHashMap<String, Object>(3);
+            Map<String, Object> map = new LinkedHashMap<>(3);
             map.put(titlePatternProcessor.getAttributeCompleteName(), titlePatternProcessor.getValue());
             map.put("data-layout-content-title", contentTitle);
             map.put("data-layout-decorator-title", decoratorTitle);

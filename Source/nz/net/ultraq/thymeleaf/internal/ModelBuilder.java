@@ -158,7 +158,7 @@ public class ModelBuilder {
      * @param parent
      * @param child
      */
-    protected void nodeCompleted(Object parent, Object child) {
+    public void nodeCompleted(Object parent, Object child) {
         IModel parentModel = (IModel) parent;
         if (parentModel != null) {
 
@@ -176,7 +176,7 @@ public class ModelBuilder {
      * @param parent
      * @param child
      */
-    protected void setParent(Object parent, Object child) {
+    public void setParent(Object parent, Object child) {
     }
 
 }

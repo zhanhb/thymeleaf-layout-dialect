@@ -83,7 +83,7 @@ public class ModelBuilder extends BuilderSupport {
      */
     @Override
     protected Object createNode(Object name) {
-        return createNode(name, null, null);
+        return builder.createNode(name);
     }
 
     /**
@@ -95,7 +95,7 @@ public class ModelBuilder extends BuilderSupport {
      */
     @Override
     protected Object createNode(Object name, Object value) {
-        return createNode(name, null, value);
+        return builder.createNode(name, value);
     }
 
     /**
@@ -108,7 +108,7 @@ public class ModelBuilder extends BuilderSupport {
     @Override
     @SuppressWarnings("rawtypes")
     protected Object createNode(Object name, Map attributes) {
-        return createNode(name, attributes, null);
+        return builder.createNode(name, attributes);
     }
 
     /**
@@ -135,12 +135,7 @@ public class ModelBuilder extends BuilderSupport {
      */
     @Override
     protected void nodeCompleted(Object parent, Object child) {
-        IModel parentModel = (IModel) parent;
-        if (parentModel != null) {
-
-            // TODO: Insert w/ whitespace?
-            parentModel.insertModel(parentModel.size() - 1, (IModel) child);
-        }
+        builder.nodeCompleted(parent, child);
     }
 
     /**
@@ -154,6 +149,7 @@ public class ModelBuilder extends BuilderSupport {
      */
     @Override
     protected void setParent(Object parent, Object child) {
+        builder.setParent(parent, child);
     }
 
 }

@@ -106,7 +106,7 @@ public class DecoratorProcessor extends AbstractAttributeModelProcessor {
                         : templateMode == TemplateMode.XML ? new XmlDocumentDecorator(context)
                                 : null;
         if (decorator == null) {
-            throw new IllegalArgumentException("Layout dialect cannot be applied to the ${templateMode} template mode, "
+            throw new IllegalArgumentException("Layout dialect cannot be applied to the " + templateMode + " template mode, "
                     + "only HTML and XML template modes are currently supported");
         }
         IModel resultTemplate = decorator.decorate(decoratorTemplate, model);
