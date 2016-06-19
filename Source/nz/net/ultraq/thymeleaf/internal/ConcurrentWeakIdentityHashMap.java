@@ -18,9 +18,7 @@ package nz.net.ultraq.thymeleaf.internal;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -32,9 +30,8 @@ import java.util.concurrent.ConcurrentMap;
  */
 class ConcurrentWeakIdentityHashMap<K, V> {
 
-    private final ConcurrentMap<Key<K>, V> map;
+    private final ConcurrentMap<Object, V> map;
     private final ReferenceQueue<K> queue = new ReferenceQueue<>();
-    private transient Set<Map.Entry<K, V>> es;
 
     ConcurrentWeakIdentityHashMap(int initialCapacity) {
         this.map = new ConcurrentHashMap<>(initialCapacity);
@@ -63,8 +60,8 @@ class ConcurrentWeakIdentityHashMap<K, V> {
         private final int hash;
 
         Key(T t, ReferenceQueue<T> queue) {
-            super(t, queue);
-            hash = System.identityHashCode(Objects.requireNonNull(t));
+            super(Objects.requireNonNull(t), queue);
+            hash = System.identityHashCode(t);
         }
 
         @Override

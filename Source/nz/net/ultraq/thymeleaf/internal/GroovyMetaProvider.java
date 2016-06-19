@@ -15,7 +15,7 @@
  */
 package nz.net.ultraq.thymeleaf.internal;
 
-import org.codehaus.groovy.runtime.ExceptionUtils;
+import lombok.SneakyThrows;
 import org.codehaus.groovy.runtime.callsite.CallSite;
 import org.codehaus.groovy.runtime.callsite.CallSiteArray;
 
@@ -30,24 +30,17 @@ class GroovyMetaProvider extends MetaProvider {
                     new String[]{"getAt", "putAt", "metaClass"}).array;
 
     @Override
+    @SneakyThrows
     @SuppressWarnings("unchecked")
     public <T> T getProperty(Object object, String key) {
-        try {
-            return (T) CALL_SITES[0].call(object, key);
-        } catch (Throwable ex) {
-            ExceptionUtils.sneakyThrow(ex);
-            return null;
-        }
+        return (T) CALL_SITES[0].call(object, key);
     }
 
     @Override
+    @SneakyThrows
     public void setProperty(Object object, String key, Object value) {
         CallSite[] vallSites = CALL_SITES;
-        try {
-            vallSites[1].call(vallSites[2].callGetProperty(object), key, value);
-        } catch (Throwable ex) {
-            ExceptionUtils.sneakyThrow(ex);
-        }
+        vallSites[1].call(vallSites[2].callGetProperty(object), key, value);
     }
 
 }
