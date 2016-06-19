@@ -105,7 +105,8 @@ public class GroupingStrategy implements SortingStrategy {
                 return MetaProvider.INSTANCE.getProperty(headSubModel, "endIndex");
             }
         }
-        throw new NullPointerException();
+        // TODO maybe different actions
+        return 1;
     }
 
 }

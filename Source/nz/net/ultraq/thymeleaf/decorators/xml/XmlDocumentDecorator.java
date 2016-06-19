@@ -18,8 +18,8 @@ package nz.net.ultraq.thymeleaf.decorators.xml;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
+import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
-import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.model.IOpenElementTag;
 
 /**
@@ -29,15 +29,15 @@ import org.thymeleaf.model.IOpenElementTag;
  */
 public class XmlDocumentDecorator implements Decorator {
 
-    protected final IModelFactory modelFactory;
+    protected final ITemplateContext context;
 
     /**
      * Constructor, set up the document decorator context.
      *
-     * @param modelFactory
+     * @param context
      */
-    public XmlDocumentDecorator(IModelFactory modelFactory) {
-        this.modelFactory = modelFactory;
+    public XmlDocumentDecorator(ITemplateContext context) {
+        this.context = context;
     }
 
     /**
@@ -45,37 +45,39 @@ public class XmlDocumentDecorator implements Decorator {
      *
      * @param targetDocumentModel
      * @param sourceDocumentModel
+     * @return Result of the decoration.
      */
     @Override
-    public void decorate(IModel targetDocumentModel, IModel sourceDocumentModel) {
+    public IModel decorate(IModel targetDocumentModel, IModel sourceDocumentModel) {
 
         // TODO
         // Copy text outside of the root element, keeping whitespace copied to a minimum
-        //boolean beforeHtml = true;
-        //boolean allowNext = false;
-        //Node lastNode = contentXml;
-        //for (Node externalNode : decoratorDocument.getChildren()) {
-        //    if (externalNode == decoratorXml) {
-        //        beforeHtml = false;
-        //        allowNext = true;
-        //    } else if (externalNode instanceof Comment || allowNext) {
-        //        if (beforeHtml) {
-        //            contentDocument.insertBefore(contentXml, externalNode);
-        //        } else {
-        //            contentDocument.insertAfter(lastNode, externalNode);
-        //            lastNode = externalNode;
-        //        }
-        //        allowNext = externalNode instanceof Comment;
-        //    }
-        //}
-        // Find the root element of the target document to merge
+//		def beforeHtml = true
+//		def allowNext = false
+//		def lastNode = contentXml
+//		decoratorDocument.children.each { externalNode ->
+//			if (externalNode == decoratorXml) {
+//				beforeHtml = false
+//				allowNext = true
+//				return
+//			}
+//			if (externalNode instanceof Comment || allowNext) {
+//				if (beforeHtml) {
+//					contentDocument.insertBefore(contentXml, externalNode)
+//				}
+//				else {
+//					contentDocument.insertAfter(lastNode, externalNode)
+//					lastNode = externalNode
+//				}
+//				allowNext = externalNode instanceof Comment
+//			}
+//		}
+        // Find the root element of the target document to work with
         IModel targetDocumentRootModel = MetaClass.findModel(targetDocumentModel, targetDocumentEvent -> {
             return targetDocumentEvent instanceof IOpenElementTag;
         });
 
-        // Decorate the target document with the source one (which is the one being processed)
-        new AttributeMerger(modelFactory).merge(targetDocumentRootModel, sourceDocumentModel);
-        MetaClass.replaceModel(targetDocumentModel, targetDocumentRootModel);
+        // Decorate the target document with the source one
+        return new AttributeMerger(context.getModelFactory()).merge(targetDocumentRootModel, sourceDocumentModel);
     }
-
 }

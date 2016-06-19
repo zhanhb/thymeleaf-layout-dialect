@@ -70,7 +70,7 @@ public class TemplateModelFinder {
      * @return Fragment matching the fragment specification.
      */
     public TemplateModel findFragment(String templateName, String fragmentName, String dialectPrefix) {
-        return find(templateName, "//[" + dialectPrefix + ":fragment='" + fragmentName + "' or data-" + dialectPrefix + "-fragment='" + fragmentName + "']");
+        return find(templateName, "//[" + dialectPrefix + ":fragment^='" + fragmentName + "' or data-" + dialectPrefix + "-fragment^='" + fragmentName + "']");
     }
 
     /**

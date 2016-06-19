@@ -27,6 +27,8 @@ import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
+import org.thymeleaf.standard.expression.Assignation;
+import org.thymeleaf.standard.expression.AssignationSequence;
 import org.thymeleaf.standard.expression.FragmentExpression;
 import org.thymeleaf.templatemode.TemplateMode;
 
@@ -68,7 +70,6 @@ public class InsertProcessor extends AbstractAttributeModelProcessor {
 
         // Locate the page and fragment to insert
         FragmentExpression fragmentExpression = (FragmentExpression) new ExpressionProcessor(context).parse(attributeValue);
-
         TemplateModel fragmentToInsert = new TemplateModelFinder(context, getTemplateMode()).findFragment(
                 fragmentExpression.getTemplateName().toString(), fragmentExpression.getFragmentSelector().toString(),
                 getDialectPrefix());
@@ -84,6 +85,12 @@ public class InsertProcessor extends AbstractAttributeModelProcessor {
         // Replace the children of this element with those of the to-be-inserted page fragment
         MetaClass.clearChildren(model);
         model.insertModel(1, fragmentToInsert.cloneModel());
+        AssignationSequence parameters = fragmentExpression.getParameters();
+        if (parameters != null) {
+            for (Assignation parameter : parameters) {
+                structureHandler.setLocalVariable((String) parameter.getLeft().execute(context), parameter.getRight().execute(context));
+            }
+        }
     }
 
 }

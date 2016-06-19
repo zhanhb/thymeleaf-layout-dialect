@@ -48,9 +48,8 @@ public class LayoutDialectContext extends HashMap<String, Object> {
             try {
                 return (LayoutDialectContext) contextKey;
             } catch (ClassCastException ex) {
-                throw new Error("Name collision on the Thymeleaf processing "
-                        + "context.  An object with the key \"layout\" exists, but is needed "
-                        + "by the Layout Dialect to work");
+                throw new Error("Name collision on the Thymeleaf processing context.  An object with the "
+                        + "key \"layout\" exists, but is needed by the Layout Dialect to work");
             }
         } else {
             LayoutDialectContext dialectContext = new LayoutDialectContext();

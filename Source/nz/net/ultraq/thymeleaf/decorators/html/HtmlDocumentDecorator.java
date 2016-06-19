@@ -21,12 +21,11 @@ import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.internal.MetaProvider;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
+import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.ICloseElementTag;
 import org.thymeleaf.model.IElementTag;
 import org.thymeleaf.model.IModel;
-import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.model.IOpenElementTag;
-import org.thymeleaf.model.ITemplateEvent;
 
 /**
  * A decorator made to work over an HTML document. Decoration for a document
@@ -37,17 +36,17 @@ import org.thymeleaf.model.ITemplateEvent;
  */
 public class HtmlDocumentDecorator implements Decorator {
 
-    private final IModelFactory modelFactory;
+    private final ITemplateContext context;
     private final SortingStrategy sortingStrategy;
 
     /**
      * Constructor, apply the given sorting strategy to the decorator.
      *
-     * @param modelFactory
+     * @param context
      * @param sortingStrategy
      */
-    public HtmlDocumentDecorator(IModelFactory modelFactory, SortingStrategy sortingStrategy) {
-        this.modelFactory = modelFactory;
+    public HtmlDocumentDecorator(ITemplateContext context, SortingStrategy sortingStrategy) {
+        this.context = context;
         this.sortingStrategy = sortingStrategy;
     }
 
@@ -56,48 +55,48 @@ public class HtmlDocumentDecorator implements Decorator {
      *
      * @param targetDocumentModel
      * @param sourceDocumentModel
+     * @return Result of the decoration.
      */
     @Override
-    public void decorate(IModel targetDocumentModel, IModel sourceDocumentModel) {
+    public IModel decorate(IModel targetDocumentModel, IModel sourceDocumentModel) {
+        // Head decoration
         ITemplateEventPredicate headModelFinder = event -> {
             return event instanceof IOpenElementTag && "head".equals(((IElementTag) event).getElementCompleteName());
         };
-
         IModel targetHeadModel = MetaClass.findModel(targetDocumentModel, headModelFinder);
-        new HtmlHeadDecorator(modelFactory, sortingStrategy).decorate(
+        IModel resultHeadModel = new HtmlHeadDecorator(context, sortingStrategy).decorate(
                 targetHeadModel,
                 MetaClass.findModel(sourceDocumentModel, headModelFinder)
         );
-
-        // Replace the head element and events with the decorated one
-        // TODO: This feels pretty hacky and should be done as part of the head
-        //       decorator using a structure handler or something
-        int headIndex = -1;
-        for (int i = 0; i < targetDocumentModel.size(); i++) {
-            ITemplateEvent event = targetDocumentModel.get(i);
-            if (event instanceof IOpenElementTag && "head".equals(((IElementTag) event).getElementCompleteName())) {
-                headIndex = i;
-                break;
+        if (MetaClass.asBoolean(resultHeadModel)) {
+            if (MetaClass.asBoolean(targetHeadModel)) {
+                MetaClass.replaceModel(targetDocumentModel, MetaProvider.INSTANCE.getProperty(targetHeadModel, "index"), resultHeadModel);
+            } else {
+                MetaClass.insertModelWithWhitespace(targetDocumentModel, (Integer) MetaProvider.INSTANCE.getProperty(MetaClass.find(targetDocumentModel, event -> {
+                    return (event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName()))
+                            || (event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName()));
+                }), "index") - 1, resultHeadModel);
             }
         }
-        if (headIndex > 0) {
-            while (true) {
-                ITemplateEvent lastEvent = targetDocumentModel.get(headIndex);
-                targetDocumentModel.remove(headIndex);
-                if (lastEvent instanceof ICloseElementTag && "head".equals(((IElementTag) lastEvent).getElementCompleteName())) {
-                    break;
-                }
-            }
-            targetDocumentModel.insertModel(headIndex, targetHeadModel);
-        }
 
+        // Body decoration
         ITemplateEventPredicate bodyModelFinder = event -> {
             return event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName());
         };
-        new HtmlBodyDecorator(modelFactory).decorate(
-                MetaClass.findModel(targetDocumentModel, bodyModelFinder),
+        IModel targetBodyModel = MetaClass.findModel(targetDocumentModel, bodyModelFinder);
+        IModel resultBodyModel = new HtmlBodyDecorator(context.getModelFactory()).decorate(
+                targetBodyModel,
                 MetaClass.findModel(sourceDocumentModel, bodyModelFinder)
         );
+        if (MetaClass.asBoolean(resultBodyModel)) {
+            if (MetaClass.asBoolean(targetBodyModel)) {
+                MetaClass.replaceModel(targetDocumentModel, MetaProvider.INSTANCE.getProperty(targetBodyModel, "index"), resultBodyModel);
+            } else {
+                MetaClass.insertModelWithWhitespace(targetDocumentModel, (Integer) MetaProvider.INSTANCE.getProperty(MetaClass.find(targetDocumentModel, event -> {
+                    return event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName());
+                }), "index") - 1, resultBodyModel);
+            }
+        }
 
         // TODO
         // Set the doctype from the decorator if missing from the content page
@@ -112,8 +111,7 @@ public class HtmlDocumentDecorator implements Decorator {
         });
 
         // Bring the decorator into the content page (which is the one being processed)
-        new AttributeMerger(modelFactory).merge(targetDocumentRootModel, sourceDocumentModel);
-        targetDocumentModel.replace(MetaProvider.INSTANCE.getProperty(targetDocumentRootModel, "index"), targetDocumentRootModel.get(0));
+        return new AttributeMerger(context.getModelFactory()).merge(targetDocumentRootModel, sourceDocumentModel);
     }
 
 }

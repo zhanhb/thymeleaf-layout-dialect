@@ -52,12 +52,17 @@ public class AttributeMerger implements ModelMerger {
      *
      * @param sourceModel
      * @param targetModel
+     * @return New element with the merged attributes.
      */
     @Override
-    public void merge(IModel targetModel, IModel sourceModel) {
+    public IModel merge(IModel targetModel, IModel sourceModel) {
+        // If one of the parameters is missing return a copy of the other, or
+        // nothing if both parameters are missing.
         if (!MetaClass.asBoolean(targetModel) || !MetaClass.asBoolean(sourceModel)) {
-            return;
+            return MetaClass.asBoolean(targetModel) ? targetModel.cloneModel() : MetaClass.asBoolean(sourceModel) ? sourceModel.cloneModel() : null;
         }
+
+        IModel mergedModel = targetModel.cloneModel();
 
         // Merge attributes from the source model's root event to the target model's root event
         for (IAttribute sourceAttribute : ((IProcessableElementTag) sourceModel.get(0)).getAllAttributes()) {
@@ -65,21 +70,23 @@ public class AttributeMerger implements ModelMerger {
             if (MetaClass.equalsName(sourceAttribute, LayoutDialect.DIALECT_PREFIX, FragmentProcessor.PROCESSOR_NAME)) {
                 continue;
             }
-            IProcessableElementTag targetEvent = (IProcessableElementTag) targetModel.get(0);
-            String mergedAttributeValue;
 
-            // Merge th:with attributes
+            IProcessableElementTag mergedEvent = (IProcessableElementTag) MetaClass.first(mergedModel);
+            String mergedAttributeValue; // Merge th:with attributes
             if (MetaClass.equalsName(sourceAttribute, StandardDialect.PREFIX, StandardWithTagProcessor.ATTR_NAME)) {
                 mergedAttributeValue = new VariableDeclarationMerger().merge(sourceAttribute.getValue(),
-                        targetEvent.getAttributeValue(StandardDialect.PREFIX, StandardWithTagProcessor.ATTR_NAME));
+                        mergedEvent.getAttributeValue(StandardDialect.PREFIX, StandardWithTagProcessor.ATTR_NAME));
             } else { // Copy every other attribute straight
                 mergedAttributeValue = sourceAttribute.getValue();
             }
 
-            targetModel.replace(0, modelFactory.replaceAttribute(targetEvent,
+            // TODO: Create model extensions for manipulating first/last elements?
+            mergedModel.replace(0, modelFactory.replaceAttribute(mergedEvent,
                     MetaClass.getAttributeName(sourceAttribute), sourceAttribute.getAttributeCompleteName(),
                     mergedAttributeValue));
         }
+
+        return mergedModel;
     }
 
 }

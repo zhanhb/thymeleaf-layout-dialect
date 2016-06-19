@@ -15,12 +15,14 @@
  */
 package nz.net.ultraq.thymeleaf.decorators;
 
+import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.processor.element.AbstractAttributeTagProcessor;
 import org.thymeleaf.processor.element.IElementTagStructureHandler;
 import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.util.StringUtils;
 
 /**
  * Allows for greater control of the resulting {@code <title>} element by
@@ -43,6 +45,18 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
 
     public static final String RESULTING_TITLE = "resultingTitle";
 
+    public static final String CONTENT_TITLE_ATTRIBUTE = "data-layout-content-title";
+    public static final String DECORATOR_TITLE_ATTRIBUTE = "data-layout-decorator-title";
+
+    private static String titleProcessor(String dataAttributeName, IProcessableElementTag tag, IElementTagStructureHandler structureHandler, ExpressionProcessor expressionProcessor) {
+        String titleExpression = tag.getAttributeValue(dataAttributeName);
+        if (!StringUtils.isEmpty(titleExpression)) {
+            structureHandler.removeAttribute(dataAttributeName);
+            return expressionProcessor.processAsString(titleExpression);
+        }
+        return null;
+    }
+
     /**
      * Constructor, sets this processor to work on the 'title-pattern'
      * attribute.
@@ -55,51 +69,37 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
     }
 
     /**
-     * {@inheritDoc}
+     * Process the {@code layout:title-pattern} directive, replaces the title
+     * text with the titles from the content and decorator pages.
+     *
+     * @param context
+     * @param tag
+     * @param attributeName
+     * @param attributeValue
+     * @param structureHandler
      */
     @Override
     protected void doProcess(ITemplateContext context, IProcessableElementTag tag,
             AttributeName attributeName, String attributeValue, IElementTagStructureHandler structureHandler) {
 
         // Ensure this attribute is only on the <title> element
-        /*if (!"title".equals(element.getNormalizedName())) {
+        if (!"title".equals(tag.getElementCompleteName())) {
             throw new IllegalArgumentException(attributeName + " processor should only appear in a <title> element");
         }
 
-        // Retrieve title values from the expanded <title> sections within this
-        // processing container (if any)
-        String titlePattern = element.getAttributeValue(attributeName);
-        NestableNode titleContainer = element.getParent();
-        List<Element> titleElements = titleContainer != null ? titleContainer.getElementChildren() : Collections.<Element>emptyList();
-        element.removeAttribute(attributeName);
+        String titlePattern = attributeValue;
+        ExpressionProcessor expressionProcessor = new ExpressionProcessor(context);
 
-        Element decoratorTitleElement = findTitleType(titleElements, TITLE_TYPE_DECORATOR);
-        String decoratorTitle = getTitle(decoratorTitleElement);
-        Element contentTitleElement = findTitleType(titleElements, TITLE_TYPE_CONTENT);
-        String contentTitle = getTitle(contentTitleElement);
-
-        AttributeMerger attributeMerger = new AttributeMerger();
-        attributeMerger.merge(element, decoratorTitleElement);
-        attributeMerger.merge(element, contentTitleElement);
+        String contentTitle = titleProcessor(CONTENT_TITLE_ATTRIBUTE, tag, structureHandler, expressionProcessor);
+        String decoratorTitle = titleProcessor(DECORATOR_TITLE_ATTRIBUTE, tag, structureHandler, expressionProcessor);
 
         String title = !StringUtils.isEmpty(titlePattern) && !StringUtils.isEmpty(decoratorTitle) && !StringUtils.isEmpty(contentTitle)
                 ? titlePattern
                 .replace(PARAM_TITLE_DECORATOR, decoratorTitle)
                 .replace(PARAM_TITLE_CONTENT, contentTitle)
-                : StringUtils.isEmpty(contentTitle) ? decoratorTitle != null ? decoratorTitle : "" : contentTitle;
+                : !StringUtils.isEmpty(contentTitle) ? contentTitle : !StringUtils.isEmpty(decoratorTitle) ? decoratorTitle : "";
 
-        // If there's a title, bring it up
-        if (!StringUtils.isEmpty(title)) {
-            element.addChild(new Text(title));
-            titleContainer.getParent().insertAfter(titleContainer, element.cloneNode(null, false));
-            LayoutDialectContext.forContext(arguments.getContext()).put(RESULTING_TITLE, title);
-        }
-
-        // Remove the processing section
-        titleContainer.getParent().removeChild(titleContainer);
-
-        return ProcessorResult.OK;
-         */
+        structureHandler.setBody(title, false);
     }
 
 }

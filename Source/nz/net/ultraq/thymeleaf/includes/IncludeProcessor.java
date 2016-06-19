@@ -31,6 +31,8 @@ import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
+import org.thymeleaf.standard.expression.Assignation;
+import org.thymeleaf.standard.expression.AssignationSequence;
 import org.thymeleaf.standard.expression.FragmentExpression;
 import org.thymeleaf.templatemode.TemplateMode;
 
@@ -80,7 +82,6 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
 
         // Locate the page and fragment for inclusion
         FragmentExpression fragmentExpression = (FragmentExpression) new ExpressionProcessor(context).parse(attributeValue);
-
         TemplateModel fragmentForInclusion = new TemplateModelFinder(context, getTemplateMode()).findFragment(
                 fragmentExpression.getTemplateName().toString(), fragmentExpression.getFragmentSelector().toString(),
                 getDialectPrefix());
@@ -99,6 +100,12 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
         for (Iterator<ITemplateEvent> it = MetaClass.childEventIterator(fragmentForInclusion.cloneModel()); it.hasNext();) {
             ITemplateEvent fragmentChildEvent = it.next();
             model.insert(model.size() - 1, fragmentChildEvent);
+        }
+        AssignationSequence parameters = fragmentExpression.getParameters();
+        if (parameters != null) {
+            for (Assignation parameter : parameters) {
+                structureHandler.setLocalVariable((String) parameter.getLeft().execute(context), parameter.getRight().execute(context));
+            }
         }
     }
 

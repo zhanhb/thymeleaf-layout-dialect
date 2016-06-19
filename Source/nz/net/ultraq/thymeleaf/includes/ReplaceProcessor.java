@@ -27,6 +27,8 @@ import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
+import org.thymeleaf.standard.expression.Assignation;
+import org.thymeleaf.standard.expression.AssignationSequence;
 import org.thymeleaf.standard.expression.FragmentExpression;
 import org.thymeleaf.templatemode.TemplateMode;
 
@@ -81,7 +83,13 @@ public class ReplaceProcessor extends AbstractAttributeModelProcessor {
         structureHandler.setTemplateData(fragmentForReplacement.getTemplateData());
 
         // Replace this element with the located fragment
-        MetaClass.replaceModel(model, fragmentForReplacement.cloneModel());
+        MetaClass.replaceModel(model, 0, fragmentForReplacement.cloneModel());
+        AssignationSequence parameters = fragmentExpression.getParameters();
+        if (parameters != null) {
+            for (Assignation parameter : parameters) {
+                structureHandler.setLocalVariable((String) parameter.getLeft().execute(context), parameter.getRight().execute(context));
+            }
+        }
     }
 
 }

@@ -15,8 +15,9 @@
  */
 package nz.net.ultraq.thymeleaf.decorators.html;
 
-import nz.net.ultraq.thymeleaf.decorators.xml.XmlElementDecorator;
+import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import nz.net.ultraq.thymeleaf.models.AttributeMerger;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
 
@@ -25,7 +26,9 @@ import org.thymeleaf.model.IModelFactory;
  *
  * @author Emanuel Rabina
  */
-public class HtmlBodyDecorator extends XmlElementDecorator {
+public class HtmlBodyDecorator implements Decorator {
+
+    private final IModelFactory modelFactory;
 
     /**
      * Constructor, sets up the element decorator context.
@@ -33,7 +36,7 @@ public class HtmlBodyDecorator extends XmlElementDecorator {
      * @param modelFactory
      */
     public HtmlBodyDecorator(IModelFactory modelFactory) {
-        super(modelFactory);
+        this.modelFactory = modelFactory;
     }
 
     /**
@@ -41,19 +44,16 @@ public class HtmlBodyDecorator extends XmlElementDecorator {
      *
      * @param targetBodyModel
      * @param sourceBodyModel
+     * @return Result of the decoration.
      */
     @Override
-    public void decorate(IModel targetBodyModel, IModel sourceBodyModel) {
-
-        // Try to ensure there is a body as a result of decoration, applying the
-        // source body, or just using what is in the target
-        if (MetaClass.asBoolean(sourceBodyModel)) {
-            if (MetaClass.asBoolean(targetBodyModel)) {
-                super.decorate(targetBodyModel, sourceBodyModel);
-            } else {
-                MetaClass.replaceModel(targetBodyModel, sourceBodyModel);
-            }
+    public IModel decorate(IModel targetBodyModel, IModel sourceBodyModel) {
+        // If one of the parameters is missing return a copy of the other, or
+        // nothing if both parameters are missing.
+        if (!MetaClass.asBoolean(targetBodyModel) || !MetaClass.asBoolean(sourceBodyModel)) {
+            return MetaClass.asBoolean(targetBodyModel) ? targetBodyModel.cloneModel() : MetaClass.asBoolean(sourceBodyModel) ? sourceBodyModel.cloneModel() : null;
         }
+        return new AttributeMerger(modelFactory).merge(targetBodyModel, sourceBodyModel);
     }
 
 }

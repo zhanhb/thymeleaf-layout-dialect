@@ -18,12 +18,8 @@ package nz.net.ultraq.thymeleaf.models;
 import groovy.lang.Closure;
 import groovy.util.BuilderSupport;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.ElementDefinitions;
-import org.thymeleaf.engine.HTMLElementDefinition;
-import org.thymeleaf.engine.HTMLElementType;
-import org.thymeleaf.model.AttributeValueQuotes;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -35,23 +31,26 @@ import org.thymeleaf.templatemode.TemplateMode;
  */
 public class ModelBuilder extends BuilderSupport {
 
-    private static final Logger logger = LoggerFactory.getLogger(ModelBuilder.class);
-
-    private final ElementDefinitions elementDefinitions;
-    private final IModelFactory modelFactory;
-    private final TemplateMode templateMode;
+    nz.net.ultraq.thymeleaf.internal.ModelBuilder builder;
 
     /**
-     * Constructor, create a new model builder using the given model factory.
+     * Constructor, create a new model builder.
+     *
+     * @param context
+     */
+    public ModelBuilder(ITemplateContext context) {
+        builder = new nz.net.ultraq.thymeleaf.internal.ModelBuilder(context);
+    }
+
+    /**
+     * Constructor, create a new model builder.
      *
      * @param modelFactory
      * @param elementDefinitions
      * @param templateMode
      */
     public ModelBuilder(IModelFactory modelFactory, ElementDefinitions elementDefinitions, TemplateMode templateMode) {
-        this.modelFactory = modelFactory;
-        this.elementDefinitions = elementDefinitions;
-        this.templateMode = templateMode;
+        builder = new nz.net.ultraq.thymeleaf.internal.ModelBuilder(modelFactory, elementDefinitions, templateMode);
     }
 
     /**
@@ -124,41 +123,7 @@ public class ModelBuilder extends BuilderSupport {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected IModel createNode(Object name, Map attributes, Object value) {
-        IModel model = modelFactory.createModel();
-        String nm = name != null ? name.toString() : null;
-        HTMLElementDefinition elementDefinition = (HTMLElementDefinition) elementDefinitions.forName(templateMode, nm);
-
-        // Standalone element
-        if (elementDefinition.getType() == HTMLElementType.VOID) {
-            if (attributes != null && attributes.containsKey("standalone")) {
-                attributes.remove("standalone");
-                model.add(modelFactory.createStandaloneElementTag(nm, attributes, AttributeValueQuotes.DOUBLE, false, true));
-            } else if (attributes != null && attributes.containsKey("void")) {
-                attributes.remove("void");
-                model.add(modelFactory.createStandaloneElementTag(nm, attributes, AttributeValueQuotes.DOUBLE, false, false));
-            } else {
-                logger.warn("Instructed to write a closing tag {0} for an HTML void element.  This\n"
-                        + "might cause processing errors further down the track.  To avoid this,\n"
-                        + "either self close the opening element, remove the closing tag, or\n"
-                        + "process this template using the XML processing mode.  See\n"
-                        + "https://html.spec.whatwg.org/multipage/syntax.html#void-elements\n"
-                        + "for more information on HTML void elements.", nm);
-
-                model.add(modelFactory.createStandaloneElementTag(nm, attributes, AttributeValueQuotes.DOUBLE, false, false));
-                model.add(modelFactory.createCloseElementTag(nm));
-            }
-        } else { // Open/close element and potential text content
-            model.add(modelFactory.createOpenElementTag(nm, attributes, AttributeValueQuotes.DOUBLE, false));
-            if (value != null) {
-                String str = value.toString();
-                if (!str.isEmpty()) {
-                    model.add(modelFactory.createText(str));
-                }
-            }
-            model.add(modelFactory.createCloseElementTag(nm));
-        }
-
-        return model;
+        return builder.createNode(name, attributes, value);
     }
 
     /**
@@ -172,6 +137,7 @@ public class ModelBuilder extends BuilderSupport {
     protected void nodeCompleted(Object parent, Object child) {
         IModel parentModel = (IModel) parent;
         if (parentModel != null) {
+
             // TODO: Insert w/ whitespace?
             parentModel.insertModel(parentModel.size() - 1, (IModel) child);
         }

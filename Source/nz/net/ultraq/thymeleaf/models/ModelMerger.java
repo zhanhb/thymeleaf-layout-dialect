@@ -30,7 +30,8 @@ public interface ModelMerger {
      *
      * @param targetModel
      * @param sourceModel
+     * @return The result of the merge.
      */
-    void merge(IModel targetModel, IModel sourceModel);
+    IModel merge(IModel targetModel, IModel sourceModel);
 
 }

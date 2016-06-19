@@ -427,14 +427,15 @@ public class MetaClass {
     }
 
     /**
-     * Replaces the enture model with a new one.
+     * Replaces the model at the specified index with the given model.
      *
      * @param delegate
+     * @param pos
      * @param model
      */
-    public static void replaceModel(IModel delegate, IModel model) {
-        delegate.reset();
-        delegate.addModel(model);
+    public static void replaceModel(IModel delegate, int pos, IModel model) {
+        removeModel(delegate, pos);
+        delegate.insertModel(pos, model);
     }
 
     /**

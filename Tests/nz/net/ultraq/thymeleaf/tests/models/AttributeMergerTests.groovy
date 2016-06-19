@@ -71,8 +71,8 @@ class AttributeMergerTests {
 			div(class: 'container', id: 'test-element')
 		}
 
-		new AttributeMerger(modelFactory).merge(target, source)
-		assertTrue(MetaClass.equals(target, expected))
+		def result = new AttributeMerger(modelFactory).merge(target, source)
+		assertTrue(MetaClass.equals(expected, result))
 	}
 
 	/**
@@ -91,7 +91,7 @@ class AttributeMergerTests {
 			div(class: 'roflcopter')
 		}
 
-		new AttributeMerger(modelFactory).merge(target, source)
-		assertTrue(MetaClass.equals(target, expected))
+		def result = new AttributeMerger(modelFactory).merge(target, source)
+		assertTrue(MetaClass.equals(expected, result))
 	}
 }

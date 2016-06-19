@@ -15,7 +15,6 @@
  */
 package nz.net.ultraq.thymeleaf.fragments;
 
-import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.models.ElementMerger;
 import org.slf4j.Logger;
@@ -78,12 +77,11 @@ public class FragmentProcessor extends AbstractAttributeModelProcessor {
         }
 
         // Locate the fragment that corresponds to this decorator/include fragment
-        String fragmentName = new ExpressionProcessor(context).processAsString(attributeValue);
-        IModel fragment = FragmentMap.get(context).get(fragmentName);
+        IModel fragment = FragmentMap.get(context).get(attributeValue);
 
         // Replace this model with the fragment
         if (MetaClass.asBoolean(fragment)) {
-            new ElementMerger(context.getModelFactory()).merge(model, fragment);
+            MetaClass.replaceModel(model, 0, new ElementMerger(context.getModelFactory()).merge(model, fragment));
         }
     }
 

@@ -27,8 +27,8 @@ import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.model.ICloseElementTag;
 import org.thymeleaf.model.IModel;
-import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.model.IOpenElementTag;
+import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -75,9 +75,17 @@ public class DecoratorProcessor extends AbstractAttributeModelProcessor {
     @Override
     protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
             String attributeValue, IElementModelStructureHandler structureHandler) {
+
         // Ensure the decorator attribute is in the root element of the document
         if (context.getElementStack().size() != 1) {
             throw new IllegalArgumentException("layout:decorator attribute must appear in the root element of your template");
+        }
+
+        // Remove the layout:decorator attribute for cases when the root element is
+        // both a decorator processor and a potential fragment
+        IProcessableElementTag rootElement = (IProcessableElementTag) MetaClass.first(model);
+        if (rootElement.hasAttribute(getDialectPrefix(), PROCESSOR_NAME)) {
+            model.replace(0, context.getModelFactory().removeAttribute(rootElement, getDialectPrefix(), PROCESSOR_NAME));
         }
 
         // Locate the template to 'redirect' processing to by completely replacing
@@ -87,38 +95,40 @@ public class DecoratorProcessor extends AbstractAttributeModelProcessor {
                 .findTemplate(decoratorTemplateName)
                 .cloneModel();
 
+        // Gather all fragment parts from this page to apply to the new document
+        // after decoration has taken place
         Map<String, IModel> pageFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);
 
         // Choose the decorator to use based on template mode, then apply it
-        IModelFactory modelFactory = context.getModelFactory();
         TemplateMode templateMode = getTemplateMode();
-        Decorator decorator = templateMode == TemplateMode.HTML ? new HtmlDocumentDecorator(modelFactory, sortingStrategy)
-                : templateMode == TemplateMode.XML ? new XmlDocumentDecorator(modelFactory) : null;
+        Decorator decorator
+                = templateMode == TemplateMode.HTML ? new HtmlDocumentDecorator(context, sortingStrategy)
+                        : templateMode == TemplateMode.XML ? new XmlDocumentDecorator(context)
+                                : null;
         if (decorator == null) {
-            throw new IllegalArgumentException("Layout dialect cannot be applied to the " + templateMode + " template mode, "
+            throw new IllegalArgumentException("Layout dialect cannot be applied to the ${templateMode} template mode, "
                     + "only HTML and XML template modes are currently supported");
         }
-        decorator.decorate(decoratorTemplate, model);
+        IModel resultTemplate = decorator.decorate(decoratorTemplate, model);
 
         // TODO: The modified decorator template includes anything outside the root
         //       element, which we don't want for the next step.  Strip those events
         //       out for now, but for future I should find a better way to merge
         //       documents.
-        while (!(MetaClass.first(decoratorTemplate) instanceof IOpenElementTag)) {
-            MetaClass.removeFirst(decoratorTemplate);
+        while (!(MetaClass.first(resultTemplate) instanceof IOpenElementTag)) {
+            MetaClass.removeFirst(resultTemplate);
         }
-        while (!(MetaClass.last(decoratorTemplate) instanceof ICloseElementTag)) {
-            MetaClass.removeLast(decoratorTemplate);
+        while (!(MetaClass.last(resultTemplate) instanceof ICloseElementTag)) {
+            MetaClass.removeLast(resultTemplate);
         }
 
         // TODO: Should probably return a new object so this doesn't look so
         //       confusing, ie: why am I changing the source model when it's the
         //       decorator model we are targeting???  See the point about
         //       immutability in https://github.com/ultraq/thymeleaf-layout-dialect/issues/102
-        MetaClass.replaceModel(model, decoratorTemplate);
+        MetaClass.replaceModel(model, 0, resultTemplate);
 
         // Save layout fragments for use later by layout:fragment processors
         FragmentMap.setForNode(context, structureHandler, pageFragments);
     }
-
 }

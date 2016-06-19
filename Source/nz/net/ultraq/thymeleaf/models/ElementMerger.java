@@ -43,20 +43,20 @@ public class ElementMerger implements ModelMerger {
      *
      * @param targetModel
      * @param sourceModel
+     * @return Model that is the result of the merge.
      */
     @Override
-    public void merge(IModel targetModel, IModel sourceModel) {
-        // Because we're basically replacing targetModel with sourceModel, we'll
-        // lose the attributes in the target.  So, create a copy of those attributes
-        // for that merge after.
-        IModel targetInitialRootElement = modelFactory.createModel(targetModel.get(0));
+    public IModel merge(IModel targetModel, IModel sourceModel) {
+        // If one of the parameters is missing return a copy of the other, or
+        // nothing if both parameters are missing.
+        if (!MetaClass.asBoolean(targetModel) || !MetaClass.asBoolean(sourceModel)) {
+            return MetaClass.asBoolean(targetModel) ? targetModel.cloneModel() : MetaClass.asBoolean(sourceModel) ? sourceModel.cloneModel() : null;
+        }
 
-        // TODO: Shouldn't all this be done with the structureHandler?  I should
-        //       make another code branch that does that, and then I can compare.
-        // Replace the target model with the source model
-        MetaClass.replaceModel(targetModel, sourceModel);
-
-        new AttributeMerger(modelFactory).merge(targetModel, targetInitialRootElement);
+        // The result we want is basically the source model, but with the target
+        // models root element attributes
+        IModel targetInitialRootElement = modelFactory.createModel(MetaClass.first(targetModel));
+        return new AttributeMerger(modelFactory).merge(sourceModel, targetInitialRootElement);
     }
 
 }
