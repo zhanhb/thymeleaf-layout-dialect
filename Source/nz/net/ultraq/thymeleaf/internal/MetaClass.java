@@ -17,6 +17,8 @@ package nz.net.ultraq.thymeleaf.internal;
 
 import java.util.Iterator;
 import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import nz.net.ultraq.thymeleaf.models.ChildEventIterator;
 import nz.net.ultraq.thymeleaf.models.ChildModelIterator;
 import org.thymeleaf.engine.AttributeName;
@@ -49,7 +51,7 @@ public class MetaClass {
      * @param delegate
      * @return {@code true} if this model has events.
      */
-    public static boolean asBoolean(IModel delegate) {
+    public static boolean asBoolean(@Nullable IModel delegate) {
         return delegate != null && delegate.size() > 0;
     }
 
@@ -61,7 +63,8 @@ public class MetaClass {
      * @return An iterator over this model's child events, or an empty iterator
      * for all other model types.
      */
-    public static Iterator<ITemplateEvent> childEventIterator(IModel delegate) {
+    @Nullable
+    public static Iterator<ITemplateEvent> childEventIterator(@Nonnull IModel delegate) {
         return isElement(delegate) ? new ChildEventIterator(delegate) : null;
     }
 
@@ -72,7 +75,8 @@ public class MetaClass {
      * @param delegate
      * @return New model iterator.
      */
-    public static Iterator<IModel> childModelIterator(IModel delegate) {
+    @Nullable
+    public static Iterator<IModel> childModelIterator(@Nonnull IModel delegate) {
         return isElement(delegate) ? new ChildModelIterator(delegate) : null;
     }
 
@@ -81,7 +85,7 @@ public class MetaClass {
      *
      * @param delegate
      */
-    public static void clear(IModel delegate) {
+    public static void clear(@Nonnull IModel delegate) {
         delegate.reset();
     }
 
@@ -91,7 +95,7 @@ public class MetaClass {
      *
      * @param delegate
      */
-    public static void clearChildren(IModel delegate) {
+    public static void clearChildren(@Nonnull IModel delegate) {
         if (isElement(delegate)) {
             while (delegate.size() > 2) {
                 delegate.remove(1);
@@ -106,9 +110,11 @@ public class MetaClass {
      * @param delegate
      * @param closure
      */
-    public static void each(IModel delegate, ITemplateEventConsumer closure) {
-        for (int i = 0; i < delegate.size(); i++) {
-            closure.accept(delegate.get(i));
+    public static void each(@Nullable IModel delegate, ITemplateEventConsumer closure) {
+        if (delegate != null) {
+            for (int i = 0; i < delegate.size(); i++) {
+                closure.accept(delegate.get(i));
+            }
         }
     }
 
@@ -120,7 +126,7 @@ public class MetaClass {
      * @param other
      * @return {@code true} if this model is the same as the other one.
      */
-    public static boolean equals(IModel delegate, Object other) {
+    public static boolean equals(IModel delegate, @Nullable Object other) {
         if (other instanceof IModel) {
             IModel iModel = (IModel) other;
             if (delegate.size() == iModel.size()) {
@@ -135,7 +141,7 @@ public class MetaClass {
         return false;
     }
 
-    private static boolean equals(ITemplateEvent event, Object other) {
+    private static boolean equals(@Nullable ITemplateEvent event, Object other) {
         if (event instanceof IOpenElementTag) {
             return equals(((IOpenElementTag) event), other);
         } else if (event instanceof ICloseElementTag) {
@@ -145,7 +151,7 @@ public class MetaClass {
         } else if (event instanceof IText) {
             return equals(((IText) event), other);
         }
-        return event.equals(other);
+        return Objects.equals(event, other);
     }
 
     /**
@@ -293,6 +299,7 @@ public class MetaClass {
      * @param pos
      * @return Model at the given position.
      */
+    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     public static IModel getModel(IModel delegate, int pos) {
         int modelSize = calculateModelSize(delegate, pos);
         IModel subModel = delegate.cloneModel();
@@ -332,6 +339,7 @@ public class MetaClass {
      * @param delegate
      * @param pos
      * @param event
+     * @param modelFactory
      */
     public static void insertWithWhitespace(IModel delegate, int pos, ITemplateEvent event, IModelFactory modelFactory) {
         // TODO: Because I can't check the parent for whitespace hints, I should

@@ -93,19 +93,20 @@ public class GroupingStrategy implements SortingStrategy {
 
         int type = findMatchingType(childModel);
         Iterator<IModel> it = MetaClass.childModelIterator(headModel);
-
-        ArrayList<IModel> list = new ArrayList<>();
-        while (it.hasNext()) {
-            list.add(it.next());
-        }
-        ListIterator<IModel> listIterator = list.listIterator(list.size());
-        while (listIterator.hasPrevious()) {
-            IModel headSubModel = listIterator.previous();
-            if (type == findMatchingType(headSubModel)) {
-                if (MetaClass.asBoolean(headModel)) {
-                    return MetaProvider.INSTANCE.getProperty(headSubModel, "endIndex");
+        if (it != null) {
+            ArrayList<IModel> list = new ArrayList<>();
+            while (it.hasNext()) {
+                list.add(it.next());
+            }
+            ListIterator<IModel> listIterator = list.listIterator(list.size());
+            while (listIterator.hasPrevious()) {
+                IModel headSubModel = listIterator.previous();
+                if (type == findMatchingType(headSubModel)) {
+                    if (MetaClass.asBoolean(headModel)) {
+                        return MetaProvider.INSTANCE.getProperty(headSubModel, "endIndex");
+                    }
+                    break;
                 }
-                break;
             }
         }
         return 1;

@@ -31,7 +31,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  */
 public class ModelBuilder extends BuilderSupport {
 
-    nz.net.ultraq.thymeleaf.internal.ModelBuilder builder;
+    private final nz.net.ultraq.thymeleaf.internal.ModelBuilder builder;
 
     /**
      * Constructor, create a new model builder.

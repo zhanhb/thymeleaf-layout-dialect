@@ -29,7 +29,7 @@ public class MetaProviderTest {
 
     private static final AtomicInteger COUNTER = new AtomicInteger();
 
-    private MetaProvider provider1 = new GroovyMetaProvider(), provider2 = new InMemoryMetaProvider();
+    private final MetaProvider provider1 = new GroovyMetaProvider(), provider2 = new InMemoryMetaProvider();
 
     @Test
     public void test() {
