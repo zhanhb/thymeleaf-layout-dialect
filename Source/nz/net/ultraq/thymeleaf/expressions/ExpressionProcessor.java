@@ -69,7 +69,7 @@ public class ExpressionProcessor {
      * @return The expression as a string.
      */
     public String processAsString(String expression) {
-        return process(expression).toString();
+        return String.valueOf(process(expression));
     }
 
 }

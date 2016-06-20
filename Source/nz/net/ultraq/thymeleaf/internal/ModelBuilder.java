@@ -109,12 +109,12 @@ public class ModelBuilder {
     public IModel createNode(Object name, Map attributes, Object value) {
         // Normalize values for Java implementations as the model factory doesn't
         // know what to do with Groovy versions of things
-        String elementName = name.toString();
+        String elementName = String.valueOf(name);
         String elementText = value != null ? value.toString() : null;
         if (attributes != null) {
             Map<?, Object> map = attributes;
             for (Map.Entry<?, Object> entry : map.entrySet()) {
-                entry.setValue(entry.getValue().toString());
+                entry.setValue(String.valueOf(entry.getValue()));
             }
         }
 
