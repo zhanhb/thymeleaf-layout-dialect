@@ -19,8 +19,12 @@ import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
 import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.model.ICloseElementTag;
+import org.thymeleaf.model.IComment;
 import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.model.IOpenElementTag;
+import org.thymeleaf.model.ITemplateEvent;
 
 /**
  * A decorator made to work over an XML document.
@@ -28,6 +32,13 @@ import org.thymeleaf.model.IOpenElementTag;
  * @author Emanuel Rabina
  */
 public class XmlDocumentDecorator implements Decorator {
+
+    // Find the root element of each document to work with
+    private static IModel rootModelFinder(IModel documentModel) {
+        return MetaClass.findModel(documentModel, documentEvent -> {
+            return documentEvent instanceof IOpenElementTag;
+        });
+    }
 
     protected final ITemplateContext context;
 
@@ -49,35 +60,33 @@ public class XmlDocumentDecorator implements Decorator {
      */
     @Override
     public IModel decorate(IModel targetDocumentModel, IModel sourceDocumentModel) {
+        IModelFactory modelFactory = context.getModelFactory();
 
-        // TODO
-        // Copy text outside of the root element, keeping whitespace copied to a minimum
-//		def beforeHtml = true
-//		def allowNext = false
-//		def lastNode = contentXml
-//		decoratorDocument.children.each { externalNode ->
-//			if (externalNode == decoratorXml) {
-//				beforeHtml = false
-//				allowNext = true
-//				return
-//			}
-//			if (externalNode instanceof Comment || allowNext) {
-//				if (beforeHtml) {
-//					contentDocument.insertBefore(contentXml, externalNode)
-//				}
-//				else {
-//					contentDocument.insertAfter(lastNode, externalNode)
-//					lastNode = externalNode
-//				}
-//				allowNext = externalNode instanceof Comment
-//			}
-//		}
-        // Find the root element of the target document to work with
-        IModel targetDocumentRootModel = MetaClass.findModel(targetDocumentModel, targetDocumentEvent -> {
-            return targetDocumentEvent instanceof IOpenElementTag;
-        });
+        IModel targetDocumentRootModel = rootModelFinder(targetDocumentModel);
+        IModel sourceDocumentRootModel = rootModelFinder(sourceDocumentModel);
 
         // Decorate the target document with the source one
-        return new AttributeMerger(context.getModelFactory()).merge(targetDocumentRootModel, sourceDocumentModel);
+        IModel resultDocumentModel = new AttributeMerger(modelFactory).merge(targetDocumentRootModel, sourceDocumentRootModel);
+
+        // Copy comments outside of the root element, keeping whitespace copied to a minimum
+        for (int i = 0; i < targetDocumentModel.size(); i++) {
+            ITemplateEvent event = targetDocumentModel.get(i);
+            if (event instanceof IComment) {
+                MetaClass.insertWithWhitespace(resultDocumentModel, 0, event, modelFactory);
+            } else if (event instanceof IOpenElementTag) {
+                break;
+            }
+        }
+        for (int i = targetDocumentModel.size() - 1; i >= 0; i--) {
+            ITemplateEvent event = targetDocumentModel.get(i);
+            if (event instanceof IComment) {
+                MetaClass.insertWithWhitespace(resultDocumentModel, resultDocumentModel.size(), event, modelFactory);
+            } else if (event instanceof ICloseElementTag) {
+                break;
+            }
+        }
+
+        return resultDocumentModel;
     }
+
 }

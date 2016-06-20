@@ -70,7 +70,7 @@ public class ReplaceProcessor extends AbstractAttributeModelProcessor {
 
         // Locate the page and fragment to use for replacement
         FragmentExpression fragmentExpression = (FragmentExpression) new ExpressionProcessor(context).parse(attributeValue);
-        TemplateModel fragmentForReplacement = new TemplateModelFinder(context, getTemplateMode()).findFragment(
+        TemplateModel fragmentForReplacement = new TemplateModelFinder(context).findFragment(
                 fragmentExpression.getTemplateName().toString(), fragmentExpression.getFragmentSelector().toString(),
                 getDialectPrefix());
 

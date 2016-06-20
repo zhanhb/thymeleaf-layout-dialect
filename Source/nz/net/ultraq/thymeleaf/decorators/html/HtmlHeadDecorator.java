@@ -22,7 +22,6 @@ import nz.net.ultraq.thymeleaf.LayoutDialect;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor;
-import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.internal.MetaProvider;
 import nz.net.ultraq.thymeleaf.internal.ModelBuilder;
@@ -47,9 +46,16 @@ import org.thymeleaf.util.StringUtils;
  */
 public class HtmlHeadDecorator implements Decorator {
 
-    private static final ITemplateEventPredicate TITLE_EVENT_INDEX_FINDER = event -> {
-        return event instanceof IOpenElementTag && "title".equals(((IElementTag) event).getElementCompleteName());
-    };
+    // Get the source and target title elements
+    private static IModel titleRetriever(IModel headModel) {
+        IModel title = MetaClass.findModel(headModel, event -> {
+            return event instanceof IOpenElementTag && "title".equals(((IElementTag) event).getElementCompleteName());
+        });
+        if (MetaClass.asBoolean(title)) {
+            MetaClass.removeModelWithWhitespace(headModel, MetaProvider.INSTANCE.getProperty(title, "startIndex"));
+        }
+        return title;
+    }
 
     private static IAttribute titlePatternProcessorRetriever(IModel titleModel) {
         if (!MetaClass.asBoolean(titleModel)) {
@@ -97,15 +103,10 @@ public class HtmlHeadDecorator implements Decorator {
             return MetaClass.asBoolean(targetHeadModel) ? targetHeadModel.cloneModel() : MetaClass.asBoolean(sourceHeadModel) ? sourceHeadModel.cloneModel() : null;
         }
 
-        // Get the source and target title elements
-        IModel sourceTitle = MetaClass.findModel(sourceHeadModel, TITLE_EVENT_INDEX_FINDER);
-        if (MetaClass.asBoolean(sourceTitle)) {
-            MetaClass.removeModelWithWhitespace(sourceHeadModel, MetaProvider.INSTANCE.getProperty(sourceTitle, "index"));
-        }
-        IModel targetTitle = MetaClass.findModel(targetHeadModel, TITLE_EVENT_INDEX_FINDER);
-        if (MetaClass.asBoolean(targetTitle)) {
-            MetaClass.removeModelWithWhitespace(targetHeadModel, MetaProvider.INSTANCE.getProperty(targetTitle, "index"));
-        }
+        // TODO: A lot of this code is just to deal with titles.  I think it should
+        //       go into its own file.
+        IModel sourceTitle = titleRetriever(sourceHeadModel);
+        IModel targetTitle = titleRetriever(targetHeadModel);
 
         IAttribute titlePatternProcessor = titlePatternProcessorRetriever(sourceTitle);
         if (titlePatternProcessor == null) {
@@ -128,65 +129,21 @@ public class HtmlHeadDecorator implements Decorator {
         MetaClass.insertModelWithWhitespace(targetHeadModel,
                 1, resultTitle);
 
-//		def titleContainer = modelBuilder.build {
-//			'title-container'(
-//				titlePatternProcessor ? [(titlePatternProcessor.attributeCompleteName): titlePatternProcessor.value] : [:]) {
-//				if (sourceTitle) {
-//					add(sourceTitle)
-//				}
-//				if (targetTitle) {
-//					add(targetTitle)
-//				}
-//			}
-//		}
-
-        /*
-		// Copy the content and decorator <title>s
-		// TODO: Surely the code below can be simplified?  The 2 conditional
-		//       blocks are doing almost the same thing.
-		def titleContainer = new Element('title-container')
-		def titlePattern = null
-		def titleExtraction = { headElement, titleType ->
-			def existingContainer = headElement?.findElement('title-container')
-			if (existingContainer) {
-				def titleElement = existingContainer.children.last()
-				titlePattern = titleElement.getAttributeValue(DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME) ?: titlePattern
-				titleElement.setNodeProperty(TITLE_TYPE, titleType)
-				headElement.removeChildWithWhitespace(existingContainer)
-				titleContainer.addChild(existingContainer)
-			}
-			else {
-				def titleElement = headElement?.findElement('title')
-				if (titleElement) {
-					titlePattern = titleElement.getAttributeValue(DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME) ?: titlePattern
-					titleElement.setNodeProperty(TITLE_TYPE, titleType)
-					titleElement.removeAttribute(DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME)
-					headElement.removeChildWithWhitespace(titleElement)
-					titleContainer.addChild(titleElement)
-				}
-			}
-		}
-		titleExtraction(decoratorHead, TITLE_TYPE_DECORATOR)
-		titleExtraction(contentHead, TITLE_TYPE_CONTENT)
-
-		def resultTitle = new Element('title')
-		resultTitle.setAttribute("${DIALECT_PREFIX_LAYOUT}:${PROCESSOR_NAME}", titlePattern)
-		titleContainer.addChild(resultTitle)
-         */
         // Merge the source <head> elements with the target <head> elements using
         // the current merging strategy, placing the resulting title at the
         // beginning of it
         if (MetaClass.asBoolean(sourceHeadModel)) {
             Iterator<IModel> it = MetaClass.childModelIterator(sourceHeadModel);
-            while (it.hasNext()) {
-                IModel childModel = it.next();
-                int position = sortingStrategy.findPositionForModel(targetHeadModel, childModel);
-                if (position != -1) {
-                    MetaClass.insertModelWithWhitespace(targetHeadModel, position, childModel);
+            if (it != null) {
+                while (it.hasNext()) {
+                    IModel childModel = it.next();
+                    int position = sortingStrategy.findPositionForModel(targetHeadModel, childModel);
+                    if (position != -1) {
+                        MetaClass.insertModelWithWhitespace(targetHeadModel, position, childModel);
+                    }
                 }
             }
         }
-
         return new AttributeMerger(context.getModelFactory()).merge(targetHeadModel, sourceHeadModel);
     }
 

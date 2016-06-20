@@ -18,7 +18,6 @@ package nz.net.ultraq.thymeleaf.models;
 import java.util.Collections;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.TemplateModel;
-import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.util.StringUtils;
 
 /**
@@ -29,18 +28,15 @@ import org.thymeleaf.util.StringUtils;
  */
 public class TemplateModelFinder {
 
-    final ITemplateContext context;
-    final TemplateMode templateMode;
+    private final ITemplateContext context;
 
     /**
      * Constructor, set the template context we're working in.
      *
      * @param context
-     * @param templateMode
      */
-    public TemplateModelFinder(ITemplateContext context, TemplateMode templateMode) {
+    public TemplateModelFinder(ITemplateContext context) {
         this.context = context;
-        this.templateMode = templateMode;
     }
 
     /**
@@ -54,7 +50,7 @@ public class TemplateModelFinder {
      */
     public TemplateModel find(String templateName, String selector) {
         return context.getConfiguration().getTemplateManager().parseStandalone(context,
-                templateName, StringUtils.isEmpty(selector) ? null : Collections.singleton(selector), templateMode, true, true);
+                templateName, StringUtils.isEmpty(selector) ? null : Collections.singleton(selector), context.getTemplateMode(), true, true);
     }
 
     public TemplateModel find(String templateName) {

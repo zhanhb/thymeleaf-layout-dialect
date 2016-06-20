@@ -22,13 +22,14 @@ import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
 import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import nz.net.ultraq.thymeleaf.internal.MetaProvider;
 import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
-import org.thymeleaf.model.ICloseElementTag;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IOpenElementTag;
 import org.thymeleaf.model.IProcessableElementTag;
+import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -81,19 +82,28 @@ public class DecoratorProcessor extends AbstractAttributeModelProcessor {
             throw new IllegalArgumentException("layout:decorator attribute must appear in the root element of your template");
         }
 
+        TemplateModelFinder templateModelFinder = new TemplateModelFinder(context);
+
         // Remove the layout:decorator attribute for cases when the root element is
         // both a decorator processor and a potential fragment
         IProcessableElementTag rootElement = (IProcessableElementTag) MetaClass.first(model);
         if (rootElement.hasAttribute(getDialectPrefix(), PROCESSOR_NAME)) {
-            model.replace(0, context.getModelFactory().removeAttribute(rootElement, getDialectPrefix(), PROCESSOR_NAME));
+            rootElement = context.getModelFactory().removeAttribute(rootElement, getDialectPrefix(), PROCESSOR_NAME);
         }
+
+        // Load the entirety of this template
+        // TODO: Can probably find a way of preventing this double-loading for #102
+        String contentTemplateName = context.getTemplateData().getTemplate();
+        IModel contentTemplate = templateModelFinder.findTemplate(contentTemplateName).cloneModel();
+        ITemplateEvent origRootElement = MetaClass.find(contentTemplate, event -> {
+            return event instanceof IOpenElementTag;
+        });
+        contentTemplate.replace(MetaProvider.INSTANCE.getProperty(origRootElement, "index"), rootElement);
 
         // Locate the template to 'redirect' processing to by completely replacing
         // the current document with it
         String decoratorTemplateName = new ExpressionProcessor(context).processAsString(attributeValue);
-        IModel decoratorTemplate = new TemplateModelFinder(context, getTemplateMode())
-                .findTemplate(decoratorTemplateName)
-                .cloneModel();
+        IModel decoratorTemplate = templateModelFinder.findTemplate(decoratorTemplateName).cloneModel();
 
         // Gather all fragment parts from this page to apply to the new document
         // after decoration has taken place
@@ -107,20 +117,9 @@ public class DecoratorProcessor extends AbstractAttributeModelProcessor {
                                 : null;
         if (decorator == null) {
             throw new IllegalArgumentException("Layout dialect cannot be applied to the " + templateMode + " template mode, "
-                    + "only HTML and XML template modes are currently supported");
+                    + "only HTML and XML template modes are currently supported ");
         }
-        IModel resultTemplate = decorator.decorate(decoratorTemplate, model);
-
-        // TODO: The modified decorator template includes anything outside the root
-        //       element, which we don't want for the next step.  Strip those events
-        //       out for now, but for future I should find a better way to merge
-        //       documents.
-        while (!(MetaClass.first(resultTemplate) instanceof IOpenElementTag)) {
-            MetaClass.removeFirst(resultTemplate);
-        }
-        while (!(MetaClass.last(resultTemplate) instanceof ICloseElementTag)) {
-            MetaClass.removeLast(resultTemplate);
-        }
+        IModel resultTemplate = decorator.decorate(decoratorTemplate, contentTemplate);
 
         // TODO: Should probably return a new object so this doesn't look so
         //       confusing, ie: why am I changing the source model when it's the

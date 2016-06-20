@@ -82,7 +82,7 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
 
         // Locate the page and fragment for inclusion
         FragmentExpression fragmentExpression = (FragmentExpression) new ExpressionProcessor(context).parse(attributeValue);
-        TemplateModel fragmentForInclusion = new TemplateModelFinder(context, getTemplateMode()).findFragment(
+        TemplateModel fragmentForInclusion = new TemplateModelFinder(context).findFragment(
                 fragmentExpression.getTemplateName().toString(), fragmentExpression.getFragmentSelector().toString(),
                 getDialectPrefix());
 
@@ -97,10 +97,11 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
         // Replace the children of this element with the children of the included page fragment
         MetaClass.clearChildren(model);
 
-        for (Iterator<ITemplateEvent> it = MetaClass.childEventIterator(fragmentForInclusion.cloneModel()); it.hasNext();) {
+        for (Iterator<ITemplateEvent> it = MetaClass.childEventIterator(fragmentForInclusion.cloneModel()); it != null && it.hasNext();) {
             ITemplateEvent fragmentChildEvent = it.next();
             model.insert(model.size() - 1, fragmentChildEvent);
         }
+
         AssignationSequence parameters = fragmentExpression.getParameters();
         if (parameters != null) {
             for (Assignation parameter : parameters) {

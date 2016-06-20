@@ -19,7 +19,6 @@ import java.util.Iterator;
 import java.util.Objects;
 import nz.net.ultraq.thymeleaf.models.ChildEventIterator;
 import nz.net.ultraq.thymeleaf.models.ChildModelIterator;
-import nz.net.ultraq.thymeleaf.models.NullIterator;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.engine.HTMLElementDefinition;
 import org.thymeleaf.engine.HTMLElementType;
@@ -28,6 +27,7 @@ import org.thymeleaf.model.IAttribute;
 import org.thymeleaf.model.ICloseElementTag;
 import org.thymeleaf.model.IElementTag;
 import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.model.IOpenElementTag;
 import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.model.IStandaloneElementTag;
@@ -62,7 +62,7 @@ public class MetaClass {
      * for all other model types.
      */
     public static Iterator<ITemplateEvent> childEventIterator(IModel delegate) {
-        return isElement(delegate) ? new ChildEventIterator(delegate) : new NullIterator<>();
+        return isElement(delegate) ? new ChildEventIterator(delegate) : null;
     }
 
     /**
@@ -73,7 +73,7 @@ public class MetaClass {
      * @return New model iterator.
      */
     public static Iterator<IModel> childModelIterator(IModel delegate) {
-        return isElement(delegate) ? new ChildModelIterator(delegate) : new NullIterator<>();
+        return isElement(delegate) ? new ChildModelIterator(delegate) : null;
     }
 
     /**
@@ -240,10 +240,35 @@ public class MetaClass {
     public static IModel findModel(IModel delegate, ITemplateEventPredicate closure) {
         ITemplateEvent event = find(delegate, closure);
         if (event != null) {
-            int index = MetaProvider.INSTANCE.getProperty(event, "index");
-            IModel model = getModel(delegate, index);
-            MetaProvider.INSTANCE.setProperty(model, "index", index);
+            IModel model = getModel(delegate, MetaProvider.INSTANCE.getProperty(event, "index"));
+            MetaProvider.INSTANCE.setProperty(model, "startIndex", MetaProvider.INSTANCE.getProperty(event, "index"));
+            MetaProvider.INSTANCE.setProperty(model, "endIndex", (Integer) MetaProvider.INSTANCE.getProperty(event, "index") + model.size());
             return model;
+        }
+        return null;
+    }
+
+    /**
+     * Returns the first event in the model that meets the criteria of the given
+     * closure.
+     *
+     * Models returned via this method are also aware of their position in the
+     * event queue of the parent model, accessible via their {@code index}
+     * property.
+     *
+     * @param delegate
+     * @param closure
+     * @return The first event to match the closure criteria, or {@code null} if
+     * nothing matched.
+     */
+    public static ITemplateEvent findWithIndex(IModel delegate, ITemplateEventIntPredicate closure) {
+        for (int i = 0; i < delegate.size(); i++) {
+            ITemplateEvent event = delegate.get(i);
+            boolean result = closure.test(event, i);
+            if (result) {
+                MetaProvider.INSTANCE.setProperty(event, "index", i);
+                return event;
+            }
         }
         return null;
     }
@@ -271,11 +296,13 @@ public class MetaClass {
     public static IModel getModel(IModel delegate, int pos) {
         int modelSize = calculateModelSize(delegate, pos);
         IModel subModel = delegate.cloneModel();
-        while (pos + modelSize < subModel.size()) {
-            removeLast(subModel);
-        }
-        while (modelSize < subModel.size()) {
+        int removeBefore = delegate instanceof TemplateModel ? pos - 1 : pos;
+        int removeAfter = subModel.size() - (removeBefore + modelSize);
+        while (removeBefore-- > 0) {
             removeFirst(subModel);
+        }
+        while (removeAfter-- > 0) {
+            removeLast(subModel);
         }
         return subModel;
     }
@@ -295,6 +322,34 @@ public class MetaClass {
             delegate.insertModel(pos, whitespace);
         } else {
             delegate.insertModel(pos, model);
+        }
+    }
+
+    /**
+     * Inserts an event, creating a whitespace event before it so that it
+     * appears in line with all the existing events.
+     *
+     * @param delegate
+     * @param pos
+     * @param event
+     */
+    public static void insertWithWhitespace(IModel delegate, int pos, ITemplateEvent event, IModelFactory modelFactory) {
+        // TODO: Because I can't check the parent for whitespace hints, I should
+        //       make this smarter and find whitespace within the model to copy.
+        IModel whitespace = getModel(delegate, pos); // Assumes that whitespace exists at the insertion point
+        if (isWhitespace(whitespace)) {
+            delegate.insert(pos, event);
+            delegate.insertModel(pos, whitespace);
+        } else {
+            IText newLine = modelFactory.createText("\n");
+            if (pos == 0) {
+                delegate.insert(pos, newLine);
+                delegate.insert(pos, event);
+            } else if (pos == delegate.size()) {
+                delegate.insert(pos, newLine);
+                delegate.insert(pos, event);
+                delegate.insert(pos, newLine);
+            }
         }
     }
 
