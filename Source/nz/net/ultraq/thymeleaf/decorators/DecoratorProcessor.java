@@ -32,6 +32,7 @@ import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
+import org.thymeleaf.standard.expression.FragmentExpression;
 import org.thymeleaf.templatemode.TemplateMode;
 
 /**
@@ -102,8 +103,8 @@ public class DecoratorProcessor extends AbstractAttributeModelProcessor {
 
         // Locate the template to 'redirect' processing to by completely replacing
         // the current document with it
-        String decoratorTemplateName = new ExpressionProcessor(context).processAsString(attributeValue);
-        IModel decoratorTemplate = templateModelFinder.findTemplate(decoratorTemplateName).cloneModel();
+        FragmentExpression decoratorTemplateExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);
+        IModel decoratorTemplate = templateModelFinder.findTemplate(decoratorTemplateExpression).cloneModel();
 
         // Gather all fragment parts from this page to apply to the new document
         // after decoration has taken place
@@ -111,23 +112,19 @@ public class DecoratorProcessor extends AbstractAttributeModelProcessor {
 
         // Choose the decorator to use based on template mode, then apply it
         TemplateMode templateMode = getTemplateMode();
-        Decorator decorator
+        XmlDocumentDecorator decorator
                 = templateMode == TemplateMode.HTML ? new HtmlDocumentDecorator(context, sortingStrategy)
                         : templateMode == TemplateMode.XML ? new XmlDocumentDecorator(context)
                                 : null;
         if (decorator == null) {
             throw new IllegalArgumentException("Layout dialect cannot be applied to the " + templateMode + " template mode, "
-                    + "only HTML and XML template modes are currently supported ");
+                    + "only HTML and XML template modes are currently supported");
         }
         IModel resultTemplate = decorator.decorate(decoratorTemplate, contentTemplate);
-
-        // TODO: Should probably return a new object so this doesn't look so
-        //       confusing, ie: why am I changing the source model when it's the
-        //       decorator model we are targeting???  See the point about
-        //       immutability in https://github.com/ultraq/thymeleaf-layout-dialect/issues/102
         MetaClass.replaceModel(model, 0, resultTemplate);
 
         // Save layout fragments for use later by layout:fragment processors
         FragmentMap.setForNode(context, structureHandler, pageFragments);
     }
+
 }

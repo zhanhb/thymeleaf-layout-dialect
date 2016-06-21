@@ -18,10 +18,11 @@ package nz.net.ultraq.thymeleaf.models;
 import java.util.Collections;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.TemplateModel;
+import org.thymeleaf.standard.expression.FragmentExpression;
 import org.thymeleaf.util.StringUtils;
 
 /**
- * A simpler API for retrieving (immutable template) models using Thymeleaf's
+ * A simple API for retrieving (immutable template) models using Thymeleaf's
  * template manager.
  *
  * @author Emanuel Rabina
@@ -46,15 +47,30 @@ public class TemplateModelFinder {
      * @param selector A Thymeleaf DOM selector, which in turn is an AttoParser
      * DOM selector. See the Appendix in the Using Thymeleaf docs for the DOM
      * selector syntax.
-     * @return Model for the selected template and element.
+     * @return Model for the selected template and selector.
      */
-    public TemplateModel find(String templateName, String selector) {
+    private TemplateModel find(String templateName, String selector) {
         return context.getConfiguration().getTemplateManager().parseStandalone(context,
                 templateName, StringUtils.isEmpty(selector) ? null : Collections.singleton(selector), context.getTemplateMode(), true, true);
     }
 
-    public TemplateModel find(String templateName) {
+    private TemplateModel find(String templateName) {
         return find(templateName, null);
+    }
+
+    /**
+     * Return the model specified by the given fragment name expression.
+     *
+     * @param fragmentExpression
+     * @param dialectPrefix
+     * @return Fragment matching the fragment specification.
+     */
+    public TemplateModel findFragment(FragmentExpression fragmentExpression, String dialectPrefix) {
+        // TODO: Simplify this method signature by deriving the layout dialect
+        //       prefix from the context.
+
+        return findFragment(String.valueOf(fragmentExpression.getTemplateName()),
+                String.valueOf(fragmentExpression.getFragmentSelector()), dialectPrefix);
     }
 
     /**
@@ -66,7 +82,19 @@ public class TemplateModelFinder {
      * @return Fragment matching the fragment specification.
      */
     public TemplateModel findFragment(String templateName, String fragmentName, String dialectPrefix) {
-        return find(templateName, "//[" + dialectPrefix + ":fragment^='" + fragmentName + "' or data-" + dialectPrefix + "-fragment^='" + fragmentName + "']");
+        return find(templateName, "//[" + dialectPrefix + ":fragment^='"
+                + fragmentName + "' or data-" + dialectPrefix + "-fragment^='"
+                + fragmentName + "']");
+    }
+
+    /**
+     * Return a model for an entire template.
+     *
+     * @param fragmentExpression
+     * @return Template model matching the fragment specification.
+     */
+    public TemplateModel findTemplate(FragmentExpression fragmentExpression) {
+        return find(String.valueOf(fragmentExpression.getTemplateName()));
     }
 
     /**

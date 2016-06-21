@@ -69,10 +69,8 @@ public class InsertProcessor extends AbstractAttributeModelProcessor {
             String attributeValue, IElementModelStructureHandler structureHandler) {
 
         // Locate the page and fragment to insert
-        FragmentExpression fragmentExpression = (FragmentExpression) new ExpressionProcessor(context).parse(attributeValue);
-        TemplateModel fragmentToInsert = new TemplateModelFinder(context).findFragment(
-                String.valueOf(fragmentExpression.getTemplateName()), String.valueOf(fragmentExpression.getFragmentSelector()),
-                getDialectPrefix());
+        FragmentExpression fragmentExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);
+        TemplateModel fragmentToInsert = new TemplateModelFinder(context).findFragment(fragmentExpression, getDialectPrefix());
 
         // Gather all fragment parts within this element, scoping them to this element
         Map<String, IModel> includeFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);

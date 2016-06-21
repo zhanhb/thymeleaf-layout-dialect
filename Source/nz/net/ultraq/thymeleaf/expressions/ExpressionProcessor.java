@@ -15,17 +15,20 @@
  */
 package nz.net.ultraq.thymeleaf.expressions;
 
+import java.util.regex.Pattern;
 import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.standard.expression.FragmentExpression;
 import org.thymeleaf.standard.expression.IStandardExpression;
 import org.thymeleaf.standard.expression.StandardExpressions;
 
 /**
- * Simple utility that hides the Thymeleaf scaffolding required to process
- * (parse and execute) an expression.
+ * A simplified API for working with Thymeleaf expressions.
  *
  * @author Emanuel Rabina
  */
 public class ExpressionProcessor {
+
+    private static final Pattern THYMELEAF_3_FRAGMENT_EXPRESSION = Pattern.compile("^~\\{.+\\}$");
 
     private final ITemplateContext context;
 
@@ -50,6 +53,19 @@ public class ExpressionProcessor {
     }
 
     /**
+     * Parses an expression under the assumption it is a fragment expression.
+     * This method will take care to wrap fragment expressions written in
+     * Thymeleaf 2 syntax as a backwards compatibility measure for those
+     * migrating their wep apps to Thymeleaf 3.
+     *
+     * @param expression
+     * @return A fragment expression.
+     */
+    public FragmentExpression parseFragmentExpression(String expression) {
+        return (FragmentExpression) parse(THYMELEAF_3_FRAGMENT_EXPRESSION.matcher(expression).matches() ? expression : "~{" + expression + "}");
+    }
+
+    /**
      * Parses and executes an expression, returning the result of the expression
      * having been parsed and executed.
      *
@@ -62,8 +78,7 @@ public class ExpressionProcessor {
 
     /**
      * Parse and execute an expression, returning the result as a string. Useful
-     * for expressions that expect a simple result, such as a template or
-     * fragment name.
+     * for expressions that expect a simple result.
      *
      * @param expression
      * @return The expression as a string.

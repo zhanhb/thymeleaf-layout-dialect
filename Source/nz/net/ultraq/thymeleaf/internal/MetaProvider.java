@@ -19,19 +19,21 @@ package nz.net.ultraq.thymeleaf.internal;
  *
  * @author zhanhb
  */
+@SuppressWarnings({"BroadCatchBlock", "TooBroadCatch", "UseSpecificCatch"})
 public abstract class MetaProvider {
 
-    public static final MetaProvider INSTANCE = createInstance();
+    public static final MetaProvider INSTANCE;
 
-    @SuppressWarnings({"BroadCatchBlock", "TooBroadCatch", "UseSpecificCatch"})
-    private static MetaProvider createInstance() {
+    static {
+        MetaProvider instance;
         try {
             Class<?> cl = groovy.lang.GroovyObject.class;
             Class.forName(cl.getName(), true, cl.getClassLoader());
-            return new GroovyMetaProvider();
-        } catch (Throwable ex) {
-            return new InMemoryMetaProvider();
+            instance = new GroovyMetaProvider();
+        } catch (Throwable ignore) {
+            instance = new InMemoryMetaProvider();
         }
+        INSTANCE = instance;
     }
 
     public abstract <T> T getProperty(Object object, String key);

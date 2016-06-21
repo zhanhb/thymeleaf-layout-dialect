@@ -81,10 +81,8 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
                 + "layout:insert/data-layout-insert processor instead.");
 
         // Locate the page and fragment for inclusion
-        FragmentExpression fragmentExpression = (FragmentExpression) new ExpressionProcessor(context).parse(attributeValue);
-        TemplateModel fragmentForInclusion = new TemplateModelFinder(context).findFragment(
-                String.valueOf(fragmentExpression.getTemplateName()), String.valueOf(fragmentExpression.getFragmentSelector()),
-                getDialectPrefix());
+        FragmentExpression fragmentExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);
+        TemplateModel fragmentForInclusion = new TemplateModelFinder(context).findFragment(fragmentExpression, getDialectPrefix());
 
         // Gather all fragment parts within the include element, scoping them to this element
         Map<String, IModel> includeFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);
