@@ -21,6 +21,7 @@ import nz.net.ultraq.thymeleaf.models.AttributeMerger;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.ICloseElementTag;
 import org.thymeleaf.model.IComment;
+import org.thymeleaf.model.IDocType;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.model.IOpenElementTag;
@@ -71,7 +72,23 @@ public class XmlDocumentDecorator implements Decorator {
         // Copy comments outside of the root element, keeping whitespace copied to a minimum
         for (int i = 0; i < targetDocumentModel.size(); i++) {
             ITemplateEvent event = targetDocumentModel.get(i);
-            if (event instanceof IComment) {
+            // Only copy doctypes if the source document doesn't already have one
+            if (event instanceof IDocType) {
+                boolean sourceContainsDocType = false;
+                for (int j = 0; j < sourceDocumentModel.size(); j++) {
+                    ITemplateEvent sourceEvent = sourceDocumentModel.get(j);
+                    if (sourceEvent instanceof IDocType) {
+                        sourceContainsDocType = true;
+                        break;
+                    }
+                    if (sourceEvent instanceof IOpenElementTag) {
+                        break;
+                    }
+                }
+                if (!sourceContainsDocType) {
+                    MetaClass.insertWithWhitespace(resultDocumentModel, 0, event, modelFactory);
+                }
+            } else if (event instanceof IComment) {
                 MetaClass.insertWithWhitespace(resultDocumentModel, 0, event, modelFactory);
             } else if (event instanceof IOpenElementTag) {
                 break;

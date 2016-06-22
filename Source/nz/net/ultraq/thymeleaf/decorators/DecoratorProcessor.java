@@ -90,6 +90,7 @@ public class DecoratorProcessor extends AbstractAttributeModelProcessor {
         IProcessableElementTag rootElement = (IProcessableElementTag) MetaClass.first(model);
         if (rootElement.hasAttribute(getDialectPrefix(), PROCESSOR_NAME)) {
             rootElement = context.getModelFactory().removeAttribute(rootElement, getDialectPrefix(), PROCESSOR_NAME);
+            model.replace(0, rootElement);
         }
 
         // Load the entirety of this template
