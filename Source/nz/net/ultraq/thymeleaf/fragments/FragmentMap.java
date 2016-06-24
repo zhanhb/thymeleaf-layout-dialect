@@ -41,7 +41,13 @@ public class FragmentMap extends HashMap<String, IModel> {
      */
     public static FragmentMap get(IContext context) {
         Object variable = context.getVariable(FRAGMENT_COLLECTION_KEY);
-        return variable != null ? (FragmentMap) variable : new FragmentMap();
+        if (variable instanceof FragmentMap) {
+            FragmentMap map = (FragmentMap) variable;
+            if (!map.isEmpty()) {
+                return map;
+            }
+        }
+        return new FragmentMap();
     }
 
     /**
@@ -54,7 +60,7 @@ public class FragmentMap extends HashMap<String, IModel> {
      */
     public static void setForNode(IContext context, IElementModelStructureHandler structureHandler,
             Map<String, IModel> fragments) {
-        FragmentMap fragmentMap = get(context);
+        FragmentMap fragmentMap = (FragmentMap) get(context).clone();
         fragmentMap.putAll(fragments);
         structureHandler.setLocalVariable(FRAGMENT_COLLECTION_KEY, fragmentMap);
     }
