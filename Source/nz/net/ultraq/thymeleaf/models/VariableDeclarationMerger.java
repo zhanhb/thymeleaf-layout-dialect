@@ -83,15 +83,18 @@ public class VariableDeclarationMerger {
 
         newDeclarations.addAll(sourceDeclarations);
 
-        if (newDeclarations.isEmpty()) {
-            return "";
+        StringBuilder buffer = new StringBuilder(source.length() + target.length());
+        boolean first = true;
+
+        for (Object value : newDeclarations) {
+            if (first) {
+                first = false;
+            } else {
+                buffer.append(',');
+            }
+            buffer.append(value);
         }
-        StringBuilder sb = new StringBuilder(source.length() + target.length())
-                .append(newDeclarations.get(0));
-        for (int i = 1, size = newDeclarations.size(); i < size; i++) {
-            sb.append(',').append(newDeclarations.get(i));
-        }
-        return sb.toString();
+        return buffer.toString();
     }
 
 }
