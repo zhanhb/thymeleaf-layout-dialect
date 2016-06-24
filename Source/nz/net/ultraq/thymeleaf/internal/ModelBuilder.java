@@ -130,7 +130,7 @@ public class ModelBuilder {
                 attributes.remove("void");
                 model.add(modelFactory.createStandaloneElementTag(elementName, attributes, AttributeValueQuotes.DOUBLE, false, false));
             } else {
-                logger.warn("Instructed to write a closing tag {0} for an HTML void element.  This "
+                logger.warn("Instructed to write a closing tag {} for an HTML void element.  This "
                         + "might cause processing errors further down the track.  To avoid this, "
                         + "either self close the opening element, remove the closing tag, or "
                         + "process this template using the XML processing mode.  See "
