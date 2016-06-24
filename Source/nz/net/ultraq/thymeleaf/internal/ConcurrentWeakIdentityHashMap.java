@@ -55,6 +55,11 @@ class ConcurrentWeakIdentityHashMap<K, V> {
         return map.putIfAbsent(new Key<>(key, queue), value);
     }
 
+    public int size() {
+        purgeKeys();
+        return map.size();
+    }
+
     private static class Key<T> extends WeakReference<T> {
 
         private final int hash;
