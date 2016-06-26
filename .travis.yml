@@ -6,7 +6,7 @@ cache:
   - $HOME/.m2
 jdk:
 - oraclejdk8
-install: true
+install: mvn deploy -DskipTests=true -Dmaven.javadoc.skip=true -Dmaven.deploy.skip=true -B -V
 script:
 - mvn install -Dmaven.javadoc.skip=true
 - jdk_switcher use oraclejdk7 && mvn -Djava.version=1.7 surefire:test
