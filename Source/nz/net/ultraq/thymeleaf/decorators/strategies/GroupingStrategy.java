@@ -94,7 +94,7 @@ public class GroupingStrategy implements SortingStrategy {
         int type = findMatchingType(childModel);
         Iterator<IModel> it = MetaClass.childModelIterator(headModel);
         if (it != null) {
-            ArrayList<IModel> list = new ArrayList<>();
+            ArrayList<IModel> list = new ArrayList<>(20);
             while (it.hasNext()) {
                 list.add(it.next());
             }

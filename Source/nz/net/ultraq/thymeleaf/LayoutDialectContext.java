@@ -51,11 +51,11 @@ public class LayoutDialectContext extends HashMap<String, Object> {
                 throw new Error("Name collision on the Thymeleaf processing context.  An object with the "
                         + "key \"layout\" exists, but is needed by the Layout Dialect to work");
             }
-        } else {
-            LayoutDialectContext dialectContext = new LayoutDialectContext();
-            ((IEngineContext) context).setVariable(CONTEXT_KEY, dialectContext);
-            return dialectContext;
         }
+
+        LayoutDialectContext dialectContext = new LayoutDialectContext();
+        ((IEngineContext) context).setVariable(CONTEXT_KEY, dialectContext);
+        return dialectContext;
     }
 
 }

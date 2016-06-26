@@ -75,11 +75,11 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
     @Override
     protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
             String attributeValue, IElementModelStructureHandler structureHandler) {
-
-        logger.warn("The layout:include/data-layout-include processor is deprecated and will be "
-                + "removed in the next major version of the layout dialect.  Use the "
-                + "layout:insert/data-layout-insert processor instead.");
-
+        logger.warn(
+                "The layout:include/data-layout-include processor is deprecated and will be removed in the next major version of the layout dialect.  "
+                + "Use the layout:insert/data-layout-insert processor instead.  "
+                + "See https://github.com/ultraq/thymeleaf-layout-dialect/issues/107 for more information."
+        );
         // Locate the page and fragment for inclusion
         FragmentExpression fragmentExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);
         TemplateModel fragmentForInclusion = new TemplateModelFinder(context).findFragment(fragmentExpression, getDialectPrefix());

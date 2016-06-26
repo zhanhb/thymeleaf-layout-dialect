@@ -16,6 +16,8 @@
 package nz.net.ultraq.thymeleaf.decorators;
 
 import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.model.IProcessableElementTag;
@@ -28,26 +30,31 @@ import org.unbescape.html.HtmlEscape;
 /**
  * Allows for greater control of the resulting {@code <title>} element by
  * specifying a pattern with some special tokens. This can be used to extend the
- * decorator's title with the content's one, instead of simply overriding it.
+ * layout's title with the content's one, instead of simply overriding it.
  *
  * @author Emanuel Rabina
  */
 public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
 
+    private static final Logger logger = LoggerFactory.getLogger(TitlePatternProcessor.class);
+
+    @Deprecated
     private static final String PARAM_TITLE_DECORATOR = "$DECORATOR_TITLE";
     private static final String PARAM_TITLE_CONTENT = "$CONTENT_TITLE";
+    private static final String PARAM_TITLE_LAYOUT = "$LAYOUT_TITLE";
 
     public static final String PROCESSOR_NAME = "title-pattern";
     public static final int PROCESSOR_PRECEDENCE = 1;
 
     public static final String TITLE_TYPE = "LayoutDialect::TitlePattern::Type";
     public static final String TITLE_TYPE_DECORATOR = "decorator-title";
+    public static final String TITLE_TYPE_LAYOUT = "layout-title";
     public static final String TITLE_TYPE_CONTENT = "content-title";
 
     public static final String RESULTING_TITLE = "resultingTitle";
 
     public static final String CONTENT_TITLE_ATTRIBUTE = "data-layout-content-title";
-    public static final String DECORATOR_TITLE_ATTRIBUTE = "data-layout-decorator-title";
+    public static final String LAYOUT_TITLE_ATTRIBUTE = "data-layout-layout-title";
 
     private static String titleProcessor(String dataAttributeName, IProcessableElementTag tag, IElementTagStructureHandler structureHandler, ExpressionProcessor expressionProcessor) {
         String titleExpression = tag.getAttributeValue(dataAttributeName);
@@ -71,7 +78,7 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
 
     /**
      * Process the {@code layout:title-pattern} directive, replaces the title
-     * text with the titles from the content and decorator pages.
+     * text with the titles from the content and layout pages.
      *
      * @param context
      * @param tag
@@ -82,7 +89,6 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
     @Override
     protected void doProcess(ITemplateContext context, IProcessableElementTag tag,
             AttributeName attributeName, String attributeValue, IElementTagStructureHandler structureHandler) {
-
         // Ensure this attribute is only on the <title> element
         if (!"title".equals(tag.getElementCompleteName())) {
             throw new IllegalArgumentException(attributeName + " processor should only appear in a <title> element");
@@ -92,13 +98,25 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
         ExpressionProcessor expressionProcessor = new ExpressionProcessor(context);
 
         String contentTitle = titleProcessor(CONTENT_TITLE_ATTRIBUTE, tag, structureHandler, expressionProcessor);
-        String decoratorTitle = titleProcessor(DECORATOR_TITLE_ATTRIBUTE, tag, structureHandler, expressionProcessor);
+        String layoutTitle = titleProcessor(LAYOUT_TITLE_ATTRIBUTE, tag, structureHandler, expressionProcessor);
 
-        String title = !StringUtils.isEmpty(titlePattern) && !StringUtils.isEmpty(decoratorTitle) && !StringUtils.isEmpty(contentTitle)
-                ? titlePattern
-                .replace(PARAM_TITLE_DECORATOR, decoratorTitle)
-                .replace(PARAM_TITLE_CONTENT, contentTitle)
-                : !StringUtils.isEmpty(contentTitle) ? contentTitle : !StringUtils.isEmpty(decoratorTitle) ? decoratorTitle : "";
+        if (!StringUtils.isEmpty(titlePattern) && titlePattern.contains(PARAM_TITLE_DECORATOR)) {
+            logger.warn(
+                    "The $DECORATOR_TITLE token is deprecated and will be removed in a future version of the layout dialect.  "
+                    + "Please use the $LAYOUT_TITLE token instead to future-proof your code.  "
+                    + "See https://github.com/ultraq/thymeleaf-layout-dialect/issues/95 for more information."
+            );
+        }
+
+        String title;
+        if (!StringUtils.isEmpty(titlePattern) && !StringUtils.isEmpty(layoutTitle) && !StringUtils.isEmpty(contentTitle)) {
+            title = titlePattern
+                    .replace(PARAM_TITLE_LAYOUT, layoutTitle)
+                    .replace(PARAM_TITLE_DECORATOR, layoutTitle)
+                    .replace(PARAM_TITLE_CONTENT, contentTitle);
+        } else {
+            title = !StringUtils.isEmpty(contentTitle) ? contentTitle : !StringUtils.isEmpty(layoutTitle) ? layoutTitle : "";
+        }
 
         structureHandler.setBody(title, false);
     }

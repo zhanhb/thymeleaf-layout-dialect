@@ -27,7 +27,6 @@ import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IAttribute;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IProcessableElementTag;
-import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.model.IText;
 import org.thymeleaf.standard.StandardDialect;
 import org.thymeleaf.standard.processor.StandardTextTagProcessor;
@@ -47,17 +46,14 @@ public class HtmlTitleDecorator implements Decorator {
         if (!MetaClass.asBoolean(titleModel)) {
             return null;
         }
-        ITemplateEvent event = MetaClass.first(titleModel);
-        return event != null ? ((IProcessableElementTag) event).getAttribute(LayoutDialect.DIALECT_PREFIX, TitlePatternProcessor.PROCESSOR_NAME) : null;
+        IProcessableElementTag event = (IProcessableElementTag) MetaClass.first(titleModel);
+        return event != null ? event.getAttribute(LayoutDialect.DIALECT_PREFIX, TitlePatternProcessor.PROCESSOR_NAME) : null;
     }
 
     private static String titleValueRetriever(IModel titleModel) {
-        ITemplateEvent first = MetaClass.first(titleModel);
-        String layout = ((IProcessableElementTag) first).getAttributeValue(StandardDialect.PREFIX, StandardTextTagProcessor.ATTR_NAME);
-        if (!StringUtils.isEmpty(layout)) {
-            return layout;
-        }
-        return titleModel.size() > 2 ? "'" + HtmlEscape.escapeHtml5Xml(((IText) titleModel.get(1)).getText()) + "'" : null;
+        IProcessableElementTag first = (IProcessableElementTag) MetaClass.first(titleModel);
+        String layout = first.getAttributeValue(StandardDialect.PREFIX, StandardTextTagProcessor.ATTR_NAME);
+        return !StringUtils.isEmpty(layout) ? layout : titleModel.size() > 2 ? "'" + HtmlEscape.escapeHtml5Xml(((IText) titleModel.get(1)).getText()) + "'" : null;
     }
 
     private ITemplateContext context;
@@ -96,8 +92,8 @@ public class HtmlTitleDecorator implements Decorator {
             String decoratorTitle = titleValueRetriever(targetTitleModel);
             Map<String, Object> map = new LinkedHashMap<>(3);
             map.put(titlePatternProcessor.getAttributeCompleteName(), titlePatternProcessor.getValue());
-            map.put("data-layout-content-title", contentTitle);
-            map.put("data-layout-decorator-title", decoratorTitle);
+            map.put(TitlePatternProcessor.CONTENT_TITLE_ATTRIBUTE, contentTitle);
+            map.put(TitlePatternProcessor.LAYOUT_TITLE_ATTRIBUTE, decoratorTitle);
             ModelBuilder builder = new ModelBuilder(context);
             resultTitle = builder.createNode("title", map);
         } else {

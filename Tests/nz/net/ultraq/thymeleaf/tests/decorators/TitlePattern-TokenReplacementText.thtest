@@ -12,7 +12,7 @@ contentTitle = "My blog"
 %INPUT
 <!DOCTYPE html>
 <html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="Layout">
+	layout:decorate="Layout">
 <head>
 	<title th:text="${contentTitle}">Content title</title>
 </head>
@@ -23,7 +23,7 @@ contentTitle = "My blog"
 <!DOCTYPE html>
 <html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-	<title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE" th:text="${layoutTitle}">Layout title</title>
+	<title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE" th:text="${layoutTitle}">Layout title</title>
 </head>
 </html>
 

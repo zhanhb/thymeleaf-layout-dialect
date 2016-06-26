@@ -63,14 +63,12 @@ public class FragmentProcessor extends AbstractAttributeModelProcessor {
     @Override
     protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
             String attributeValue, IElementModelStructureHandler structureHandler) {
-
         // Emit a warning if found in the <head> section
         if (getTemplateMode() == TemplateMode.HTML) {
             for (IProcessableElementTag element : context.getElementStack()) {
                 if ("head".equals(element.getElementCompleteName())) {
-                    logger.warn("You don't need to put the layout:fragment attribute into the <head> "
-                            + "section - the decoration process will automatically copy the <head> "
-                            + "section of your content templates into your layout page.");
+                    logger.warn("You don't need to put the layout:fragment/data-layout-fragment attribute into the <head> section - "
+                            + "the decoration process will automatically copy the <head> section of your content templates into your layout page.");
                     break;
                 }
             }
@@ -78,7 +76,6 @@ public class FragmentProcessor extends AbstractAttributeModelProcessor {
 
         // Locate the fragment that corresponds to this decorator/include fragment
         IModel fragment = FragmentMap.get(context).get(attributeValue);
-
         // Replace this model with the fragment
         if (MetaClass.asBoolean(fragment)) {
             MetaClass.replaceModel(model, 0, new ElementMerger(context.getModelFactory()).merge(model, fragment));

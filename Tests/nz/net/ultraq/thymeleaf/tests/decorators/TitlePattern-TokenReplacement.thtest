@@ -7,7 +7,7 @@
 %INPUT
 <!DOCTYPE html>
 <html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="Layout">
+	layout:decorate="Layout">
 <head>
 	<title>My blog</title>
 </head>
@@ -18,7 +18,7 @@
 <!DOCTYPE html>
 <html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-	<title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE">My website</title>
+	<title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">My website</title>
 </head>
 </html>
 
