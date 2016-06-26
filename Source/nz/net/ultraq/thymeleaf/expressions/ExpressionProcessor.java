@@ -1,12 +1,12 @@
-/*
+/* 
  * Copyright 2016, Emanuel Rabina (http://www.ultraq.net.nz/)
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +16,9 @@
 package nz.net.ultraq.thymeleaf.expressions;
 
 import java.util.regex.Pattern;
-import org.thymeleaf.context.ITemplateContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.thymeleaf.context.IExpressionContext;
 import org.thymeleaf.standard.expression.FragmentExpression;
 import org.thymeleaf.standard.expression.IStandardExpression;
 import org.thymeleaf.standard.expression.StandardExpressions;
@@ -28,16 +30,17 @@ import org.thymeleaf.standard.expression.StandardExpressions;
  */
 public class ExpressionProcessor {
 
+    private static final Logger logger = LoggerFactory.getLogger(ExpressionProcessor.class);
     private static final Pattern THYMELEAF_3_FRAGMENT_EXPRESSION = Pattern.compile("^~\\{.+\\}$");
 
-    private final ITemplateContext context;
+    private final IExpressionContext context;
 
     /**
      * Constructor, sets the execution context.
      *
      * @param context
      */
-    public ExpressionProcessor(ITemplateContext context) {
+    public ExpressionProcessor(IExpressionContext context) {
         this.context = context;
     }
 
@@ -54,15 +57,24 @@ public class ExpressionProcessor {
 
     /**
      * Parses an expression under the assumption it is a fragment expression.
-     * This method will take care to wrap fragment expressions written in
-     * Thymeleaf 2 syntax as a backwards compatibility measure for those
-     * migrating their wep apps to Thymeleaf 3.
+     * This method will wrap fragment expressions written in Thymeleaf 2 syntax
+     * as a temporary backwards compatibility measure for those migrating their
+     * web apps to Thymeleaf 3.
      *
      * @param expression
      * @return A fragment expression.
      */
     public FragmentExpression parseFragmentExpression(String expression) {
-        return (FragmentExpression) parse(THYMELEAF_3_FRAGMENT_EXPRESSION.matcher(expression).matches() ? expression : "~{" + expression + "}");
+        if (!THYMELEAF_3_FRAGMENT_EXPRESSION.matcher(expression).matches()) {
+            logger.warn(
+                    "Fragment expression \"{}\" is being wrapped as a Thymeleaf 3 fragment expression (~{...}) for backwards compatibility purposes.  "
+                    + "This wrapping will be dropped in future versions of the expression processor, so please rewrite as a Thymeleaf 3 fragment expression to future-proof your code.  "
+                    + "See https://github.com/thymeleaf/thymeleaf/issues/451 for more information.",
+                    expression);
+            return (FragmentExpression) parse("~{" + expression + "}");
+        }
+
+        return (FragmentExpression) parse(expression);
     }
 
     /**

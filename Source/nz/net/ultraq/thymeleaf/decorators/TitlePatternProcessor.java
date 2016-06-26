@@ -23,6 +23,7 @@ import org.thymeleaf.processor.element.AbstractAttributeTagProcessor;
 import org.thymeleaf.processor.element.IElementTagStructureHandler;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.util.StringUtils;
+import org.unbescape.html.HtmlEscape;
 
 /**
  * Allows for greater control of the resulting {@code <title>} element by
@@ -52,7 +53,7 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
         String titleExpression = tag.getAttributeValue(dataAttributeName);
         if (!StringUtils.isEmpty(titleExpression)) {
             structureHandler.removeAttribute(dataAttributeName);
-            return expressionProcessor.processAsString(titleExpression);
+            return HtmlEscape.unescapeHtml(expressionProcessor.processAsString(titleExpression));
         }
         return null;
     }

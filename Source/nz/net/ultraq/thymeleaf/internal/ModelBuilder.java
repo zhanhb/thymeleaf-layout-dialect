@@ -16,6 +16,7 @@
 package nz.net.ultraq.thymeleaf.internal;
 
 import java.util.Map;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.ITemplateContext;
@@ -110,7 +111,7 @@ public class ModelBuilder {
         // Normalize values for Java implementations as the model factory doesn't
         // know what to do with Groovy versions of things
         String elementName = String.valueOf(name);
-        String elementText = value != null ? value.toString() : null;
+        String elementText = !Objects.equals(value, null) ? value.toString() : null;
         if (attributes != null) {
             Map<?, Object> map = attributes;
             for (Map.Entry<?, Object> entry : map.entrySet()) {
