@@ -16,6 +16,7 @@
 package nz.net.ultraq.thymeleaf.models;
 
 import java.util.Collections;
+import java.util.Objects;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.standard.expression.FragmentExpression;
@@ -68,9 +69,11 @@ public class TemplateModelFinder {
     public TemplateModel findFragment(FragmentExpression fragmentExpression, String dialectPrefix) {
         // TODO: Simplify this method signature by deriving the layout dialect
         //       prefix from the context.
-
-        return findFragment(String.valueOf(fragmentExpression.getTemplateName().execute(context)),
-                String.valueOf(fragmentExpression.getFragmentSelector().execute(context)), dialectPrefix);
+        String templateName = String.valueOf(fragmentExpression.getTemplateName().execute(context));
+        if (Objects.equals(templateName, "this")) {
+            templateName = context.getTemplateData().getTemplate();
+        }
+        return findFragment(templateName, String.valueOf(fragmentExpression.getFragmentSelector().execute(context)), dialectPrefix);
     }
 
     /**
@@ -82,9 +85,7 @@ public class TemplateModelFinder {
      * @return Fragment matching the fragment specification.
      */
     public TemplateModel findFragment(String templateName, String fragmentName, String dialectPrefix) {
-        return find(templateName, "//[" + dialectPrefix + ":fragment^='"
-                + fragmentName + "' or data-" + dialectPrefix + "-fragment^='"
-                + fragmentName + "']");
+        return find(templateName, "//[" + dialectPrefix + ":fragment^='" + fragmentName + "' or data-" + dialectPrefix + "-fragment^='" + fragmentName + "']");
     }
 
     /**

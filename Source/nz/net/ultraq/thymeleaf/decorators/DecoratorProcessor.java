@@ -63,7 +63,7 @@ public class DecoratorProcessor extends DecorateProcessor {
     protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
             String attributeValue, IElementModelStructureHandler structureHandler) {
         logger.warn(
-                "The layout:decorator/data-layout-decorator processor has been deprecated and will be removed in a future version of the layout dialect.  "
+                "The layout:decorator/data-layout-decorator processor has been deprecated and will be removed in the next major version of the layout dialect.  "
                 + "Please use layout:decorate/data-layout-decorate instead to future-proof your code.  "
                 + "See https://github.com/ultraq/thymeleaf-layout-dialect/issues/95 for more information."
         );

@@ -15,16 +15,20 @@
  */
 package nz.net.ultraq.thymeleaf.includes;
 
+import java.util.List;
 import java.util.Map;
 import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
 import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
+import nz.net.ultraq.thymeleaf.fragments.FragmentParameterNamesExtractor;
+import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import org.thymeleaf.standard.expression.Assignation;
@@ -81,12 +85,30 @@ public class InsertProcessor extends AbstractAttributeModelProcessor {
         structureHandler.setTemplateData(fragmentToInsert.getTemplateData());
 
         // Replace the children of this element with those of the to-be-inserted page fragment
+        IModel fragmentToInsertUse = fragmentToInsert.cloneModel();
         MetaClass.clearChildren(model);
-        model.insertModel(1, fragmentToInsert.cloneModel());
-        AssignationSequence parameters = fragmentExpression.getParameters();
-        if (parameters != null) {
-            for (Assignation parameter : parameters) {
-                structureHandler.setLocalVariable((String) parameter.getLeft().execute(context), parameter.getRight().execute(context));
+        model.insertModel(1, fragmentToInsertUse);
+
+        // When fragment parameters aren't named, derive the name from the fragment definition
+        // TODO: Common code across all the inclusion processors
+        if (fragmentExpression.hasSyntheticParameters()) {
+            String fragmentDefinition = ((IProcessableElementTag) MetaClass.first(fragmentToInsertUse)).getAttributeValue(getDialectPrefix(), FragmentProcessor.PROCESSOR_NAME);
+            List<String> parameterNames = new FragmentParameterNamesExtractor().extract(fragmentDefinition);
+
+            AssignationSequence parameters = fragmentExpression.getParameters();
+            if (parameters != null) {
+                int index = 0;
+                for (Assignation parameter : parameters) {
+                    structureHandler.setLocalVariable(parameterNames.get(index), parameter.getRight().execute(context));
+                    ++index;
+                }
+            }
+        } else { // Otherwise, apply values as is
+            AssignationSequence parameters = fragmentExpression.getParameters();
+            if (parameters != null) {
+                for (Assignation parameter : parameters) {
+                    structureHandler.setLocalVariable((String) parameter.getLeft().execute(context), parameter.getRight().execute(context));
+                }
             }
         }
     }

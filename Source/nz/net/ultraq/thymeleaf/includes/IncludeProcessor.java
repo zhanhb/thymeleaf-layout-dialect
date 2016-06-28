@@ -16,10 +16,13 @@
 package nz.net.ultraq.thymeleaf.includes;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
 import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
+import nz.net.ultraq.thymeleaf.fragments.FragmentParameterNamesExtractor;
+import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
 import org.slf4j.Logger;
@@ -28,6 +31,7 @@ import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
@@ -93,9 +97,10 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
         structureHandler.setTemplateData(fragmentForInclusion.getTemplateData());
 
         // Replace the children of this element with the children of the included page fragment
+        IModel fragmentForInclusionUse = fragmentForInclusion.cloneModel();
         MetaClass.clearChildren(model);
 
-        Iterator<ITemplateEvent> it = MetaClass.childEventIterator(fragmentForInclusion.cloneModel());
+        Iterator<ITemplateEvent> it = MetaClass.childEventIterator(fragmentForInclusionUse);
         if (it != null) {
             while (it.hasNext()) {
                 ITemplateEvent fragmentChildEvent = it.next();
@@ -103,10 +108,26 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
             }
         }
 
-        AssignationSequence parameters = fragmentExpression.getParameters();
-        if (parameters != null) {
-            for (Assignation parameter : parameters) {
-                structureHandler.setLocalVariable((String) parameter.getLeft().execute(context), parameter.getRight().execute(context));
+        // When fragment parameters aren't named, derive the name from the fragment definition
+        // TODO: Common code across all the inclusion processors
+        if (fragmentExpression.hasSyntheticParameters()) {
+            String fragmentDefinition = ((IProcessableElementTag) MetaClass.first(fragmentForInclusionUse)).getAttributeValue(getDialectPrefix(), FragmentProcessor.PROCESSOR_NAME);
+            List<String> parameterNames = new FragmentParameterNamesExtractor().extract(fragmentDefinition);
+
+            AssignationSequence parameters = fragmentExpression.getParameters();
+            if (parameters != null) {
+                int index = 0;
+                for (Assignation parameter : parameters) {
+                    structureHandler.setLocalVariable(parameterNames.get(index), parameter.getRight().execute(context));
+                    ++index;
+                }
+            }
+        } else { // Otherwise, apply values as is
+            AssignationSequence parameters = fragmentExpression.getParameters();
+            if (parameters != null) {
+                for (Assignation parameter : parameters) {
+                    structureHandler.setLocalVariable((String) parameter.getLeft().execute(context), parameter.getRight().execute(context));
+                }
             }
         }
     }
