@@ -21,6 +21,7 @@ import org.thymeleaf.model.ITemplateEvent;
  *
  * @author zhanhb
  */
+@FunctionalInterface
 public interface ITemplateEventPredicate {
 
     boolean test(ITemplateEvent event);
