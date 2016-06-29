@@ -18,7 +18,7 @@ package nz.net.ultraq.thymeleaf.tests.models
 
 import nz.net.ultraq.thymeleaf.LayoutDialect
 import nz.net.ultraq.thymeleaf.internal.MetaClass
-import nz.net.ultraq.thymeleaf.models.AttributeMerger
+import nz.net.ultraq.thymeleaf.models.ElementMerger
 import nz.net.ultraq.thymeleaf.models.ModelBuilder
 
 import org.junit.Before
@@ -30,17 +30,16 @@ import org.thymeleaf.templatemode.TemplateMode
 import static org.junit.Assert.*
 
 /**
- * Tests for the attribute merger, spins up a Thymeleaf template engine so that
- * we can use the model factory for creating models.
+ * Tests for the element merger.
  * 
  * @author Emanuel Rabina
  */
-class AttributeMergerTests {
+class ElementMergerTests {
 
 	private static ModelBuilder modelBuilder
 	private static IModelFactory modelFactory
 
-	private AttributeMerger attributeMerger
+	private ElementMerger elementMerger
 
 	/**
 	 * Set up, create a template engine.
@@ -50,7 +49,7 @@ class AttributeMergerTests {
 
 		def templateEngine = new TemplateEngine(
 			additionalDialects: [
-			  new LayoutDialect()
+				new LayoutDialect()
 			]
 		)
 		modelFactory = templateEngine.configuration.getModelFactory(TemplateMode.HTML)
@@ -61,49 +60,67 @@ class AttributeMergerTests {
 	 * Set up, create a new attribute merger.
 	 */
 	@Before
-	void setupAttributeMerger() {
+	void setupElementMerger() {
 
-		attributeMerger = new AttributeMerger(modelFactory)
+		elementMerger = new ElementMerger(modelFactory)
 	}
 
 	/**
-	 * Test that the merger just adds attributes found in the source to the target
-	 * that don't already exist in the target
+	 * Test that the merger merges the source elements into the target.
 	 */
 	@Test
-	void addAttributes() {
+	void mergeElements() {
 
 		def source = modelBuilder.build {
-			div(id: 'test-element')
+			section {
+				header()
+			}
 		}
 		def target = modelBuilder.build {
-			div(class: 'container')
-		}
-		def expected = modelBuilder.build {
-			div(class: 'container', id: 'test-element')
+			div {
+				p('Hello')
+			}
 		}
 
-		def result = attributeMerger.merge(target, source)
-		assertTrue(MetaClass.equals(expected, result))
+		def result = elementMerger.merge(target, source)
+		assertTrue(MetaClass.equals(source, result))
 	}
 
 	/**
-	 * Test that attributes in the source element override those of the target.
- 	 */
+	 * Test that the merger merges the source root element attributes into the
+	 * target root element attributes.
+	 */
 	@Test
-	void mergeAttributes() {
+	void mergeRootAttributes() {
 
 		def source = modelBuilder.build {
-			div(class: 'roflcopter')
+			div(id: 'source-id')
 		}
 		def target = modelBuilder.build {
-			div(class: 'container')
-		}
-		def expected = modelBuilder.build {
-			div(class: 'roflcopter')
+			div(id: 'target-id')
 		}
 
-		def result = attributeMerger.merge(target, source)
-		assertTrue(MetaClass.equals(expected, result))
+		def result = elementMerger.merge(target, source)
+		assertTrue(MetaClass.equals(source, result))
+	}
+
+	/**
+	 * Test that the merging of the root element attributes doesn't mess with the
+	 * root element type (a plain old attribute merger would do that).
+	 */
+	@Test
+	void retainSourceShape() {
+
+		def source = modelBuilder.build {
+			section {
+				header()
+			}
+		}
+		def target = modelBuilder.build {
+			div(standalone: true)
+		}
+
+		def result = elementMerger.merge(target, source)
+		assertTrue(MetaClass.equals(source, result))
 	}
 }

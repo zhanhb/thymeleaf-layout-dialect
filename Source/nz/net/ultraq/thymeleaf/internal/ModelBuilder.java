@@ -141,6 +141,9 @@ public class ModelBuilder {
                 model.add(modelFactory.createStandaloneElementTag(elementName, attributes, AttributeValueQuotes.DOUBLE, false, false));
                 model.add(modelFactory.createCloseElementTag(elementName));
             }
+        } else if (attributes != null && attributes.containsKey("standalone")) { // Other standalone element
+            attributes.remove("standalone");
+            model.add(modelFactory.createStandaloneElementTag(elementName, attributes, AttributeValueQuotes.DOUBLE, false, true));
         } else { // Open/close element and potential text content
             model.add(modelFactory.createOpenElementTag(elementName, attributes, AttributeValueQuotes.DOUBLE, false));
             if (!StringUtils.isEmpty(elementText)) {
