@@ -61,14 +61,14 @@ public class ElementMerger implements ModelMerger {
         // The result we want is the source model, but merged into the target root element attributes
         IElementTag sourceRootEvent = (IElementTag) MetaClass.first(sourceModel);
         IModel sourceRootElement = modelFactory.createModel(sourceRootEvent);
-        IProcessableElementTag targetRootEvent = ((IProcessableElementTag) MetaClass.first(targetModel));
+        IProcessableElementTag targetRootEvent = (IProcessableElementTag) MetaClass.first(targetModel);
         IModel targetRootElement = modelFactory.createModel(
                 sourceRootEvent instanceof IOpenElementTag
                         ? modelFactory.createOpenElementTag(sourceRootEvent.getElementCompleteName(),
                                 targetRootEvent.getAttributeMap(), AttributeValueQuotes.DOUBLE, false)
                         : sourceRootEvent instanceof IStandaloneElementTag
                                 ? modelFactory.createStandaloneElementTag(sourceRootEvent.getElementCompleteName(),
-                                        targetRootEvent.getAttributeMap(), AttributeValueQuotes.DOUBLE, false, false)
+                                        targetRootEvent.getAttributeMap(), AttributeValueQuotes.DOUBLE, false, ((IStandaloneElementTag) sourceRootEvent).isMinimized())
                                 : null);
         IModel mergedRootElement = new AttributeMerger(modelFactory).merge(targetRootElement, sourceRootElement);
         IModel mergedModel = sourceModel.cloneModel();

@@ -17,7 +17,6 @@
 package nz.net.ultraq.thymeleaf.tests.models
 
 import nz.net.ultraq.thymeleaf.LayoutDialect
-import nz.net.ultraq.thymeleaf.internal.MetaClass
 import nz.net.ultraq.thymeleaf.models.ModelBuilder
 
 import org.junit.BeforeClass
@@ -107,6 +106,6 @@ class ModelBuilderTests {
 			}
 		}
 
-		assertTrue(MetaClass.equalsIgnoreWhitespace(modelFromTemplate, modelFromBuilder))
+		assertTrue(modelFromTemplate.equalsIgnoreWhitespace(modelFromBuilder))
 	}
 }

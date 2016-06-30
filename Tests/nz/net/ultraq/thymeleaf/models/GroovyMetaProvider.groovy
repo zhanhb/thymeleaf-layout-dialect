@@ -13,18 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nz.net.ultraq.thymeleaf.internal;
+package nz.net.ultraq.thymeleaf.models;
+
+import nz.net.ultraq.thymeleaf.internal.MetaProvider;
 
 /**
  *
  * @author zhanhb
  */
-public interface MetaProvider {
+class GroovyMetaProvider implements MetaProvider {
 
-    public static final MetaProvider INSTANCE = new InMemoryMetaProvider();
+    @Override
+    <T> T getProperty(Object object, String key) {
+        object[key]
+    }
 
-    public abstract <T> T getProperty(Object object, String key);
-
-    public abstract void setProperty(Object object, String key, Object value);
+    @Override
+    void setProperty(Object object, String key, Object value) {
+        object.metaClass[key] = value
+    }
 
 }

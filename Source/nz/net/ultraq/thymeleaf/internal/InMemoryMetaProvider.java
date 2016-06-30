@@ -15,67 +15,26 @@
  */
 package nz.net.ultraq.thymeleaf.internal;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 /**
  *
  * @author zhanhb
  */
-class InMemoryMetaProvider extends MetaProvider {
-
-    private static final Object NULL = new Object();
-
-    private static Object wrapperNull(Object value) {
-        return value == null ? NULL : value;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> T unwrapper(Object value) {
-        return value == NULL ? null : (T) value;
-    }
+class InMemoryMetaProvider implements MetaProvider {
 
     private final ConcurrentWeakIdentityHashMap<Object, Map<String, Object>> map = new ConcurrentWeakIdentityHashMap<>(200);
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T getProperty(Object object, String key) {
-        T value = unwrapper(getMap(object).get(key));
-        if (value == null) {
-            // assert object != null
-            List<Object> list = new ArrayList<>(8);
-            Class<?> clazz = object.getClass();
-
-            list.add(object);
-            while (clazz != null) {
-                list.add(clazz);
-                Object wrappered = getMap(clazz).get(key);
-                if (wrappered != null) {
-                    for (Object o : list) {
-                        getMap(o).put(key, wrappered);
-                    }
-                    return unwrapper(wrappered);
-                }
-                clazz = clazz.getSuperclass();
-            }
-            for (Class<?> aInterface : object.getClass().getInterfaces()) {
-                Object wrappered = getMap(aInterface).get(key);
-                if (wrappered != null) {
-                    getMap(object).put(key, wrappered);
-                    getMap(object.getClass()).put(key, wrappered);
-                    return unwrapper(wrappered);
-                }
-            }
-            throw new NoSuchElementException();
-        }
-        return value;
+        return (T) getMap(object).get(key);
     }
 
     @Override
     public void setProperty(Object object, String key, Object value) {
-        getMap(object).put(key, wrapperNull(value));
+        getMap(object).put(key, value);
     }
 
     @SuppressWarnings("NestedAssignment")

@@ -17,7 +17,6 @@
 package nz.net.ultraq.thymeleaf.tests.models
 
 import nz.net.ultraq.thymeleaf.LayoutDialect
-import nz.net.ultraq.thymeleaf.internal.MetaClass
 import nz.net.ultraq.thymeleaf.models.ModelBuilder
 
 import org.junit.BeforeClass
@@ -75,20 +74,20 @@ class ModelExtensionsTests {
 			}
 		}
 
-		def childModelIterator = MetaClass.childModelIterator(model)
+		def childModelIterator = model.childModelIterator()
 
 		def nextModel = childModelIterator.next()
-		assertTrue(MetaClass.equalsIgnoreWhitespace(nextModel, pModel1))
+		assertTrue(nextModel.equalsIgnoreWhitespace(pModel1))
 		assertEquals(1, nextModel.startIndex)
 		assertEquals(4, nextModel.endIndex)
 
 		nextModel = childModelIterator.next()
-		assertTrue(MetaClass.equalsIgnoreWhitespace(nextModel, hrModel))
+		assertTrue(nextModel.equalsIgnoreWhitespace(hrModel))
 		assertEquals(4, nextModel.startIndex)
 		assertEquals(5, nextModel.endIndex)
 
 		nextModel = childModelIterator.next()
-		assertTrue(MetaClass.equalsIgnoreWhitespace(nextModel, pModel2))
+		assertTrue(nextModel.equalsIgnoreWhitespace(pModel2))
 		assertEquals(5, nextModel.startIndex)
 		assertEquals(8, nextModel.endIndex)
 
@@ -113,8 +112,8 @@ class ModelExtensionsTests {
 			}
 		}
 
-		def modelExtract = MetaClass.getModel(model, 0)
-		assertTrue(MetaClass.equals(model, modelExtract))
+		def modelExtract = model.getModel(0)
+		assertTrue(model == modelExtract)
 	}
 
 	/**
@@ -130,8 +129,8 @@ class ModelExtensionsTests {
 			}
 		}
 
-		def modelExtract = MetaClass.getModel(model, 0)
-		assertTrue(MetaClass.equals(model, modelExtract))
+		def modelExtract = model.getModel(0)
+		assertTrue(model == modelExtract)
 	}
 
 	/**
@@ -147,8 +146,8 @@ class ModelExtensionsTests {
 			}
 		}
 
-		def modelExtract = MetaClass.getModel(model, 0)
-		assertTrue(MetaClass.equals(model, modelExtract))
+		def modelExtract = model.getModel(0)
+		assertTrue(model == modelExtract)
 	}
 
 	/**
@@ -166,7 +165,7 @@ class ModelExtensionsTests {
 			}
 		}
 
-		def modelExtract = MetaClass.getModel(model, 0)
-		assertTrue(MetaClass.equals(model, modelExtract))
+		def modelExtract = model.getModel(0)
+		assertTrue(model == modelExtract)
 	}
 }

@@ -25,6 +25,7 @@ import nz.net.ultraq.thymeleaf.decorators.strategies.AppendingStrategy;
 import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
 import nz.net.ultraq.thymeleaf.includes.InsertProcessor;
 import nz.net.ultraq.thymeleaf.includes.ReplaceProcessor;
+import nz.net.ultraq.thymeleaf.models.ModelExtensions;
 import org.thymeleaf.dialect.AbstractProcessorDialect;
 import org.thymeleaf.processor.IProcessor;
 import org.thymeleaf.standard.processor.StandardXmlNsTagProcessor;
@@ -40,6 +41,10 @@ public class LayoutDialect extends AbstractProcessorDialect {
     public static final String DIALECT_NAME = "Layout";
     public static final String DIALECT_PREFIX = "layout";
     public static final int DIALECT_PRECEDENCE = 10;
+
+    static {
+        ModelExtensions.apply();
+    }
 
     private final SortingStrategy sortingStrategy;
 

@@ -17,7 +17,6 @@
 package nz.net.ultraq.thymeleaf.tests.models
 
 import nz.net.ultraq.thymeleaf.LayoutDialect
-import nz.net.ultraq.thymeleaf.internal.MetaClass
 import nz.net.ultraq.thymeleaf.models.ElementMerger
 import nz.net.ultraq.thymeleaf.models.ModelBuilder
 
@@ -83,7 +82,7 @@ class ElementMergerTests {
 		}
 
 		def result = elementMerger.merge(target, source)
-		assertTrue(MetaClass.equals(source, result))
+		assertTrue(source == result)
 	}
 
 	/**
@@ -101,7 +100,7 @@ class ElementMergerTests {
 		}
 
 		def result = elementMerger.merge(target, source)
-		assertTrue(MetaClass.equals(source, result))
+		assertTrue(source == result)
 	}
 
 	/**
@@ -121,6 +120,6 @@ class ElementMergerTests {
 		}
 
 		def result = elementMerger.merge(target, source)
-		assertTrue(MetaClass.equals(source, result))
+		assertTrue(source == result)
 	}
 }
