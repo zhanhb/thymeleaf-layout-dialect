@@ -23,6 +23,7 @@ import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.model.IOpenElementTag;
 import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.model.IStandaloneElementTag;
+import org.thymeleaf.model.ITemplateEvent;
 
 /**
  * Merges an element and all its children into an existing element.
@@ -59,15 +60,15 @@ public class ElementMerger implements ModelMerger {
         }
 
         // The result we want is the source model, but merged into the target root element attributes
-        IElementTag sourceRootEvent = (IElementTag) MetaClass.first(sourceModel);
+        ITemplateEvent sourceRootEvent = MetaClass.first(sourceModel);
         IModel sourceRootElement = modelFactory.createModel(sourceRootEvent);
         IProcessableElementTag targetRootEvent = (IProcessableElementTag) MetaClass.first(targetModel);
         IModel targetRootElement = modelFactory.createModel(
                 sourceRootEvent instanceof IOpenElementTag
-                        ? modelFactory.createOpenElementTag(sourceRootEvent.getElementCompleteName(),
+                        ? modelFactory.createOpenElementTag(((IElementTag) sourceRootEvent).getElementCompleteName(),
                                 targetRootEvent.getAttributeMap(), AttributeValueQuotes.DOUBLE, false)
                         : sourceRootEvent instanceof IStandaloneElementTag
-                                ? modelFactory.createStandaloneElementTag(sourceRootEvent.getElementCompleteName(),
+                                ? modelFactory.createStandaloneElementTag(((IElementTag) sourceRootEvent).getElementCompleteName(),
                                         targetRootEvent.getAttributeMap(), AttributeValueQuotes.DOUBLE, false, ((IStandaloneElementTag) sourceRootEvent).isMinimized())
                                 : null);
         IModel mergedRootElement = new AttributeMerger(modelFactory).merge(targetRootElement, sourceRootElement);
