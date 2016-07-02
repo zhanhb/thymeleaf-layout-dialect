@@ -312,6 +312,11 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>**/extensions/*Extensions.class</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>

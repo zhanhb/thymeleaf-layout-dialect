@@ -19,8 +19,8 @@ import java.util.Iterator;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import nz.net.ultraq.thymeleaf.models.ChildEventIterator;
-import nz.net.ultraq.thymeleaf.models.ChildModelIterator;
+import nz.net.ultraq.thymeleaf.models.extensions.ChildEventIterator;
+import nz.net.ultraq.thymeleaf.models.extensions.ChildModelIterator;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.engine.HTMLElementDefinition;
 import org.thymeleaf.engine.HTMLElementType;
@@ -38,7 +38,7 @@ import org.thymeleaf.model.IText;
 import org.thymeleaf.templatemode.TemplateMode;
 
 /**
- * Additional methods applied to the Thymeleaf model classes via Groovy
+ * Additional methods applied to the Thymeleaf {@link IModel} class via Groovy
  * meta-programming.
  *
  * @author zhanhb
@@ -81,15 +81,6 @@ public class MetaClass {
     }
 
     /**
-     * Clears all the events from the model.
-     *
-     * @param delegate
-     */
-    public static void clear(@Nonnull IModel delegate) {
-        delegate.reset();
-    }
-
-    /**
      * If the model represents an element open to close tags, then this method
      * removes all of the inner events. Otherwise, it does nothing.
      *
@@ -104,8 +95,7 @@ public class MetaClass {
     }
 
     /**
-     * Iterate through each event in the model. This is similar to what the
-     * {@code accept} method does.
+     * Iterate through each event in the model.
      *
      * @param delegate
      * @param closure
@@ -130,12 +120,9 @@ public class MetaClass {
         if (other instanceof IModel) {
             IModel iModel = (IModel) other;
             if (delegate.size() == iModel.size()) {
-                for (int i = 0; i < delegate.size(); i++) {
-                    if (!equals(delegate.get(i), iModel.get(i))) {
-                        return false;
-                    }
-                }
-                return true;
+                return everyWithIndex(delegate, (event, index) -> {
+                    return equals(event, iModel.get(index));
+                });
             }
         }
         return false;
@@ -250,31 +237,6 @@ public class MetaClass {
             MetaProvider.INSTANCE.setProperty(model, "startIndex", MetaProvider.INSTANCE.getProperty(event, "index"));
             MetaProvider.INSTANCE.setProperty(model, "endIndex", (Integer) MetaProvider.INSTANCE.getProperty(event, "index") + model.size());
             return model;
-        }
-        return null;
-    }
-
-    /**
-     * Returns the first event in the model that meets the criteria of the given
-     * closure.
-     *
-     * Models returned via this method are also aware of their position in the
-     * event queue of the parent model, accessible via their {@code index}
-     * property.
-     *
-     * @param delegate
-     * @param closure
-     * @return The first event to match the closure criteria, or {@code null} if
-     * nothing matched.
-     */
-    public static ITemplateEvent findWithIndex(IModel delegate, ITemplateEventIntPredicate closure) {
-        for (int i = 0; i < delegate.size(); i++) {
-            ITemplateEvent event = delegate.get(i);
-            boolean result = closure.test(event, i);
-            if (result) {
-                MetaProvider.INSTANCE.setProperty(event, "index", i);
-                return event;
-            }
         }
         return null;
     }

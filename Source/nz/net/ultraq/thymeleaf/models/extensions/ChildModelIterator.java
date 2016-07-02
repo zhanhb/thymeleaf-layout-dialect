@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nz.net.ultraq.thymeleaf.models;
+package nz.net.ultraq.thymeleaf.models.extensions;
 
 import java.util.Iterator;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;

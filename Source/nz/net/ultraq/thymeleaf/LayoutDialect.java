@@ -15,6 +15,8 @@
  */
 package nz.net.ultraq.thymeleaf;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -25,7 +27,6 @@ import nz.net.ultraq.thymeleaf.decorators.strategies.AppendingStrategy;
 import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
 import nz.net.ultraq.thymeleaf.includes.InsertProcessor;
 import nz.net.ultraq.thymeleaf.includes.ReplaceProcessor;
-import nz.net.ultraq.thymeleaf.models.ModelExtensions;
 import org.thymeleaf.dialect.AbstractProcessorDialect;
 import org.thymeleaf.processor.IProcessor;
 import org.thymeleaf.standard.processor.StandardXmlNsTagProcessor;
@@ -42,8 +43,33 @@ public class LayoutDialect extends AbstractProcessorDialect {
     public static final String DIALECT_PREFIX = "layout";
     public static final int DIALECT_PRECEDENCE = 10;
 
+    /**
+     * Apply model extensions.
+     */
     static {
-        ModelExtensions.apply();
+        MethodHandles.Lookup publicLookup = MethodHandles.publicLookup();
+        for (String className : new String[]{
+            "nz.net.ultraq.thymeleaf.models.extensions.IAttributeExtensions",
+            "nz.net.ultraq.thymeleaf.models.extensions.ICloseElementTagExtensions",
+            "nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions",
+            "nz.net.ultraq.thymeleaf.models.extensions.IOpenElementTagExtensions",
+            "nz.net.ultraq.thymeleaf.models.extensions.IStandaloneElementTagExtensions",
+            "nz.net.ultraq.thymeleaf.models.extensions.ITemplateEventExtensions",
+            "nz.net.ultraq.thymeleaf.models.extensions.ITextExtensions",
+            "nz.net.ultraq.thymeleaf.models.extensions.TemplateModelExtensions"
+        }) {
+            Class<?> cl;
+            try {
+                cl = Class.forName(className);
+            } catch (ClassNotFoundException | Error ex) {
+                continue;
+            }
+            try {
+                publicLookup.findStatic(cl, "apply", MethodType.methodType(Void.TYPE)).invoke();
+            } catch (Throwable ex) {
+                throw new ExceptionInInitializerError(ex);
+            }
+        }
     }
 
     private final SortingStrategy sortingStrategy;

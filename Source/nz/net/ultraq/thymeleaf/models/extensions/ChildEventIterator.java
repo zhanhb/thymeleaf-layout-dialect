@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nz.net.ultraq.thymeleaf.models;
+package nz.net.ultraq.thymeleaf.models.extensions;
 
 import java.util.Iterator;
 import nz.net.ultraq.thymeleaf.internal.MetaProvider;
@@ -26,6 +26,9 @@ import org.thymeleaf.model.ITemplateEvent;
  *
  * Models returned by this iterator are also aware of their position within the
  * event queue of the parent model, accessible via their {@code index} property.
+ *
+ * TODO: This class is only used in 1 place where the model iterator would
+ * suffice. Might be able to delete this class.
  *
  * @author Emanuel Rabina
  */
@@ -60,6 +63,7 @@ public class ChildEventIterator implements Iterator<ITemplateEvent> {
      * @return The next event.
      */
     @Override
+    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     public ITemplateEvent next() {
         ITemplateEvent event = parent.get(currentIndex);
         MetaProvider.INSTANCE.setProperty(event, "index", currentIndex++);

@@ -62,8 +62,7 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
             return event instanceof IOpenElementTag && "head".equals(((IElementTag) event).getElementCompleteName());
         };
         IModel targetHeadModel = MetaClass.findModel(targetDocumentModel, headModelFinder);
-        IModel resultHeadModel = new HtmlHeadDecorator(context, sortingStrategy).decorate(
-                targetHeadModel,
+        IModel resultHeadModel = new HtmlHeadDecorator(context, sortingStrategy).decorate(targetHeadModel,
                 MetaClass.findModel(sourceDocumentModel, headModelFinder)
         );
         if (MetaClass.asBoolean(resultHeadModel)) {
@@ -82,8 +81,7 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
             return event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName());
         };
         IModel targetBodyModel = MetaClass.findModel(targetDocumentModel, bodyModelFinder);
-        IModel resultBodyModel = new HtmlBodyDecorator(context.getModelFactory()).decorate(
-                targetBodyModel,
+        IModel resultBodyModel = new HtmlBodyDecorator(context.getModelFactory()).decorate(targetBodyModel,
                 MetaClass.findModel(sourceDocumentModel, bodyModelFinder)
         );
         if (MetaClass.asBoolean(resultBodyModel)) {
