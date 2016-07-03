@@ -18,6 +18,7 @@ package nz.net.ultraq.thymeleaf.decorators.html;
 import java.util.Iterator;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
+import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.internal.MetaProvider;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
@@ -25,6 +26,7 @@ import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IElementTag;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IOpenElementTag;
+import org.thymeleaf.model.ITemplateEvent;
 
 /**
  * A decorator specific to processing an HTML {@code <head>} element.
@@ -33,15 +35,8 @@ import org.thymeleaf.model.IOpenElementTag;
  */
 public class HtmlHeadDecorator implements Decorator {
 
-    // Get the source and target title elements
-    private static IModel titleRetriever(IModel headModel) {
-        IModel title = MetaClass.findModel(headModel, event -> {
-            return event instanceof IOpenElementTag && "title".equals(((IElementTag) event).getElementCompleteName());
-        });
-        if (MetaClass.asBoolean(title)) {
-            MetaClass.removeModelWithWhitespace(headModel, MetaProvider.INSTANCE.getProperty(title, "startIndex"));
-        }
-        return title;
+    private static IModel titleRetriever(IModel headModel, ITemplateEventPredicate isTitle) {
+        return MetaClass.asBoolean(headModel) ? MetaClass.findModel(headModel, isTitle) : null;
     }
 
     private final ITemplateContext context;
@@ -67,33 +62,43 @@ public class HtmlHeadDecorator implements Decorator {
      */
     @Override
     public IModel decorate(IModel targetHeadModel, IModel sourceHeadModel) {
-        // If one of the parameters is missing return a copy of the other, or
-        // nothing if both parameters are missing.
-        if (!MetaClass.asBoolean(targetHeadModel) || !MetaClass.asBoolean(sourceHeadModel)) {
-            return MetaClass.asBoolean(targetHeadModel) ? targetHeadModel.cloneModel() : MetaClass.asBoolean(sourceHeadModel) ? sourceHeadModel.cloneModel() : null;
+        // If none of the parameters are present, return nothing
+        if (!MetaClass.asBoolean(targetHeadModel) && !MetaClass.asBoolean(sourceHeadModel)) {
+            return null;
         }
 
-        IModel resultTitle = new HtmlTitleDecorator(context).decorate(
-                titleRetriever(targetHeadModel),
-                titleRetriever(sourceHeadModel));
-        MetaClass.insertModelWithWhitespace(targetHeadModel, 1, resultTitle);
+        ITemplateEventPredicate isTitle = event -> event instanceof IOpenElementTag && "title".equals(((IElementTag) event).getElementCompleteName());
 
-        // Merge the source <head> elements with the target <head> elements using
-        // the current merging strategy, placing the resulting title at the
-        // beginning of it
+        // New head model based off the target being decorated
+        IModel resultHeadModel = new AttributeMerger(context.getModelFactory()).merge(targetHeadModel, sourceHeadModel);
+        ITemplateEvent titleInResult = MetaClass.find(resultHeadModel, isTitle);
+        if (titleInResult != null) {
+            MetaClass.removeModelWithWhitespace(resultHeadModel, MetaProvider.INSTANCE.getProperty(titleInResult, "index"));
+        }
+
+        // Get the source and target title elements to pass to the title decorator
+        IModel resultTitle = new HtmlTitleDecorator(context).decorate(titleRetriever(targetHeadModel, isTitle),
+                titleRetriever(sourceHeadModel, isTitle));
+        MetaClass.insertModelWithWhitespace(resultHeadModel, 1, resultTitle);
+
+        // Merge the rest of the source <head> elements with the target <head>
+        // elements using the current merging strategy
         if (MetaClass.asBoolean(sourceHeadModel)) {
             Iterator<IModel> it = MetaClass.childModelIterator(sourceHeadModel);
             if (it != null) {
                 while (it.hasNext()) {
-                    IModel childModel = it.next();
-                    int position = sortingStrategy.findPositionForModel(targetHeadModel, childModel);
+                    IModel model = it.next();
+                    if (isTitle.test(MetaClass.first(model))) {
+                        continue;
+                    }
+                    int position = sortingStrategy.findPositionForModel(resultHeadModel, model);
                     if (position != -1) {
-                        MetaClass.insertModelWithWhitespace(targetHeadModel, position, childModel);
+                        MetaClass.insertModelWithWhitespace(resultHeadModel, position, model);
                     }
                 }
             }
         }
-        return new AttributeMerger(context.getModelFactory()).merge(targetHeadModel, sourceHeadModel);
+        return resultHeadModel;
     }
 
 }

@@ -262,7 +262,7 @@ public class MetaClass {
      * @return Model at the given position.
      */
     @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
-    public static IModel getModel(IModel delegate, int pos) {
+    public static IModel getModel(@Nonnull IModel delegate, int pos) {
         int modelSize = calculateModelSize(delegate, pos);
         IModel subModel = delegate.cloneModel();
         int removeBefore = delegate instanceof TemplateModel ? pos - 1 : pos;
@@ -284,7 +284,7 @@ public class MetaClass {
      * @param pos
      * @param model
      */
-    public static void insertModelWithWhitespace(IModel delegate, int pos, IModel model) {
+    public static void insertModelWithWhitespace(@Nonnull IModel delegate, int pos, IModel model) {
         IModel whitespace = getModel(delegate, pos); // Assumes that whitespace exists at the insertion point
         if (isWhitespace(whitespace)) {
             delegate.insertModel(pos, model);
@@ -331,7 +331,7 @@ public class MetaClass {
      * @return {@code true} if the first event in this model is an opening tag
      * and the last event is the matching closing tag.
      */
-    public static boolean isElement(IModel delegate) {
+    public static boolean isElement(@Nonnull IModel delegate) {
         return first(delegate) instanceof IOpenElementTag && last(delegate) instanceof ICloseElementTag;
     }
 
@@ -341,7 +341,7 @@ public class MetaClass {
      * @param delegate
      * @return {@code true} if this is a collapsible text model.
      */
-    public static boolean isWhitespace(IModel delegate) {
+    public static boolean isWhitespace(@Nonnull IModel delegate) {
         return delegate.size() == 1 && isWhitespace(first(delegate));
     }
 
@@ -352,7 +352,7 @@ public class MetaClass {
      * @return The model's lats event, or {@code null} if the model has no
      * events.
      */
-    public static ITemplateEvent last(IModel delegate) {
+    public static ITemplateEvent last(@Nonnull IModel delegate) {
         return delegate.get(delegate.size() - 1);
     }
 
@@ -361,7 +361,7 @@ public class MetaClass {
      *
      * @param delegate
      */
-    public static void removeFirst(IModel delegate) {
+    public static void removeFirst(@Nonnull IModel delegate) {
         delegate.remove(0);
     }
 

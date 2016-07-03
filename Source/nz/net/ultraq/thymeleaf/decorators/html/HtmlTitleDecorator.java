@@ -16,7 +16,6 @@
 package nz.net.ultraq.thymeleaf.decorators.html;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor;
@@ -51,9 +50,20 @@ public class HtmlTitleDecorator implements Decorator {
     }
 
     private static String titleValueRetriever(IModel titleModel) {
-        IProcessableElementTag first = (IProcessableElementTag) MetaClass.first(titleModel);
-        String layout = first.getAttributeValue(StandardDialect.PREFIX, StandardTextTagProcessor.ATTR_NAME);
-        return !StringUtils.isEmpty(layout) ? layout : titleModel.size() > 2 ? "'" + HtmlEscape.escapeHtml5Xml(((IText) titleModel.get(1)).getText()) + "'" : null;
+        if (MetaClass.asBoolean(titleModel)) {
+            IProcessableElementTag event = (IProcessableElementTag) MetaClass.first(titleModel);
+            String result = null;
+            if (event != null) {
+                result = event.getAttributeValue(StandardDialect.PREFIX, StandardTextTagProcessor.ATTR_NAME);
+            }
+            if (!StringUtils.isEmpty(result)) {
+                return result;
+            }
+            if (titleModel.size() > 2) {
+                return "'" + HtmlEscape.escapeHtml5Xml(((IText) titleModel.get(1)).getText()) + "'";
+            }
+        }
+        return null;
     }
 
     private ITemplateContext context;
@@ -88,14 +98,19 @@ public class HtmlTitleDecorator implements Decorator {
         // Set the title pattern to use on a new model, as well as the important
         // title result parts that we want to use on the pattern.
         if (titlePatternProcessor != null) {
+            LinkedHashMap<String, Object> titleValuesMap = new LinkedHashMap<>(2);
             String contentTitle = titleValueRetriever(sourceTitleModel);
-            String decoratorTitle = titleValueRetriever(targetTitleModel);
-            Map<String, Object> map = new LinkedHashMap<>(3);
-            map.put(titlePatternProcessor.getAttributeCompleteName(), titlePatternProcessor.getValue());
-            map.put(TitlePatternProcessor.CONTENT_TITLE_ATTRIBUTE, contentTitle);
-            map.put(TitlePatternProcessor.LAYOUT_TITLE_ATTRIBUTE, decoratorTitle);
-            ModelBuilder builder = new ModelBuilder(context);
-            resultTitle = builder.createNode("title", map);
+            if (!StringUtils.isEmpty(contentTitle)) {
+                titleValuesMap.put(TitlePatternProcessor.CONTENT_TITLE_ATTRIBUTE, contentTitle);
+            }
+            String layoutTitle = titleValueRetriever(targetTitleModel);
+            if (!StringUtils.isEmpty(layoutTitle)) {
+                titleValuesMap.put(TitlePatternProcessor.LAYOUT_TITLE_ATTRIBUTE, layoutTitle);
+            }
+            LinkedHashMap<String, Object> linkedHashMap = new LinkedHashMap<>(3);
+            linkedHashMap.put(titlePatternProcessor.getAttributeCompleteName(), titlePatternProcessor.getValue());
+            linkedHashMap.putAll(titleValuesMap);
+            resultTitle = new ModelBuilder(context).createNode("title", linkedHashMap);
         } else {
             resultTitle = new ElementMerger(context.getModelFactory()).merge(targetTitleModel, sourceTitleModel);
         }
