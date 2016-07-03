@@ -20,6 +20,7 @@ import java.util.Objects;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.standard.expression.FragmentExpression;
+import org.thymeleaf.standard.expression.IStandardExpression;
 import org.thymeleaf.util.StringUtils;
 
 /**
@@ -69,7 +70,14 @@ public class TemplateModelFinder {
     public TemplateModel findFragment(FragmentExpression fragmentExpression, String dialectPrefix) {
         // TODO: Simplify this method signature by deriving the layout dialect
         //       prefix from the context.
-        String templateName = String.valueOf(fragmentExpression.getTemplateName().execute(context));
+        String templateName = "this";
+        IStandardExpression expression = fragmentExpression.getTemplateName();
+        if (expression != null) {
+            Object result = expression.execute(context);
+            if (result != null) {
+                templateName = String.valueOf(result);
+            }
+        }
         if (Objects.equals(templateName, "this")) {
             templateName = context.getTemplateData().getTemplate();
         }

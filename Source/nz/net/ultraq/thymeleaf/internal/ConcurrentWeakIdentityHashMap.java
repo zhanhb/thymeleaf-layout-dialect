@@ -42,7 +42,7 @@ class ConcurrentWeakIdentityHashMap<K, V> {
         return map.get(new Key<>(key, null));
     }
 
-    @SuppressWarnings({"NestedAssignment", "element-type-mismatch"})
+    @SuppressWarnings("NestedAssignment")
     private void purgeKeys() {
         Reference<? extends K> reference;
         while ((reference = queue.poll()) != null) {
