@@ -49,6 +49,9 @@ public class LayoutDialect extends AbstractProcessorDialect {
     static {
         MethodHandles.Lookup publicLookup = MethodHandles.publicLookup();
         for (String className : new String[]{
+            // Context extensions
+            "nz.net.ultraq.thymeleaf.context.extensions.IContextExtensions",
+            // Model extensions
             "nz.net.ultraq.thymeleaf.models.extensions.IAttributeExtensions",
             "nz.net.ultraq.thymeleaf.models.extensions.ICloseElementTagExtensions",
             "nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions",
@@ -89,7 +92,10 @@ public class LayoutDialect extends AbstractProcessorDialect {
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the layout dialect's processors.
+     *
+     * @param dialectPrefix
+     * @return All of the processors for HTML and XML template modes.
      */
     @Override
     @SuppressWarnings("deprecation")

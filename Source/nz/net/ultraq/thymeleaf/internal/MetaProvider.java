@@ -21,10 +21,10 @@ package nz.net.ultraq.thymeleaf.internal;
  */
 public interface MetaProvider {
 
-    public static final MetaProvider INSTANCE = new InMemoryMetaProvider();
+    MetaProvider INSTANCE = new InMemoryMetaProvider();
 
-    public abstract <T> T getProperty(Object object, String key);
+    <T> T getProperty(Object object, String key);
 
-    public abstract void setProperty(Object object, String key, Object value);
+    void setProperty(Object object, String key, Object value);
 
 }

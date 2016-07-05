@@ -16,6 +16,7 @@
 package nz.net.ultraq.thymeleaf.decorators;
 
 import java.util.Map;
+import nz.net.ultraq.thymeleaf.context.LayoutContext;
 import nz.net.ultraq.thymeleaf.decorators.html.HtmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
@@ -136,5 +137,9 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
 
         // Save layout fragments for use later by layout:fragment processors
         FragmentMap.setForNode(context, structureHandler, pageFragments);
+
+		// Create a layout context
+		LayoutContext.forContext(context);
     }
+
 }

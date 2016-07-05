@@ -100,7 +100,7 @@ public class MetaClass {
      * @param delegate
      * @param closure
      */
-    public static void each(@Nullable IModel delegate, ITemplateEventConsumer closure) {
+    public static void each(@Nullable IModel delegate, @Nonnull ITemplateEventConsumer closure) {
         if (delegate != null) {
             for (int i = 0; i < delegate.size(); i++) {
                 closure.accept(delegate.get(i));
@@ -183,7 +183,7 @@ public class MetaClass {
      * @param closure
      * @return {@code true} if every event satisfies the closure.
      */
-    public static boolean everyWithIndex(IModel delegate, ITemplateEventIntPredicate closure) {
+    public static boolean everyWithIndex(IModel delegate, @Nonnull ITemplateEventIntPredicate closure) {
         for (int i = 0; i < delegate.size(); i++) {
             if (!closure.test(delegate.get(i), i)) {
                 return false;
@@ -205,7 +205,8 @@ public class MetaClass {
      * @return The first event to match the closure criteria, or {@code null} if
      * nothing matched.
      */
-    public static ITemplateEvent find(IModel delegate, ITemplateEventPredicate closure) {
+    @Nullable
+    public static ITemplateEvent find(@Nonnull IModel delegate, @Nonnull ITemplateEventPredicate closure) {
         for (int i = 0; i < delegate.size(); i++) {
             ITemplateEvent event = delegate.get(i);
             boolean result = closure.test(event);
@@ -230,7 +231,8 @@ public class MetaClass {
      * @return A model over the event that matches the closure criteria, or
      * {@code null} if nothing matched.
      */
-    public static IModel findModel(IModel delegate, ITemplateEventPredicate closure) {
+    @Nullable
+    public static IModel findModel(@Nonnull IModel delegate, @Nonnull ITemplateEventPredicate closure) {
         ITemplateEvent event = find(delegate, closure);
         if (event != null) {
             IModel model = getModel(delegate, MetaProvider.INSTANCE.getProperty(event, "index"));
@@ -248,7 +250,8 @@ public class MetaClass {
      * @return The model's first event, or {@code null} if the model has no
      * events.
      */
-    public static ITemplateEvent first(IModel delegate) {
+    @Nonnull
+    public static ITemplateEvent first(@Nonnull IModel delegate) {
         return delegate.get(0);
     }
 
@@ -261,6 +264,7 @@ public class MetaClass {
      * @param pos
      * @return Model at the given position.
      */
+    @Nonnull
     @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     public static IModel getModel(@Nonnull IModel delegate, int pos) {
         int modelSize = calculateModelSize(delegate, pos);
@@ -352,6 +356,7 @@ public class MetaClass {
      * @return The model's lats event, or {@code null} if the model has no
      * events.
      */
+    @Nonnull
     public static ITemplateEvent last(@Nonnull IModel delegate) {
         return delegate.get(delegate.size() - 1);
     }
@@ -370,7 +375,7 @@ public class MetaClass {
      *
      * @param delegate
      */
-    public static void removeLast(IModel delegate) {
+    public static void removeLast(@Nonnull IModel delegate) {
         delegate.remove(delegate.size() - 1);
     }
 
@@ -383,7 +388,7 @@ public class MetaClass {
      * @param delegate
      * @param pos
      */
-    public static void removeModel(IModel delegate, int pos) {
+    public static void removeModel(@Nonnull IModel delegate, int pos) {
         int modelSize = calculateModelSize(delegate, pos);
         while (modelSize > 0) {
             delegate.remove(pos);
@@ -398,7 +403,7 @@ public class MetaClass {
      * @param delegate
      * @param pos
      */
-    public static void removeModelWithWhitespace(IModel delegate, int pos) {
+    public static void removeModelWithWhitespace(@Nonnull IModel delegate, int pos) {
         removeModel(delegate, pos);
         ITemplateEvent priorEvent = delegate.get(pos - 1);
         if (isWhitespace(priorEvent)) {
@@ -413,7 +418,7 @@ public class MetaClass {
      * @param pos
      * @param model
      */
-    public static void replaceModel(IModel delegate, int pos, IModel model) {
+    public static void replaceModel(@Nonnull IModel delegate, int pos, IModel model) {
         removeModel(delegate, pos);
         delegate.insertModel(pos, model);
     }
@@ -426,7 +431,7 @@ public class MetaClass {
      * @param delegate
      * @return Template name.
      */
-    public static String getTemplate(TemplateModel delegate) {
+    public static String getTemplate(@Nonnull TemplateModel delegate) {
         return delegate.getTemplateData().getTemplate();
     }
 
@@ -436,7 +441,7 @@ public class MetaClass {
      * @param delegate
      * @return {@code true} if this is a collapsible text node.
      */
-    public static boolean isWhitespace(ITemplateEvent delegate) {
+    public static boolean isWhitespace(@Nonnull ITemplateEvent delegate) {
         return delegate instanceof IText && isWhitespace((IText) delegate);
     }
 
@@ -448,7 +453,7 @@ public class MetaClass {
      * @return {@code true} if this tag has the same name and attributes as the
      * other element.
      */
-    public static boolean equals(IOpenElementTag delegate, Object other) {
+    public static boolean equals(IOpenElementTag delegate, @Nullable Object other) {
         return other instanceof IOpenElementTag
                 && Objects.equals(delegate.getElementCompleteName(), ((IElementTag) other).getElementCompleteName())
                 && Objects.equals(delegate.getAttributeMap(), ((IProcessableElementTag) other).getAttributeMap());
@@ -461,7 +466,7 @@ public class MetaClass {
      * @param other
      * @return {@code true} if this tag has the same name as the other element.
      */
-    public static boolean equals(ICloseElementTag delegate, Object other) {
+    public static boolean equals(ICloseElementTag delegate, @Nullable Object other) {
         return other instanceof ICloseElementTag
                 && Objects.equals(delegate.getElementCompleteName(), ((IElementTag) other).getElementCompleteName());
     }
@@ -474,7 +479,7 @@ public class MetaClass {
      * @return {@code true} if this tag has the same name and attributes as the
      * other element.
      */
-    public static boolean equals(IStandaloneElementTag delegate, Object other) {
+    public static boolean equals(IStandaloneElementTag delegate, @Nullable Object other) {
         return other instanceof IStandaloneElementTag
                 && Objects.equals(delegate.getElementCompleteName(), ((IElementTag) other).getElementCompleteName())
                 && Objects.equals(delegate.getAttributeMap(), ((IProcessableElementTag) other).getAttributeMap());
@@ -491,7 +496,7 @@ public class MetaClass {
      * @return {@code true} if this attribute is an attribute processor of the
      * matching name.
      */
-    public static boolean equalsName(IAttribute delegate, String prefix, String name) {
+    public static boolean equalsName(@Nonnull IAttribute delegate, String prefix, String name) {
         String attributeName = delegate.getAttributeCompleteName();
         return (prefix + ":" + name).equals(attributeName) || ("data-" + prefix + "-" + name).equals(attributeName);
     }
@@ -502,7 +507,7 @@ public class MetaClass {
      * @param delegate
      * @return Attribute name object.
      */
-    public static AttributeName getAttributeName(IAttribute delegate) {
+    public static AttributeName getAttributeName(@Nonnull IAttribute delegate) {
         return delegate.getAttributeDefinition().getAttributeName();
     }
 
@@ -513,7 +518,7 @@ public class MetaClass {
      * @param other
      * @return {@code true} if the text content matches.
      */
-    public static boolean equals(IText delegate, Object other) {
+    public static boolean equals(IText delegate, @Nullable Object other) {
         return other instanceof IText && Objects.equals(delegate.getText(), ((IText) other).getText());
     }
 
@@ -523,7 +528,7 @@ public class MetaClass {
      * @param delegate
      * @return {@code true} if, when trimmed, the text content is empty.
      */
-    public static boolean isWhitespace(IText delegate) {
+    public static boolean isWhitespace(@Nonnull IText delegate) {
         return delegate.getText().trim().isEmpty();
     }
 
@@ -538,7 +543,7 @@ public class MetaClass {
      * the position isn't an opening element.
      */
     @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
-    private static int calculateModelSize(IModel model, int index) {
+    private static int calculateModelSize(@Nonnull IModel model, int index) {
         int eventIndex = index;
         ITemplateEvent event = model.get(eventIndex++);
 

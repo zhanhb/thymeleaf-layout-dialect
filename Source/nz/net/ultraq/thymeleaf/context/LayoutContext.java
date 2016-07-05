@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nz.net.ultraq.thymeleaf;
+package nz.net.ultraq.thymeleaf.context;
 
 import java.util.HashMap;
+import lombok.SneakyThrows;
 import org.thymeleaf.context.IContext;
 import org.thymeleaf.context.IEngineContext;
 
@@ -26,7 +27,7 @@ import org.thymeleaf.context.IEngineContext;
  * @author Emanuel Rabina
  */
 @SuppressWarnings({"serial", "CloneableImplementsClone"})
-public class LayoutDialectContext extends HashMap<String, Object> {
+public class LayoutContext extends HashMap<String, Object> {
 
     private static final String CONTEXT_KEY = "layout";
 
@@ -38,24 +39,27 @@ public class LayoutDialectContext extends HashMap<String, Object> {
      * @param context
      * @return A new or existing layout dialect context for the context.
      */
-    public static LayoutDialectContext forContext(IContext context) {
-        Object contextKey = context.getVariable(CONTEXT_KEY);
+    @SneakyThrows
+    public static LayoutContext forContext(IContext context) {
+        Object dialectContext = context.getVariable(CONTEXT_KEY);
 
-        // Error if something has already taken this value.  Hopefully there
-        // aren't any collisions, but this name isn't exactly rare, so it *just*
-        // might happen.
-        if (contextKey != null) {
+        // Error if something has already taken this value.  Hopefully there aren't
+        // any collisions, but this name isn't exactly rare, so it *just* might
+        // happen.
+        if (dialectContext != null) {
             try {
-                return (LayoutDialectContext) contextKey;
+                return (LayoutContext) dialectContext;
             } catch (ClassCastException ex) {
-                throw new Error("Name collision on the Thymeleaf processing context.  An object with the "
-                        + "key \"layout\" exists, but is needed by the Layout Dialect to work");
+                throw new Exception(
+                        "Name collision on the Thymeleaf processing context.  "
+                        + "An object with the key \"layout\" already exists, but is needs to be free for the Layout Dialect to work."
+                );
             }
         }
 
-        LayoutDialectContext dialectContext = new LayoutDialectContext();
-        ((IEngineContext) context).setVariable(CONTEXT_KEY, dialectContext);
-        return dialectContext;
+        LayoutContext layoutContext = new LayoutContext();
+        ((IEngineContext) context).setVariable(CONTEXT_KEY, layoutContext);
+        return layoutContext;
     }
 
 }
