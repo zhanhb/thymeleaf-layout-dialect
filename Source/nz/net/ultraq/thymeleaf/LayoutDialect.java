@@ -20,6 +20,7 @@ import java.lang.invoke.MethodType;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import nz.net.ultraq.thymeleaf.context.ContextCreationProcessor;
 import nz.net.ultraq.thymeleaf.decorators.DecorateProcessor;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor;
@@ -107,6 +108,7 @@ public class LayoutDialect extends AbstractProcessorDialect {
         return new LinkedHashSet<>(Arrays.<IProcessor>asList(
                 // Processors available in the HTML template mode
                 new StandardXmlNsTagProcessor(TemplateMode.HTML, dialectPrefix),
+                new ContextCreationProcessor(TemplateMode.HTML),
                 new DecorateProcessor(TemplateMode.HTML, dialectPrefix, sortingStrategy),
                 new nz.net.ultraq.thymeleaf.decorators.DecoratorProcessor(TemplateMode.HTML, dialectPrefix, sortingStrategy),
                 new nz.net.ultraq.thymeleaf.includes.IncludeProcessor(TemplateMode.HTML, dialectPrefix),
@@ -116,6 +118,7 @@ public class LayoutDialect extends AbstractProcessorDialect {
                 new TitlePatternProcessor(TemplateMode.HTML, dialectPrefix),
                 // Processors available in the XML template mode
                 new StandardXmlNsTagProcessor(TemplateMode.XML, dialectPrefix),
+                new ContextCreationProcessor(TemplateMode.XML),
                 new DecorateProcessor(TemplateMode.XML, dialectPrefix, sortingStrategy),
                 new nz.net.ultraq.thymeleaf.decorators.DecoratorProcessor(TemplateMode.XML, dialectPrefix, sortingStrategy),
                 new nz.net.ultraq.thymeleaf.includes.IncludeProcessor(TemplateMode.XML, dialectPrefix),
