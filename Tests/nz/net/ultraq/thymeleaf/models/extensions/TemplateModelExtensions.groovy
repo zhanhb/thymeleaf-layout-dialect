@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package nz.net.ultraq.thymeleaf.models.extensions
+package nz.net.ultraq.thymeleaf.models.extensions;
 
-import org.thymeleaf.engine.TemplateModel
+import nz.net.ultraq.thymeleaf.internal.MetaClass as Z;
+import org.thymeleaf.engine.TemplateModel;
 
 class TemplateModelExtensions {
 

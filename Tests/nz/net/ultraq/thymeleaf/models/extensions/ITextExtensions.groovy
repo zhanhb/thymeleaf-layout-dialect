@@ -1,6 +1,7 @@
 package nz.net.ultraq.thymeleaf.models.extensions
 
-import org.thymeleaf.model.IText
+import nz.net.ultraq.thymeleaf.internal.MetaClass as Z;
+import org.thymeleaf.model.IText;
 
 class ITextExtensions {
 
