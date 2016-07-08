@@ -15,8 +15,6 @@
  */
 package nz.net.ultraq.thymeleaf;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -43,38 +41,6 @@ public class LayoutDialect extends AbstractProcessorDialect {
     public static final String DIALECT_NAME = "Layout";
     public static final String DIALECT_PREFIX = "layout";
     public static final int DIALECT_PRECEDENCE = 10;
-
-    /**
-     * Apply model extensions.
-     */
-    static {
-        MethodHandles.Lookup publicLookup = MethodHandles.publicLookup();
-        for (String className : new String[]{
-            // Context extensions
-            "nz.net.ultraq.thymeleaf.context.extensions.IContextExtensions",
-            // Model extensions
-            "nz.net.ultraq.thymeleaf.models.extensions.IAttributeExtensions",
-            "nz.net.ultraq.thymeleaf.models.extensions.ICloseElementTagExtensions",
-            "nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions",
-            "nz.net.ultraq.thymeleaf.models.extensions.IOpenElementTagExtensions",
-            "nz.net.ultraq.thymeleaf.models.extensions.IStandaloneElementTagExtensions",
-            "nz.net.ultraq.thymeleaf.models.extensions.ITemplateEventExtensions",
-            "nz.net.ultraq.thymeleaf.models.extensions.ITextExtensions",
-            "nz.net.ultraq.thymeleaf.models.extensions.TemplateModelExtensions"
-        }) {
-            Class<?> cl;
-            try {
-                cl = Class.forName(className);
-            } catch (ClassNotFoundException | Error ex) {
-                continue;
-            }
-            try {
-                publicLookup.findStatic(cl, "apply", MethodType.methodType(Void.TYPE)).invoke();
-            } catch (Throwable ex) {
-                throw new ExceptionInInitializerError(ex);
-            }
-        }
-    }
 
     private final SortingStrategy sortingStrategy;
 

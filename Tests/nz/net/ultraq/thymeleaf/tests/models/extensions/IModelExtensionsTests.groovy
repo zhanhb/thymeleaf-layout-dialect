@@ -16,7 +16,7 @@
 
 package nz.net.ultraq.thymeleaf.tests.models.extensions
 
-import nz.net.ultraq.thymeleaf.LayoutDialect
+import nz.net.ultraq.thymeleaf.tests.LayoutDialect
 import nz.net.ultraq.thymeleaf.models.ModelBuilder
 
 import org.junit.BeforeClass

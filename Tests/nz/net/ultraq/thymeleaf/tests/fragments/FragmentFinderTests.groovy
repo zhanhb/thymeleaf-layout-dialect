@@ -16,7 +16,7 @@
 
 package nz.net.ultraq.thymeleaf.tests.fragments
 
-import nz.net.ultraq.thymeleaf.LayoutDialect
+import nz.net.ultraq.thymeleaf.tests.LayoutDialect
 import nz.net.ultraq.thymeleaf.fragments.FragmentFinder
 import nz.net.ultraq.thymeleaf.models.ModelBuilder
 
