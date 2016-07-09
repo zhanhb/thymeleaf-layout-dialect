@@ -250,7 +250,6 @@ public class MetaClass {
      * @return The model's first event, or {@code null} if the model has no
      * events.
      */
-    @Nonnull
     public static ITemplateEvent first(@Nonnull IModel delegate) {
         return delegate.get(0);
     }
@@ -356,7 +355,6 @@ public class MetaClass {
      * @return The model's lats event, or {@code null} if the model has no
      * events.
      */
-    @Nonnull
     public static ITemplateEvent last(@Nonnull IModel delegate) {
         return delegate.get(delegate.size() - 1);
     }

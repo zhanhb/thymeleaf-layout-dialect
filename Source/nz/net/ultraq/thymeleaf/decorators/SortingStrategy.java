@@ -31,7 +31,7 @@ public interface SortingStrategy {
      *
      * @param headModel Model of a {@code <head>} element.
      * @param childModel A model that can be found in a {@code <head>} element.
-     * @return Position to insert the childe model into.
+     * @return Position to insert the child model into.
      */
     int findPositionForModel(IModel headModel, IModel childModel);
 

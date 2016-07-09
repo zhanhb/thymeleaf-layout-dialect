@@ -61,7 +61,7 @@ public class TemplateModelFinder {
     }
 
     /**
-     * Return the model specified by the given fragment name expression.
+     * Return the model specified by the given fragment expression.
      *
      * @param fragmentExpression
      * @param dialectPrefix
@@ -85,7 +85,7 @@ public class TemplateModelFinder {
     }
 
     /**
-     * Return the model specified by the given fragment name expression.
+     * Return the model specified by the given fragment expression.
      *
      * @param templateName
      * @param fragmentName
@@ -110,7 +110,8 @@ public class TemplateModelFinder {
     }
 
     /**
-     * Return a model for an entire template.
+     * Return a model for the template specified by the given fragment
+     * expression.
      *
      * @param fragmentExpression
      * @return Template model matching the fragment specification.
@@ -120,7 +121,7 @@ public class TemplateModelFinder {
     }
 
     /**
-     * Return a model for an entire template.
+     * Return a model for the template specified by the given template name.
      *
      * @param templateName
      * @return Template model matching the fragment specification.

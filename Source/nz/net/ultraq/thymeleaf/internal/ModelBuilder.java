@@ -30,7 +30,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.util.StringUtils;
 
 /**
- * Create Thymeleaf 3.0 models using a simplified syntax.
+ * Create Thymeleaf 3 models using the Groovy builder syntax.
  *
  * @author Emanuel Rabina
  */
@@ -65,32 +65,34 @@ public class ModelBuilder {
     }
 
     /**
-     * Create a model for the given HTML element.
+     * Create a model for the given element.
      *
-     * @param name HTML element name.
-     * @return New model with the given name.
+     * @param name Element name.
+     * @return New model representing an element with the given name.
      */
     public IModel createNode(Object name) {
         return createNode(name, null, null);
     }
 
     /**
-     * Create a model for the given HTML element and inner text content.
+     * Create a model for the given element and inner text content.
      *
-     * @param name HTML element name.
+     * @param name Element name.
      * @param value Text content.
-     * @return New model with the given name and content.
+     * @return New model representing an element with the given name and
+     * content.
      */
     public IModel createNode(Object name, Object value) {
         return createNode(name, null, value);
     }
 
     /**
-     * Create a model for the given HTML element and attributes.
+     * Create a model for the given element and attributes.
      *
-     * @param name HTML element name.
+     * @param name Element name.
      * @param attributes Element attributes.
-     * @return New model with the given name and attributes.
+     * @return New model representing an element with the given name and
+     * attributes.
      */
     @SuppressWarnings("rawtypes")
     public IModel createNode(Object name, Map attributes) {
@@ -98,13 +100,13 @@ public class ModelBuilder {
     }
 
     /**
-     * Create a model for the given HTML element, attributes, and inner text
-     * content.
+     * Create a model for the given element, attributes, and inner text content.
      *
-     * @param name HTML element name.
+     * @param name Element name.
      * @param attributes Element attributes.
      * @param value Text content.
-     * @return New model with the given name, attributes, and content.
+     * @return New model representing an element with the given name,
+     * attributes, and content.
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public IModel createNode(Object name, Map attributes, Object value) {

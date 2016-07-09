@@ -22,20 +22,13 @@ import org.thymeleaf.util.StringUtils;
 
 /**
  * Merges variable declarations in a {@code th:with} attribute processor, taking
- * the declarations in the source and overriding same-named declarations in the
- * target.
+ * the declarations in the target and combining them with the declarations in
+ * the source, overriding any same-named declarations in the target.
  *
  * @author Emanuel Rabina
  */
 public class VariableDeclarationMerger {
 
-    /**
-     * Create variable declaration objects out of the declaration string.
-     *
-     * @param declarationString
-     * @return A list of variable declaration objects that make up the
-     * declaration string.
-     */
     private static List<VariableDeclaration> deriveDeclarations(String declarationString) {
         String[] attributeTokens = declarationString.split(",");
         ArrayList<VariableDeclaration> arrayList = new ArrayList<>(attributeTokens.length);

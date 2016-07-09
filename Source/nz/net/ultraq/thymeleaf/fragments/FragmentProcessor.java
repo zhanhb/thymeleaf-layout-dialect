@@ -51,8 +51,8 @@ public class FragmentProcessor extends AbstractAttributeModelProcessor {
     }
 
     /**
-     * Includes or replaces the content of fragments into the corresponding
-     * fragment placeholder.
+     * Inserts the content of fragments into the encountered fragment
+     * placeholder.
      *
      * @param context
      * @param model

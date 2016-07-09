@@ -24,7 +24,7 @@ import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import org.thymeleaf.templatemode.TemplateMode;
 
 /**
- * An alias of the {@link DecoratorProcessor} to warn people that the
+ * An alias of the {@link DecorateProcessor} to warn people that the
  * {@code layout:decorator}/{@code data-layout-decorator} processor has been
  * renamed.
  *

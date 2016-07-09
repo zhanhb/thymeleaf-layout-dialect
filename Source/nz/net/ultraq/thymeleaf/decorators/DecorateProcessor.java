@@ -36,7 +36,7 @@ import org.thymeleaf.standard.expression.FragmentExpression;
 import org.thymeleaf.templatemode.TemplateMode;
 
 /**
- * Specifies the name of the template to decorate using the content template.
+ * Specifies the name of the template to decorate using the current template.
  *
  * @author Emanuel Rabina
  */
