@@ -11,7 +11,6 @@
             <goal>package</goal>
             <goal>source:jar</goal>
             <goal>javadoc:jar</goal>
-            <goal>gpg:sign</goal>
             <goal>deploy</goal>
         </goals>
     </action>
