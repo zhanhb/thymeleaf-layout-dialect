@@ -15,13 +15,18 @@
  */
 package nz.net.ultraq.thymeleaf.decorators.strategies;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.ListIterator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
-import org.thymeleaf.dom.Comment;
-import org.thymeleaf.dom.Element;
-import org.thymeleaf.dom.Node;
+import nz.net.ultraq.thymeleaf.internal.MetaProvider;
+import org.thymeleaf.model.IComment;
+import org.thymeleaf.model.IElementTag;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IOpenElementTag;
+import org.thymeleaf.model.IProcessableElementTag;
+import org.thymeleaf.model.ITemplateEvent;
 
 /**
  * The {@code <head>} merging strategy which groups like elements together.
@@ -32,33 +37,40 @@ import org.thymeleaf.dom.Node;
 public class GroupingStrategy implements SortingStrategy {
 
     /**
-     * Figure out the type for the given node type.
+     * Figure out the enum for the given model.
      *
-     * @param node The node to match.
-     * @return Matching <tt>int</tt> type to descript the node.
+     * @param model
+     * @return Matching enum to describe the model.
      */
-    private static int findMatchingType(Node node) {
+    private static int findMatchingType(IModel model) {
         final int COMMENT = 1;
         final int META = 2;
-        final int STYLESHEET = 3;
-        final int SCRIPT = 4;
-        final int OTHER_ELEMENT = 5;
+        final int SCRIPT = 3;
+        final int STYLE = 4;
+        final int STYLESHEET = 5;
+        final int OTHER = 6;
 
-        if (node instanceof Comment) {
+        ITemplateEvent event = MetaClass.first(model);
+
+        if (event instanceof IComment) {
             return COMMENT;
-        } else if (node instanceof Element) {
-            Element element = (Element) node;
-            String normalizedName = element.getNormalizedName();
-            if ("meta".equals(normalizedName)) {
+        }
+        if (event instanceof IElementTag) {
+            String elementCompleteName = ((IElementTag) event).getElementCompleteName();
+            if (event instanceof IProcessableElementTag && "meta".equals(elementCompleteName)) {
                 return META;
-            } else if ("link".equals(normalizedName)) {
-                if ("stylesheet".equals(element.getAttributeValue("rel"))) {
-                    return STYLESHEET;
-                }
-            } else if ("script".equals(normalizedName)) {
+            }
+            if (event instanceof IOpenElementTag && "script".equals(elementCompleteName)) {
                 return SCRIPT;
             }
-            return OTHER_ELEMENT;
+            if (event instanceof IOpenElementTag && "style".equals(elementCompleteName)) {
+                return STYLE;
+            }
+            if (event instanceof IProcessableElementTag && "link".equals(elementCompleteName)
+                    && "stylesheet".equals(((IProcessableElementTag) event).getAttributeValue("rel"))) {
+                return STYLESHEET;
+            }
+            return OTHER;
         }
         return 0;
     }
@@ -68,26 +80,36 @@ public class GroupingStrategy implements SortingStrategy {
      * as the content node. eg: groups scripts with scripts, stylesheets with
      * stylesheets, and so on.
      *
-     * @param decoratorNodes
-     * @param contentNode
+     * @param headModel
+     * @param childModel
      * @return Position of the end of the matching element group.
      */
     @Override
-    public int findPositionForContent(List<Node> decoratorNodes, Node contentNode) {
+    public int findPositionForModel(IModel headModel, IModel childModel) {
         // Discard text/whitespace nodes
-        if (MetaClass.isWhitespaceNode(contentNode)) {
+        if (MetaClass.isWhitespace(childModel)) {
             return -1;
         }
 
-        int type = findMatchingType(contentNode);
-        ListIterator<Node> it = decoratorNodes.listIterator(decoratorNodes.size());
-
-        while (it.hasPrevious()) {
-            if (type == findMatchingType(it.previous())) {
-                return it.nextIndex() + 1;
+        int type = findMatchingType(childModel);
+        Iterator<IModel> it = MetaClass.childModelIterator(headModel);
+        if (it != null) {
+            ArrayList<IModel> list = new ArrayList<>(20);
+            while (it.hasNext()) {
+                list.add(it.next());
+            }
+            ListIterator<IModel> listIterator = list.listIterator(list.size());
+            while (listIterator.hasPrevious()) {
+                IModel headSubModel = listIterator.previous();
+                if (type == findMatchingType(headSubModel)) {
+                    if (MetaClass.asBoolean(headModel)) {
+                        return MetaProvider.INSTANCE.getProperty(headSubModel, "endIndex");
+                    }
+                    break;
+                }
             }
         }
-        return 0;
+        return 1;
     }
 
 }

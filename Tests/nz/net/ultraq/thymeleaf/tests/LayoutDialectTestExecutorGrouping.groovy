@@ -16,19 +16,19 @@
 
 package nz.net.ultraq.thymeleaf.tests
 
-import nz.net.ultraq.thymeleaf.LayoutDialect
+import nz.net.ultraq.thymeleaf.tests.LayoutDialect
 import nz.net.ultraq.thymeleaf.decorators.strategies.GroupingStrategy
 import nz.net.ultraq.thymeleaf.testing.JUnitTestExecutor
 
 import org.junit.runners.Parameterized.Parameters
+import org.reflections.Reflections
+import org.reflections.scanners.ResourcesScanner
 import org.thymeleaf.dialect.IDialect
 import org.thymeleaf.standard.StandardDialect
 
-import java.util.regex.Pattern
-
 /**
- * A parameterized JUnit test class that is run over just the grouping strategy
- * Thymeleaf testing files.
+ * A parameterized JUnit test class that is run over just the files involved in
+ * testing the {@link GroupingStrategy} head element sorter.
  * 
  * @author Emanuel Rabina
  */
@@ -41,14 +41,15 @@ class LayoutDialectTestExecutorGrouping extends JUnitTestExecutor {
 
 	/**
 	 * Return only Thymeleaf testing files involved in the testing of the
-	 * <tt>GroupingStrategy</tt> {@code <head>} element sorter.
+	 * {@link GroupingStrategy} head element sorter.
 	 * 
-	 * @return List of all the Thymeleaf testing files for the <tt>GroupingStrategy</tt>.
-	 * @throws URISyntaxException
+	 * @return List of all the Thymeleaf testing files for the grouping head
+	 *         element sorter.
 	 */
 	@Parameters(name = '{0}')
-	static List<String> listGroupingLayoutDialectTests() throws URISyntaxException {
+	static List<String> listGroupingLayoutDialectTests() {
 
-		return reflections.getResources(Pattern.compile('GroupingStrategy.*\\.thtest')) as List
+		return new Reflections('', new ResourcesScanner())
+			.getResources(~/GroupingStrategy.*\.thtest/) as List
 	}
 }

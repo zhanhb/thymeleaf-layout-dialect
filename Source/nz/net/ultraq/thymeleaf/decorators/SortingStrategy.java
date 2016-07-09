@@ -1,12 +1,12 @@
-/* 
+/*
  * Copyright 2015, Emanuel Rabina (http://www.ultraq.net.nz/)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,25 +15,24 @@
  */
 package nz.net.ultraq.thymeleaf.decorators;
 
-import java.util.List;
-import org.thymeleaf.dom.Node;
+import org.thymeleaf.model.IModel;
 
 /**
- * Interface for controlling the sort order in which elements are placed into
- * decorator template from the content one.
+ * Interface for controlling the sort order in which {@code <head>} elements
+ * from one source are placed into another.
  *
  * @author Emanuel Rabina
  */
 public interface SortingStrategy {
 
     /**
-     * Returns the position in amongst a list of the decorator's nodes to insert
-     * a content child node.
+     * Returns the position in a {@code <head>} element model to insert a child
+     * model.
      *
-     * @param decoratorNodes
-     * @param contentNode
-     * @return Index in the list of decorator nodes to insert the content node.
+     * @param headModel Model of a {@code <head>} element.
+     * @param childModel A model that can be found in a {@code <head>} element.
+     * @return Position to insert the childe model into.
      */
-    int findPositionForContent(List<Node> decoratorNodes, Node contentNode);
+    int findPositionForModel(IModel headModel, IModel childModel);
 
 }

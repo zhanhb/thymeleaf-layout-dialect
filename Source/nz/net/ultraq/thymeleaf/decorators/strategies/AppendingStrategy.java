@@ -15,11 +15,9 @@
  */
 package nz.net.ultraq.thymeleaf.decorators.strategies;
 
-import java.util.List;
-import java.util.ListIterator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
-import org.thymeleaf.dom.Node;
+import org.thymeleaf.model.IModel;
 
 /**
  * The standard {@code <head>} merging strategy, which simply appends the
@@ -30,26 +28,14 @@ import org.thymeleaf.dom.Node;
 public class AppendingStrategy implements SortingStrategy {
 
     /**
-     * Returns a value to append the content node to the end of the decorator
-     * nodes.
+     * Returns the position at the end of the {@code <head>} section.
      *
-     * @param decoratorNodes
-     * @param contentNode
-     * @return The size of the decorator nodes list.
+     * @param headModel
+     * @return The end of the head model.
      */
     @Override
-    public int findPositionForContent(List<Node> decoratorNodes, Node contentNode) {
-        if (MetaClass.isWhitespaceNode(contentNode)) {
-            return -1;
-        }
-        ListIterator<Node> it = decoratorNodes.listIterator(decoratorNodes.size());
-
-        while (it.hasPrevious()) {
-            if (!MetaClass.isWhitespaceNode(it.previous())) {
-                return it.nextIndex() + 1;
-            }
-        }
-        return 0;
+    public int findPositionForModel(IModel headModel, IModel childModel) {
+        return !MetaClass.isWhitespace(childModel) ? headModel.size() - 2 : -1;
     }
 
 }

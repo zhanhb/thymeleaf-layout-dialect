@@ -1,12 +1,12 @@
-/* 
- * Copyright 2012, Emanuel Rabina (http://www.ultraq.net.nz/)
- * 
+/*
+ * Copyright 2016, Emanuel Rabina (http://www.ultraq.net.nz/)
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,95 +15,60 @@
  */
 package nz.net.ultraq.thymeleaf.decorators;
 
-import java.util.Map;
-import nz.net.ultraq.thymeleaf.decorators.html.HtmlDocumentDecorator;
-import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
-import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
-import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
-import nz.net.ultraq.thymeleaf.fragments.FragmentMapper;
-import org.thymeleaf.Arguments;
-import org.thymeleaf.Template;
-import org.thymeleaf.dom.Document;
-import org.thymeleaf.dom.Element;
-import org.thymeleaf.processor.ProcessorResult;
-import org.thymeleaf.processor.attr.AbstractAttrProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.engine.AttributeName;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.processor.element.IElementModelStructureHandler;
+import org.thymeleaf.templatemode.TemplateMode;
 
 /**
- * Specifies the name of the decorator template to apply to a content template.
- * <p>
- * The mechanism for resolving decorator templates is the same as that used by
- * Thymeleaf to resolve pages in the <tt>th:fragment</tt> and
- * <tt>th:include</tt> processors.
+ * An alias of the {@link DecoratorProcessor} to warn people that the
+ * {@code layout:decorator}/{@code data-layout-decorator} processor has been
+ * renamed.
  *
  * @author Emanuel Rabina
  */
-public class DecoratorProcessor extends AbstractAttrProcessor {
+@Deprecated
+public class DecoratorProcessor extends DecorateProcessor {
 
-    public static final String PROCESSOR_NAME_DECORATOR = "decorator";
+    private static final Logger logger = LoggerFactory.getLogger(DecoratorProcessor.class);
 
-    private final SortingStrategy sortingStrategy;
+    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
+    public static final String PROCESSOR_NAME = "decorator";
 
     /**
-     * Constructor, configure this processor to work on the 'decorator'
+     * Constructor, configure this processor to work on the old 'decorator'
      * attribute and to use the given sorting strategy.
      *
+     * @param templateMode
+     * @param dialectPrefix
      * @param sortingStrategy
      */
-    public DecoratorProcessor(SortingStrategy sortingStrategy) {
-        super(PROCESSOR_NAME_DECORATOR);
-        this.sortingStrategy = sortingStrategy;
+    public DecoratorProcessor(TemplateMode templateMode, String dialectPrefix, SortingStrategy sortingStrategy) {
+        super(templateMode, dialectPrefix, sortingStrategy, PROCESSOR_NAME);
     }
 
     /**
-     * Locates the decorator page specified by the layout attribute and applies
-     * it to the current page being processed.
+     * Logs a deprecation warning before delegating to the decorate processor.
      *
-     * @param arguments
-     * @param element
+     * @param context
+     * @param model
      * @param attributeName
-     * @return Result of the processing.
+     * @param attributeValue
+     * @param structureHandler
      */
     @Override
-    protected ProcessorResult processAttribute(Arguments arguments, Element element, String attributeName) {
+    protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
+            String attributeValue, IElementModelStructureHandler structureHandler) {
+        logger.warn(
+                "The layout:decorator/data-layout-decorator processor has been deprecated and will be removed in the next major version of the layout dialect.  "
+                + "Please use layout:decorate/data-layout-decorate instead to future-proof your code.  "
+                + "See https://github.com/ultraq/thymeleaf-layout-dialect/issues/95 for more information."
+        );
 
-        // Ensure the decorator attribute is in the root element of the document
-        // NOTE: The NekoHTML parser adds <html> and <body> elements to template
-        //       fragments that don't already have them, potentially failing
-        //       this restriction.  For now I'll relax it for the LEGACYHTML5
-        //       template mode, but developers should be aware that putting the
-        //       layout:decorator attribute anywhere but the root element can
-        //       lead to unexpected results.
-        if (!(element.getParent() instanceof Document)
-                && !"LEGACYHTML5".equals(arguments.getTemplateResolution().getTemplateMode())) {
-            throw new IllegalArgumentException("layout:decorator attribute must appear in the root element of your content page");
-        }
-
-        Document document = arguments.getDocument();
-
-        // Locate the decorator page
-        Template decoratorTemplate = new FragmentFinder(arguments)
-                .findFragmentTemplate(element.getAttributeValue(attributeName));
-        element.removeAttribute(attributeName);
-
-        // Gather all fragment parts from this page to apply to the new document
-        // after decoration has taken place
-        Map<String, Element> pageFragments = new FragmentMapper().map(document.getElementChildren());
-
-        // Decide which kind of decorator to use, then apply it
-        Element decoratorRootElement = decoratorTemplate.getDocument().getFirstElementChild();
-        XmlDocumentDecorator decorator = decoratorRootElement != null && "html".equals(decoratorRootElement.getOriginalName())
-                ? new HtmlDocumentDecorator(sortingStrategy)
-                : new XmlDocumentDecorator();
-        decorator.decorate(decoratorRootElement, document.getFirstElementChild());
-
-        FragmentMap.updateForNode(arguments, document.getFirstElementChild(), pageFragments);
-
-        return ProcessorResult.OK;
-    }
-
-    @Override
-    public int getPrecedence() {
-        return 0;
+        super.doProcess(context, model, attributeName, attributeValue, structureHandler);
     }
 
 }

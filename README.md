@@ -2,17 +2,18 @@
 Thymeleaf Layout Dialect
 ========================
 
-[![Build Status](https://travis-ci.org/zhanhb/thymeleaf-layout-dialect.svg?branch=master)](https://travis-ci.org/zhanhb/thymeleaf-layout-dialect)
+[![Build Status](https://travis-ci.org/zhanhb/thymeleaf-layout-dialect.svg?branch=thymeleaf-3.0)](https://travis-ci.org/zhanhb/thymeleaf-layout-dialect)
+[![Code Coverage](https://img.shields.io/codecov/c/github/zhanhb/thymeleaf-layout-dialect/thymeleaf-3.0.svg?maxAge=3600)](https://codecov.io/gh/zhanhb/thymeleaf-layout-dialect/branch/thymeleaf-3.0)
 [![GitHub Release](https://img.shields.io/github/release/zhanhb/thymeleaf-layout-dialect.svg?maxAge=3600)](https://github.com/zhanhb/thymeleaf-layout-dialect/releases/latest)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.zhanhb/thymeleaf-layout-dialect.svg?maxAge=3600)](http://search.maven.org/#search|ga|1|g%3A%22com.github.zhanhb%22%20AND%20a%3A%22thymeleaf-layout-dialect%22)
-[![License](https://img.shields.io/github/license/zhanhb/thymeleaf-layout-dialect.svg?maxAge=2592000)](https://github.com/zhanhb/thymeleaf-layout-dialect/blob/master/LICENSE.txt)
+[![License](https://img.shields.io/github/license/zhanhb/thymeleaf-layout-dialect.svg?maxAge=3600)](https://github.com/ultraq/thymeleaf-layout-dialect/blob/master/LICENSE.txt)
 
 Thymeleaf Layout Dialect rewriten in java.
 
 Installation
 ------------
 
-Minimum of Java 8 and Thymeleaf 2.1 required.
+Minimum of Java 7 and Thymeleaf 3.0 required.
 
 ### Standalone distribution
 Copy the JAR from [one of the release bundles](https://github.com/zhanhb/thymeleaf-layout-dialect/releases),
@@ -31,4 +32,3 @@ Usage, Examples and Other documents
 -----
 The package names keep the same as orignal.
 Please visit https://github.com/ultraq/thymeleaf-layout-dialect for details.
-

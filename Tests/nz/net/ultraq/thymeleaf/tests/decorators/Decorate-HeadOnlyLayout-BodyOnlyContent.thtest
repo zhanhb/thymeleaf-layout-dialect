@@ -1,0 +1,39 @@
+
+# Test decoration of a page with body content only, using a head-only layout.
+
+%TEMPLATE_MODE HTML
+
+
+%INPUT
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="Layout">
+<body>
+	<div layout:fragment="content">
+		<p>This is a paragraph from the content page</p>
+	</div>
+</body>
+</html>
+
+
+%INPUT[Layout]
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+	<title>Layout page</title>
+</head>
+</html>
+
+
+%OUTPUT
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Layout page</title>
+</head>
+<body>
+	<div>
+		<p>This is a paragraph from the content page</p>
+	</div>
+</body>
+</html>

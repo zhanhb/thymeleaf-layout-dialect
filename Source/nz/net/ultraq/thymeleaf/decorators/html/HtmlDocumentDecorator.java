@@ -17,14 +17,19 @@ package nz.net.ultraq.thymeleaf.decorators.html;
 
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
+import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
-import org.thymeleaf.dom.Document;
-import org.thymeleaf.dom.Element;
+import nz.net.ultraq.thymeleaf.internal.MetaProvider;
+import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.model.ICloseElementTag;
+import org.thymeleaf.model.IElementTag;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IOpenElementTag;
 
 /**
- * A decorator made to work over whole HTML pages. Decoration will be done in 2
- * phases: a special one for the HEAD element, and a generic one for the BODY
- * element.
+ * A decorator made to work over an HTML document. Decoration for a document
+ * involves 2 sub-decorators: a special one of the {@code <head>} element, and a
+ * standard one for the {@code <body>} element.
  *
  * @author Emanuel Rabina
  */
@@ -32,30 +37,64 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
 
     private final SortingStrategy sortingStrategy;
 
-    public HtmlDocumentDecorator(SortingStrategy sortingStrategy) {
+    /**
+     * Constructor, apply the given sorting strategy to the decorator.
+     *
+     * @param context
+     * @param sortingStrategy
+     */
+    public HtmlDocumentDecorator(ITemplateContext context, SortingStrategy sortingStrategy) {
+        super(context);
         this.sortingStrategy = sortingStrategy;
     }
 
     /**
      * Decorate an entire HTML page.
      *
-     * @param decoratorHtml Decorator's HTML element.
-     * @param contentHtml	Content's HTML element.
+     * @param targetDocumentModel
+     * @param sourceDocumentModel
+     * @return Result of the decoration.
      */
     @Override
-    public void decorate(Element decoratorHtml, Element contentHtml) {
-
-        new HtmlHeadDecorator(sortingStrategy).decorate(decoratorHtml, MetaClass.findElement(contentHtml, "head"));
-        new HtmlBodyDecorator().decorate(decoratorHtml, MetaClass.findElement(contentHtml, "body"));
-
-        // Set the doctype from the decorator if missing from the content page
-        Document decoratorDocument = (Document) decoratorHtml.getParent();
-        Document contentDocument = (Document) contentHtml.getParent();
-        if (contentDocument.getDocType() == null && decoratorDocument.getDocType() != null) {
-            contentDocument.setDocType(decoratorDocument.getDocType());
+    public IModel decorate(IModel targetDocumentModel, IModel sourceDocumentModel) {
+        // Head decoration
+        ITemplateEventPredicate headModelFinder = event -> {
+            return event instanceof IOpenElementTag && "head".equals(((IElementTag) event).getElementCompleteName());
+        };
+        IModel targetHeadModel = MetaClass.findModel(targetDocumentModel, headModelFinder);
+        IModel resultHeadModel = new HtmlHeadDecorator(context, sortingStrategy).decorate(targetHeadModel,
+                MetaClass.findModel(sourceDocumentModel, headModelFinder)
+        );
+        if (MetaClass.asBoolean(resultHeadModel)) {
+            if (MetaClass.asBoolean(targetHeadModel)) {
+                MetaClass.replaceModel(targetDocumentModel, MetaProvider.INSTANCE.getProperty(targetHeadModel, "startIndex"), resultHeadModel);
+            } else {
+                MetaClass.insertModelWithWhitespace(targetDocumentModel, (Integer) MetaProvider.INSTANCE.getProperty(MetaClass.find(targetDocumentModel, event -> {
+                    return (event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName()))
+                            || (event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName()));
+                }), "index") - 1, resultHeadModel);
+            }
         }
 
-        super.decorate(decoratorHtml, contentHtml);
+        // Body decoration
+        ITemplateEventPredicate bodyModelFinder = event -> {
+            return event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName());
+        };
+        IModel targetBodyModel = MetaClass.findModel(targetDocumentModel, bodyModelFinder);
+        IModel resultBodyModel = new HtmlBodyDecorator(context.getModelFactory()).decorate(targetBodyModel,
+                MetaClass.findModel(sourceDocumentModel, bodyModelFinder)
+        );
+        if (MetaClass.asBoolean(resultBodyModel)) {
+            if (MetaClass.asBoolean(targetBodyModel)) {
+                MetaClass.replaceModel(targetDocumentModel, MetaProvider.INSTANCE.getProperty(targetBodyModel, "startIndex"), resultBodyModel);
+            } else {
+                MetaClass.insertModelWithWhitespace(targetDocumentModel, (Integer) MetaProvider.INSTANCE.getProperty(MetaClass.find(targetDocumentModel, event -> {
+                    return event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName());
+                }), "index") - 1, resultBodyModel);
+            }
+        }
+
+        return super.decorate(targetDocumentModel, sourceDocumentModel);
     }
 
 }

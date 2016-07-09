@@ -3,11 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.zhanhb</groupId>
     <artifactId>thymeleaf-layout-dialect</artifactId>
-    <version>1.4.1-BUILD-SNAPSHOT</version>
+    <version>2.0.0-BUILD-SNAPSHOT</version>
     <name>Thymeleaf Layout Dialect</name>
-    <description>A dialect for Thymeleaf that allows you to use layout/decorator templates to style your content.</description>
+    <description>Thymeleaf Layout Dialect rewritten in java.</description>
     <url>https://github.com/zhanhb/thymeleaf-layout-dialect</url>
-    <inceptionYear>2012</inceptionYear>
+    <inceptionYear>2016</inceptionYear>
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -57,6 +58,7 @@
             </properties>
         </contributor>
     </contributors>
+
     <scm>
         <connection>scm:git:git@github.com:zhanhb/thymeleaf-layout-dialect.git</connection>
         <developerConnection>scm:git:git@github.com:zhanhb/thymeleaf-layout-dialect.git</developerConnection>
@@ -75,55 +77,78 @@
         </snapshotRepository>
     </distributionManagement>
     <properties>
-        <java.version>1.6</java.version>
+        <argLine>-Dfile.encoding=${file.encoding} -ea</argLine>
+        <groovy.version>2.4.7</groovy.version>
+        <java.version>1.8</java.version>
+        <javassist.version>3.20.0-GA</javassist.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
+        <nekohtml.version>1.9.22</nekohtml.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <slf4j.version>1.7.21</slf4j.version>
+        <thymeleaf.version>3.0.0.RELEASE</thymeleaf.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>${javassist.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>3.0.1</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.nekohtml</groupId>
             <artifactId>nekohtml</artifactId>
-            <version>1.9.21</version>
+            <version>${nekohtml.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>nz.net.ultraq.thymeleaf</groupId>
             <artifactId>thymeleaf-testing-junit</artifactId>
-            <version>1.1.1</version>
+            <version>2.0.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
-            <version>2.4.3</version>
+            <version>${groovy.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.8</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.7.12</version>
+            <version>${slf4j.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf</artifactId>
-            <version>2.1.4.RELEASE</version>
-            <scope>compile</scope>
+            <version>${thymeleaf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf-testing</artifactId>
-            <version>2.1.4.RELEASE</version>
+            <version>${thymeleaf.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
+
     <build>
         <sourceDirectory>${project.basedir}/Source</sourceDirectory>
         <testSourceDirectory>${project.basedir}/Tests</testSourceDirectory>
@@ -169,6 +194,19 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>net.orfjackal.retrolambda</groupId>
+                <artifactId>retrolambda-maven-plugin</artifactId>
+                <version>2.3.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>process-main</goal>
+                            <goal>process-test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.5.1</version>
@@ -184,8 +222,21 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
+                <version>2.10.4</version>
                 <configuration>
                     <additionalJOption>-J-Dfile.encoding=${file.encoding}</additionalJOption>
                     <excludePackageNames>*.internal.*</excludePackageNames>
@@ -197,16 +248,21 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.18.1</version>
                 <configuration>
-                    <argLine>-Dfile.encoding=${file.encoding}</argLine>
                     <includes>
-                        <include>**/*Test*.class</include>
+                        <include>**/*Test.class</include>
+                        <include>**/*Tests.class</include>
+                        <include>**/*Executor.class</include>
+                        <include>**/*ExecutorGrouping.class</include>
                     </includes>
+                    <excludes>
+                        <exclude>**/Abstract*.class</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.18.1</version>
+                <version>2.19.1</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
@@ -215,20 +271,57 @@
                 <executions>
                     <execution>
                         <goals>
+                            <goal>addSources</goal>
+                            <goal>addStubSources</goal>
+                            <goal>compile</goal>
                             <goal>addTestSources</goal>
+                            <goal>addTestStubSources</goal>
                             <goal>testCompile</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
+                    <sources>
+                        <source>
+                            <directory>${project.build.sourceDirectory}</directory>
+                            <includes>
+                                <include>**/*.groovy</include>
+                            </includes>
+                        </source>
+                    </sources>
                     <testSources>
                         <testSource>
-                            <directory>${project.basedir}/Tests</directory>
+                            <directory>${project.build.testSourceDirectory}</directory>
                             <includes>
                                 <include>**/*.groovy</include>
                             </includes>
                         </testSource>
                     </testSources>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.7.7.201606060606</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>**/extensions/*Extensions.class</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
         </plugins>

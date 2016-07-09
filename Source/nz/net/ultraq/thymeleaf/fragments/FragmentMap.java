@@ -1,12 +1,12 @@
 /*
  * Copyright 2015, Emanuel Rabina (http://www.ultraq.net.nz/)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,9 +17,9 @@ package nz.net.ultraq.thymeleaf.fragments;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.thymeleaf.Arguments;
-import org.thymeleaf.dom.Element;
-import org.thymeleaf.dom.Node;
+import org.thymeleaf.context.IContext;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.processor.element.IElementModelStructureHandler;
 
 /**
  * Holds the layout fragments encountered across layout/decorator and content
@@ -28,34 +28,41 @@ import org.thymeleaf.dom.Node;
  * @author Emanuel Rabina
  */
 @SuppressWarnings({"serial", "CloneableImplementsClone"})
-public class FragmentMap extends HashMap<String, Element> {
+public class FragmentMap extends HashMap<String, IModel> {
 
     private static final String FRAGMENT_COLLECTION_KEY = "LayoutDialect::FragmentCollection";
 
     /**
-     * Retrieve the fragment collection specific to the given context. If none
-     * exists, a new collection is created, applied to the context, and
-     * returned.
+     * Retrieves either the fragment map for the current context, or a new
+     * fragment map.
      *
-     * @param arguments
+     * @param context
      * @return A new or existing fragment collection for the context.
      */
-    public static FragmentMap get(Arguments arguments) {
-        Object localVariable = arguments.getLocalVariable(FRAGMENT_COLLECTION_KEY);
-        return localVariable != null ? (FragmentMap) localVariable : new FragmentMap();
+    public static FragmentMap get(IContext context) {
+        Object variable = context.getVariable(FRAGMENT_COLLECTION_KEY);
+        if (variable instanceof FragmentMap) {
+            FragmentMap map = (FragmentMap) variable;
+            if (!map.isEmpty()) {
+                return map;
+            }
+        }
+        return new FragmentMap();
     }
 
     /**
-     * Updates the fragment collection just for the current node.
+     * Set the fragment collection to contain whatever it initially had, plus
+     * the given fragments, just for the scope of the current node.
      *
-     * @param arguments
-     * @param node
+     * @param context
+     * @param structureHandler
      * @param fragments The new fragments to add to the map.
      */
-    public static void updateForNode(Arguments arguments, Node node, Map<String, Element> fragments) {
-        FragmentMap map = get(arguments);
-        map.putAll(fragments);
-        node.setNodeLocalVariable(FRAGMENT_COLLECTION_KEY, map);
+    public static void setForNode(IContext context, IElementModelStructureHandler structureHandler,
+            Map<String, IModel> fragments) {
+        FragmentMap fragmentMap = (FragmentMap) get(context).clone();
+        fragmentMap.putAll(fragments);
+        structureHandler.setLocalVariable(FRAGMENT_COLLECTION_KEY, fragmentMap);
     }
 
 }

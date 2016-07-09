@@ -15,7 +15,7 @@
  */
 package nz.net.ultraq.thymeleaf.decorators;
 
-import org.thymeleaf.dom.Element;
+import org.thymeleaf.model.IModel;
 
 /**
  * The contract for all decorators.
@@ -25,12 +25,13 @@ import org.thymeleaf.dom.Element;
 public interface Decorator {
 
     /**
-     * Apply the contents of the decorator element to the content element.
+     * Decorate the target model with the contents of the source model,
+     * returning a new model that is the result of that decoration.
      *
-     * @param decorator Element from the decorator template to bring in to the
-     * content template which is currently being processed.
-     * @param content	Element from the content template.
+     * @param targetModel The target model to be decorated.
+     * @param sourceModel The source model to use for decorating.
+     * @return A new model that is the result of the decoration process.
      */
-    void decorate(Element decorator, Element content);
+    public IModel decorate(IModel targetModel, IModel sourceModel);
 
 }

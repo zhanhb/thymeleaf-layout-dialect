@@ -16,19 +16,20 @@
 
 package nz.net.ultraq.thymeleaf.tests
 
-import nz.net.ultraq.thymeleaf.LayoutDialect
+import nz.net.ultraq.thymeleaf.tests.LayoutDialect
+import nz.net.ultraq.thymeleaf.decorators.strategies.AppendingStrategy
 import nz.net.ultraq.thymeleaf.testing.JUnitTestExecutor
 
 import org.junit.runners.Parameterized.Parameters
+import org.reflections.Reflections
+import org.reflections.scanners.ResourcesScanner
 import org.thymeleaf.dialect.IDialect
 import org.thymeleaf.standard.StandardDialect
 
-import java.util.regex.Pattern
-
 /**
  * A parameterized JUnit test class that is run over every Thymeleaf testing
- * file (.thtest) in the test directory with the standard <tt>AppendingStrategy</tt>
- * head element sorter.
+ * file (.thtest) in the test directory with the standard
+ * {@link AppendingStrategy} head element sorter.
  * 
  * @author Emanuel Rabina
  */
@@ -40,15 +41,24 @@ class LayoutDialectTestExecutor extends JUnitTestExecutor {
 	]
 
 	/**
-	 * Return all Thymeleaf test files except those involved with testing the
-	 * <tt>GroupingStrategy</tt> {@code <head>} element sorter.
+	 * Return all Thymeleaf test files that use the standard
+	 * {@link AppendingStrategy} head element sorter.
 	 * 
-	 * @return List of almost all Thymeleaf test files.
-	 * @throws URISyntaxException
+	 * @return List of all Thymeleaf test files for the standard head element
+	 *         sorter.
 	 */
 	@Parameters(name = '{0}')
-	static List<String> listStandardLayoutDialectTests() throws URISyntaxException {
+	static List<String> listStandardLayoutDialectTests() {
 
-		return reflections.getResources(Pattern.compile('(?!GroupingStrategy|TitlePattern-DynamicContent).*\\.thtest')) as List
+		def tests = new Reflections('', new ResourcesScanner())
+			.getResources(~/(?!GroupingStrategy|Examples).*\.thtest/) as List
+		def exclusions = [
+			'nz/net/ultraq/thymeleaf/tests/decorators/Decorate-DeepHierarchy.thtest',
+			'nz/net/ultraq/thymeleaf/tests/decorators/html/TitlePattern-AllowOtherProcessors.thtest',
+
+			// Disabled, see test file for details
+			'nz/net/ultraq/thymeleaf/tests/decorators/html/TitlePattern-DynamicContent.thtest'
+		]
+		return tests - exclusions
 	}
 }

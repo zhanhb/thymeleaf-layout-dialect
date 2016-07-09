@@ -1,12 +1,12 @@
 /*
  * Copyright 2013, Emanuel Rabina (http://www.ultraq.net.nz/)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,52 +16,94 @@
 package nz.net.ultraq.thymeleaf.decorators.xml;
 
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
-import nz.net.ultraq.thymeleaf.fragments.mergers.ElementMerger;
-import org.thymeleaf.dom.Comment;
-import org.thymeleaf.dom.Element;
-import org.thymeleaf.dom.NestableNode;
-import org.thymeleaf.dom.Node;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import nz.net.ultraq.thymeleaf.models.AttributeMerger;
+import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.model.ICloseElementTag;
+import org.thymeleaf.model.IComment;
+import org.thymeleaf.model.IDocType;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IModelFactory;
+import org.thymeleaf.model.IOpenElementTag;
+import org.thymeleaf.model.ITemplateEvent;
 
 /**
- * A decorator made to work over any Thymeleaf document.
+ * A decorator made to work over an XML document.
  *
  * @author Emanuel Rabina
  */
 public class XmlDocumentDecorator implements Decorator {
 
+    // Find the root element of each document to work with
+    private static IModel rootModelFinder(IModel documentModel) {
+        return MetaClass.findModel(documentModel, documentEvent -> {
+            return documentEvent instanceof IOpenElementTag;
+        });
+    }
+
+    protected final ITemplateContext context;
+
     /**
-     * {@inheritDoc}
+     * Constructor, set up the document decorator context.
+     *
+     * @param context
+     */
+    public XmlDocumentDecorator(ITemplateContext context) {
+        this.context = context;
+    }
+
+    /**
+     * Decorates the target XML document with the source one.
+     *
+     * @param targetDocumentModel
+     * @param sourceDocumentModel
+     * @return Result of the decoration.
      */
     @Override
-    public void decorate(Element decoratorXml, Element contentXml) {
+    public IModel decorate(IModel targetDocumentModel, IModel sourceDocumentModel) {
+        IModelFactory modelFactory = context.getModelFactory();
 
-        NestableNode decoratorDocument = decoratorXml.getParent();
-        NestableNode contentDocument = contentXml.getParent();
+        IModel targetDocumentRootModel = rootModelFinder(targetDocumentModel);
+        IModel sourceDocumentRootModel = rootModelFinder(sourceDocumentModel);
 
-        // Copy text outside of the root element, keeping whitespace copied to a minimum
-        boolean beforeHtml = true;
-        boolean allowNext = false;
-        Node lastNode = contentXml;
-        for (Node externalNode : decoratorDocument.getChildren()) {
-            if (externalNode == decoratorXml) {
-                beforeHtml = false;
-                allowNext = true;
-            } else if (externalNode instanceof Comment || allowNext) {
-                if (beforeHtml) {
-                    contentDocument.insertBefore(contentXml, externalNode);
-                } else {
-                    contentDocument.insertAfter(lastNode, externalNode);
-                    lastNode = externalNode;
+        // Decorate the target document with the source one
+        IModel resultDocumentModel = new AttributeMerger(modelFactory).merge(targetDocumentRootModel, sourceDocumentRootModel);
+
+        // Copy comments outside of the root element, keeping whitespace copied to a minimum
+        for (int i = 0; i < targetDocumentModel.size(); i++) {
+            ITemplateEvent event = targetDocumentModel.get(i);
+            // Only copy doctypes if the source document doesn't already have one
+            if (event instanceof IDocType) {
+                boolean sourceContainsDocType = false;
+                for (int j = 0; j < sourceDocumentModel.size(); j++) {
+                    ITemplateEvent sourceEvent = sourceDocumentModel.get(j);
+                    if (sourceEvent instanceof IDocType) {
+                        sourceContainsDocType = true;
+                        break;
+                    }
+                    if (sourceEvent instanceof IOpenElementTag) {
+                        break;
+                    }
                 }
-                allowNext = externalNode instanceof Comment;
+                if (!sourceContainsDocType) {
+                    MetaClass.insertWithWhitespace(resultDocumentModel, 0, event, modelFactory);
+                }
+            } else if (event instanceof IComment) {
+                MetaClass.insertWithWhitespace(resultDocumentModel, 0, event, modelFactory);
+            } else if (event instanceof IOpenElementTag) {
+                break;
+            }
+        }
+        for (int i = targetDocumentModel.size() - 1; i >= 0; i--) {
+            ITemplateEvent event = targetDocumentModel.get(i);
+            if (event instanceof IComment) {
+                MetaClass.insertWithWhitespace(resultDocumentModel, resultDocumentModel.size(), event, modelFactory);
+            } else if (event instanceof ICloseElementTag) {
+                break;
             }
         }
 
-        String normalizedName = decoratorXml.getNormalizedName();
-        String normalizedName1 = contentXml.getNormalizedName();
-        // Bring the decorator into the content page (which is the one being processed)
-        new ElementMerger(normalizedName == null ? normalizedName1 != null
-                : !normalizedName.equals(normalizedName1)).merge(contentXml, decoratorXml);
+        return resultDocumentModel;
     }
 
 }

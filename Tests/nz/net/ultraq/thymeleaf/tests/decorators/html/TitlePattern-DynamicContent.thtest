@@ -1,0 +1,51 @@
+
+# Test that title patterns can continue to have dynamic content.  Regression in
+# this issue: https://github.com/ultraq/thymeleaf-layout-dialect/issues/64
+
+# TODO: This test is disabled because I haven't decided what I should do for the
+#       error encountered by this, in that the layout:include requests for the
+#       title, but the element is a self-closing one.  The layout:include
+#       processor only fills-in an elements child elements, but a self-closed
+#       one has no children, and I don't think it's safe to force the element
+#       to become an expanded one.  Also, layout:include is deprecated, so I
+#       shouldn't really spend more time on that processor.
+
+%TEMPLATE_MODE HTML
+
+%CONTEXT
+someVar = "dynamic!"
+
+
+%INPUT
+<html data-layout-decorator="Layout">
+<head>
+	<title data-layout-fragment="widget-title"
+		data-th-text="|Do something ${someVar}|">Download link</title>
+</head>
+<body>
+	<section data-layout-fragment="page-content">
+		<h3><span data-layout-include=" :: widget-title"/></h3>
+	</section>
+</body>
+</html>
+
+
+%INPUT[Layout]
+<html>
+<body>
+	<section data-layout-fragment="page-content"></section>
+</body>
+</html>
+
+
+%OUTPUT
+<html>
+<head>
+	<title>Do something dynamic!</title>
+</head>
+<body>
+	<section>
+		<h3><span>Do something dynamic!</span></h3>
+	</section>
+</body>
+</html>

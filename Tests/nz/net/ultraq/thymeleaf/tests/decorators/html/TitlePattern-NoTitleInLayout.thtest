@@ -1,0 +1,31 @@
+
+# Test the behaviour when there's no decorator title.
+
+%TEMPLATE_MODE HTML
+
+
+%INPUT
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="Layout">
+<head>
+	<title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">Content title</title>
+</head>
+</html>
+
+
+%INPUT[Layout]
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+</html>
+
+
+%OUTPUT
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Content title</title>
+</head>
+</html>

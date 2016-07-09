@@ -15,43 +15,45 @@
  */
 package nz.net.ultraq.thymeleaf.decorators.html;
 
-import nz.net.ultraq.thymeleaf.decorators.xml.XmlElementDecorator;
+import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
-import org.thymeleaf.dom.Element;
-import org.thymeleaf.dom.Text;
+import nz.net.ultraq.thymeleaf.models.AttributeMerger;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IModelFactory;
 
 /**
- * A decorator specific to processing an HTML BODY element.
+ * A decorator specific to processing an HTML {@code <body>} element.
  *
  * @author Emanuel Rabina
  */
-public class HtmlBodyDecorator extends XmlElementDecorator {
+public class HtmlBodyDecorator implements Decorator {
+
+    private final IModelFactory modelFactory;
 
     /**
-     * Decorate the BODY part. This step merges the decorator and content BODY
-     * attributes, ensuring only that a BODY element actually exists in the
-     * result. The bulk of the body decoration is actually performed by the
-     * fragment replacements.
+     * Constructor, sets up the element decorator context.
      *
-     * @param decoratorHtml Decorator's HTML element.
-     * @param contentBody	Content's BODY element.
+     * @param modelFactory
+     */
+    public HtmlBodyDecorator(IModelFactory modelFactory) {
+        this.modelFactory = modelFactory;
+    }
+
+    /**
+     * Decorate the {@code <body>} part.
+     *
+     * @param targetBodyModel
+     * @param sourceBodyModel
+     * @return Result of the decoration.
      */
     @Override
-    public void decorate(Element decoratorHtml, Element contentBody) {
-        // If the page has no BODY, then we don't need to do anything
-        if (contentBody == null) {
-            return;
+    public IModel decorate(IModel targetBodyModel, IModel sourceBodyModel) {
+        // If one of the parameters is missing return a copy of the other, or
+        // nothing if both parameters are missing.
+        if (!MetaClass.asBoolean(targetBodyModel) || !MetaClass.asBoolean(sourceBodyModel)) {
+            return MetaClass.asBoolean(targetBodyModel) ? targetBodyModel.cloneModel() : MetaClass.asBoolean(sourceBodyModel) ? sourceBodyModel.cloneModel() : null;
         }
-
-        // If the decorator has no BODY, we can just copy the page BODY
-        Element decoratorBody = MetaClass.findElement(decoratorHtml, "body");
-        if (decoratorBody == null) {
-            decoratorHtml.addChild(contentBody);
-            decoratorHtml.addChild(new Text(System.getProperty("line.separator")));
-            return;
-        }
-
-        super.decorate(decoratorBody, contentBody);
+        return new AttributeMerger(modelFactory).merge(targetBodyModel, sourceBodyModel);
     }
 
 }

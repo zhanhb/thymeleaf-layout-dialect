@@ -1,0 +1,15 @@
+
+# Test that the decorator processor must appear in the root element only.
+
+%TEMPLATE_MODE HTML
+
+%INPUT
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	<body layout:decorate="Layout">
+	</body>
+</html>
+
+%EXCEPTION java.lang.IllegalArgumentException
+%EXCEPTION_MESSAGE_PATTERN layout:decorate/data-layout-decorate must appear in the root element of your template

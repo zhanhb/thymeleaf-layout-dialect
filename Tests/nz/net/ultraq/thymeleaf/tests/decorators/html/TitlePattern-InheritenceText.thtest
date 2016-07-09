@@ -1,0 +1,32 @@
+
+# Test the use of th:text in the title tag of a page decorated with a layout.
+
+%TEMPLATE_MODE HTML
+
+
+%INPUT
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="Layout">
+<head>
+	<title th:text="'Content title'">Placeholder title</title>
+</head>
+</html>
+
+
+%INPUT[Layout]
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Layout title</title>
+</head>
+</html>
+
+
+%OUTPUT
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Content title</title>
+</head>
+</html>

@@ -15,64 +15,62 @@
  */
 package nz.net.ultraq.thymeleaf.fragments;
 
-import java.util.List;
-import org.thymeleaf.Arguments;
-import org.thymeleaf.Template;
-import org.thymeleaf.TemplateProcessingParameters;
-import org.thymeleaf.dom.Node;
-import org.thymeleaf.standard.fragment.StandardFragment;
-import org.thymeleaf.standard.fragment.StandardFragmentProcessor;
-
-import static nz.net.ultraq.thymeleaf.LayoutDialect.DIALECT_PREFIX_LAYOUT;
-import static nz.net.ultraq.thymeleaf.fragments.FragmentProcessor.PROCESSOR_NAME_FRAGMENT;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IOpenElementTag;
+import org.thymeleaf.model.IProcessableElementTag;
+import org.thymeleaf.model.ITemplateEvent;
+import org.thymeleaf.util.StringUtils;
 
 /**
- * Hides all the scaffolding business required to find a fragment or fragment
- * template.
+ * Searches for and returns layout dialect fragments within a given
+ * scope/element.
  *
  * @author Emanuel Rabina
  */
 public class FragmentFinder {
 
-    private final Arguments arguments;
+    private final String dialectPrefix;
 
-    public FragmentFinder(Arguments arguments) {
-        this.arguments = arguments;
+    /**
+     * Constructor, create a new fragment finder using an existing model finder.
+     *
+     * @param dialectPrefix
+     */
+    public FragmentFinder(String dialectPrefix) {
+        this.dialectPrefix = dialectPrefix;
     }
 
     /**
-     * Computes the fragment for the given fragment spec, returning the
-     * Thymeleaf fragment object representing a fragment.
+     * Find and return models for layout dialect fragments within the scope of
+     * the given model, without delving into {@code layout:include} or
+     * {@code layout:replace} elements, mapped by the name of each fragment.
      *
-     * @param fragmentSpec
-     * @return Thymeleaf fragment object.
+     * @param model Model whose events are to be searched.
+     * @return Map of fragment names and their elements.
      */
-    private StandardFragment computeFragment(String fragmentSpec) {
-        return StandardFragmentProcessor.computeStandardFragmentSpec(
-                arguments.getConfiguration(), arguments, fragmentSpec,
-                DIALECT_PREFIX_LAYOUT, PROCESSOR_NAME_FRAGMENT);
-    }
+    public Map<String, IModel> findFragments(IModel model) {
+        Map<String, IModel> fragments = new LinkedHashMap<>();
 
-    /**
-     * Returns the fragment(s) specified by the given fragment spec string.
-     *
-     * @param fragmentSpec
-     * @return List of fragment nodes matching the fragment specification.
-     */
-    public List<Node> findFragments(String fragmentSpec) {
-        return computeFragment(fragmentSpec).extractFragment(
-                arguments.getConfiguration(), arguments, arguments.getTemplateRepository());
-    }
+        // TODO: Don't go into layout:include/replace/insert elements
+        int eventIndex = 0;
+        while (eventIndex < model.size()) {
+            ITemplateEvent event = model.get(eventIndex);
+            if (event instanceof IOpenElementTag) {
+                String fragmentName = ((IProcessableElementTag) event).getAttributeValue(dialectPrefix, FragmentProcessor.PROCESSOR_NAME);
+                if (!StringUtils.isEmpty(fragmentName)) {
+                    IModel fragment = MetaClass.getModel(model, eventIndex);
+                    fragments.put(fragmentName, fragment);
+                    eventIndex += fragment.size();
+                    continue;
+                }
+            }
+            eventIndex++;
+        }
 
-    /**
-     * Return the template specified by the given fragment spec string.
-     *
-     * @param fragmentSpec
-     * @return Template matching the fragment specification.
-     */
-    public Template findFragmentTemplate(String fragmentSpec) {
-        return arguments.getTemplateRepository().getTemplate(new TemplateProcessingParameters(
-                arguments.getConfiguration(), computeFragment(fragmentSpec).getTemplateName(), arguments.getContext()));
+        return fragments;
     }
 
 }

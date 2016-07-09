@@ -15,69 +15,71 @@
  */
 package nz.net.ultraq.thymeleaf.fragments;
 
-import nz.net.ultraq.thymeleaf.fragments.mergers.ElementMerger;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import nz.net.ultraq.thymeleaf.models.ElementMerger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.thymeleaf.Arguments;
-import org.thymeleaf.dom.Element;
-import org.thymeleaf.processor.ProcessorResult;
-import org.thymeleaf.processor.attr.AbstractAttrProcessor;
+import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.engine.AttributeName;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IProcessableElementTag;
+import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
+import org.thymeleaf.processor.element.IElementModelStructureHandler;
+import org.thymeleaf.templatemode.TemplateMode;
 
 /**
- * Marks sections of the template that can be replaced by sections in the
- * content template (if decorating) or passed along to included pages (if
- * including), which share the same name.
+ * This processor serves a dual purpose: to mark sections of the template that
+ * can be replaced, and to do the replacing when they're encountered.
  *
  * @author Emanuel Rabina
  */
-public class FragmentProcessor extends AbstractAttrProcessor {
+public class FragmentProcessor extends AbstractAttributeModelProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(FragmentProcessor.class);
 
-    public static final String PROCESSOR_NAME_FRAGMENT = "fragment";
+    public static final String PROCESSOR_NAME = "fragment";
+    public static final int PROCESSOR_PRECEDENCE = 1;
 
     /**
      * Constructor, sets this processor to work on the 'fragment' attribute.
+     *
+     * @param templateMode
+     * @param dialectPrefix
      */
-    public FragmentProcessor() {
-        super(PROCESSOR_NAME_FRAGMENT);
+    public FragmentProcessor(TemplateMode templateMode, String dialectPrefix) {
+        super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);
     }
 
     /**
      * Includes or replaces the content of fragments into the corresponding
      * fragment placeholder.
      *
-     * @param arguments
-     * @param element
+     * @param context
+     * @param model
      * @param attributeName
-     * @return Processing result
+     * @param attributeValue
+     * @param structureHandler
      */
     @Override
-    protected ProcessorResult processAttribute(Arguments arguments, Element element, String attributeName) {
-
-        // Emit a warning if found in the <title> element
-        if ("title".equals(element.getOriginalName())) {
-            logger.warn("You don't need to put the layout:fragment attribute into the <title> element - "
-                    + "the decoration process will automatically override the <title> with the one in "
-                    + "your content page, if present.");
+    protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
+            String attributeValue, IElementModelStructureHandler structureHandler) {
+        // Emit a warning if found in the <head> section
+        if (getTemplateMode() == TemplateMode.HTML) {
+            for (IProcessableElementTag element : context.getElementStack()) {
+                if ("head".equals(element.getElementCompleteName())) {
+                    logger.warn("You don't need to put the layout:fragment/data-layout-fragment attribute into the <head> section - "
+                            + "the decoration process will automatically copy the <head> section of your content templates into your layout page.");
+                    break;
+                }
+            }
         }
 
-        // Locate the page fragment that corresponds to this decorator/include fragment
-        String fragmentName = element.getAttributeValue(attributeName);
-        Element fragment = FragmentMap.get(arguments).get(fragmentName);
-        element.removeAttribute(attributeName);
-
-        // Replace the decorator/include fragment with the page fragment
-        if (fragment != null) {
-            new ElementMerger().merge(element, fragment);
+        // Locate the fragment that corresponds to this decorator/include fragment
+        IModel fragment = FragmentMap.get(context).get(attributeValue);
+        // Replace this model with the fragment
+        if (MetaClass.asBoolean(fragment)) {
+            MetaClass.replaceModel(model, 0, new ElementMerger(context.getModelFactory()).merge(model, fragment));
         }
-
-        return ProcessorResult.OK;
-    }
-
-    @Override
-    public int getPrecedence() {
-        return 1;
     }
 
 }
