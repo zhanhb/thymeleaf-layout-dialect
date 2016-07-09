@@ -16,7 +16,6 @@
 package nz.net.ultraq.thymeleaf.context;
 
 import java.util.HashMap;
-import lombok.SneakyThrows;
 import org.thymeleaf.context.IContext;
 
 /**
@@ -36,7 +35,6 @@ public class LayoutContext extends HashMap<String, Object> {
      * @param context
      * @return The existing layout dialect context, or `null` if none exists.
      */
-    @SneakyThrows
     public static LayoutContext forContext(IContext context) {
         Object dialectContext = context.getVariable(CONTEXT_KEY);
 
@@ -47,7 +45,7 @@ public class LayoutContext extends HashMap<String, Object> {
             return (LayoutContext) dialectContext;
         } catch (ClassCastException ex) {
             // see https://github.com/ultraq/thymeleaf-layout-dialect/commit/4f170e090a5ff5967ed8fa8c5240ec48914233bd
-            throw new Exception(
+            throw new IllegalStateException(
                     "Name collision on the Thymeleaf processing context.  "
                     + "An object with the key \"layout\" already exists, but is needs to be free for the Layout Dialect to work."
             );

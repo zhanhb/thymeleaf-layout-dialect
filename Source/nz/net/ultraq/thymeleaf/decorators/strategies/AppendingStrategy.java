@@ -35,7 +35,7 @@ public class AppendingStrategy implements SortingStrategy {
      */
     @Override
     public int findPositionForModel(IModel headModel, IModel childModel) {
-        return !MetaClass.isWhitespace(childModel) ? headModel.size() - 2 : -1;
+        return MetaClass.isWhitespace(childModel) ? -1 : headModel.size() - 2;
     }
 
 }

@@ -66,7 +66,7 @@ public class HtmlTitleDecorator implements Decorator {
         return null;
     }
 
-    private ITemplateContext context;
+    private final ITemplateContext context;
 
     /**
      * Constructor, sets up the decorator context.

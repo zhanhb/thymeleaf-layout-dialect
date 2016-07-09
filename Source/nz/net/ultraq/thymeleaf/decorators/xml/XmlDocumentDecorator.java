@@ -40,7 +40,20 @@ public class XmlDocumentDecorator implements Decorator {
             return documentEvent instanceof IOpenElementTag;
         });
     }
-
+    
+    private static boolean documentContainsDocType(IModel document) {
+        for (int i = 0; i < document.size(); i++) {
+            ITemplateEvent event = document.get(i);
+            if (event instanceof IDocType) {
+                return true;
+            }
+            if (event instanceof IOpenElementTag) {
+                break;
+            }
+        }
+        return false;
+    }
+    
     protected final ITemplateContext context;
 
     /**
@@ -62,7 +75,7 @@ public class XmlDocumentDecorator implements Decorator {
     @Override
     public IModel decorate(IModel targetDocumentModel, IModel sourceDocumentModel) {
         IModelFactory modelFactory = context.getModelFactory();
-
+        
         IModel targetDocumentRootModel = rootModelFinder(targetDocumentModel);
         IModel sourceDocumentRootModel = rootModelFinder(sourceDocumentModel);
 
@@ -74,18 +87,7 @@ public class XmlDocumentDecorator implements Decorator {
             ITemplateEvent event = targetDocumentModel.get(i);
             // Only copy doctypes if the source document doesn't already have one
             if (event instanceof IDocType) {
-                boolean sourceContainsDocType = false;
-                for (int j = 0; j < sourceDocumentModel.size(); j++) {
-                    ITemplateEvent sourceEvent = sourceDocumentModel.get(j);
-                    if (sourceEvent instanceof IDocType) {
-                        sourceContainsDocType = true;
-                        break;
-                    }
-                    if (sourceEvent instanceof IOpenElementTag) {
-                        break;
-                    }
-                }
-                if (!sourceContainsDocType) {
+                if (!documentContainsDocType(sourceDocumentModel)) {
                     MetaClass.insertWithWhitespace(resultDocumentModel, 0, event, modelFactory);
                 }
             } else if (event instanceof IComment) {
@@ -102,8 +104,8 @@ public class XmlDocumentDecorator implements Decorator {
                 break;
             }
         }
-
+        
         return resultDocumentModel;
     }
-
+    
 }
