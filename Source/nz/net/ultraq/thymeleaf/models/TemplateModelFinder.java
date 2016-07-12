@@ -81,7 +81,16 @@ public class TemplateModelFinder {
         if (Objects.equals(templateName, "this")) {
             templateName = context.getTemplateData().getTemplate();
         }
-        return findFragment(templateName, String.valueOf(fragmentExpression.getFragmentSelector().execute(context)), dialectPrefix);
+        IStandardExpression fragmentSelector = fragmentExpression.getFragmentSelector();
+        Object execute = null;
+        if (fragmentSelector != null) {
+            execute = fragmentSelector.execute(context);
+        }
+        return findFragment(templateName, execute != null ? execute.toString() : null, dialectPrefix);
+    }
+
+    public TemplateModel findFragment(FragmentExpression fragmentExpression) {
+        return findFragment(fragmentExpression, null);
     }
 
     /**
@@ -95,18 +104,26 @@ public class TemplateModelFinder {
     public TemplateModel findFragment(String templateName, String fragmentName, String dialectPrefix) {
         return find(templateName,
                 // Attoparser fragment selector, picks a fragment with layout:fragment="name"
-                // or starts with layout:fragment="name( or layout:fragment="name (  plus
+                // or starts with layout:fragment="name( or layout:fragment="name ( plus
                 // their data attribute equivalents. See the attoparser API docs for details:
                 // http://www.attoparser.org/apidocs/attoparser/2.0.0.RELEASE/org/attoparser/select/package-summary.html
-                "//["
+                !StringUtils.isEmpty(templateName) && !StringUtils.isEmpty(fragmentName) ? "//["
                 + dialectPrefix + ":fragment='" + fragmentName + "' or "
                 + dialectPrefix + ":fragment^='" + fragmentName + "(' or "
                 + dialectPrefix + ":fragment^='" + fragmentName + " (' or "
                 + "data-" + dialectPrefix + "-fragment='" + fragmentName + "' or "
                 + "data-" + dialectPrefix + "-fragment^='" + fragmentName + "(' or "
                 + "data-" + dialectPrefix + "-fragment^='" + fragmentName + " ('"
-                + "]"
+                + "]" : null
         );
+    }
+
+    public TemplateModel findFragment(String templateName, String fragmentName) {
+        return findFragment(templateName, fragmentName, null);
+    }
+
+    public TemplateModel findFragment(String templateName) {
+        return findFragment(templateName, null, null);
     }
 
     /**

@@ -40,7 +40,7 @@ public class XmlDocumentDecorator implements Decorator {
             return documentEvent instanceof IOpenElementTag;
         });
     }
-    
+
     private static boolean documentContainsDocType(IModel document) {
         for (int i = 0; i < document.size(); i++) {
             ITemplateEvent event = document.get(i);
@@ -53,7 +53,7 @@ public class XmlDocumentDecorator implements Decorator {
         }
         return false;
     }
-    
+
     protected final ITemplateContext context;
 
     /**
@@ -75,7 +75,7 @@ public class XmlDocumentDecorator implements Decorator {
     @Override
     public IModel decorate(IModel targetDocumentModel, IModel sourceDocumentModel) {
         IModelFactory modelFactory = context.getModelFactory();
-        
+
         IModel targetDocumentRootModel = rootModelFinder(targetDocumentModel);
         IModel sourceDocumentRootModel = rootModelFinder(sourceDocumentModel);
 
@@ -104,8 +104,8 @@ public class XmlDocumentDecorator implements Decorator {
                 break;
             }
         }
-        
+
         return resultDocumentModel;
     }
-    
+
 }
