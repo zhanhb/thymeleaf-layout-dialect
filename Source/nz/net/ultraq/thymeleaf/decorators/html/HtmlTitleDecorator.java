@@ -19,7 +19,6 @@ import java.util.LinkedHashMap;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor;
-import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.internal.ModelBuilder;
 import nz.net.ultraq.thymeleaf.models.ElementMerger;
 import org.thymeleaf.context.ITemplateContext;
@@ -38,20 +37,21 @@ import org.unbescape.html.HtmlEscape;
  *
  * @author Emanuel Rabina
  */
+@lombok.experimental.ExtensionMethod(nz.net.ultraq.thymeleaf.internal.MetaClass.class)
 public class HtmlTitleDecorator implements Decorator {
 
     // Get the title pattern to use
     private static IAttribute titlePatternProcessorRetriever(IModel titleModel) {
-        if (!MetaClass.asBoolean(titleModel)) {
+        if (!titleModel.asBoolean()) {
             return null;
         }
-        IProcessableElementTag event = (IProcessableElementTag) MetaClass.first(titleModel);
+        IProcessableElementTag event = (IProcessableElementTag) titleModel.first();
         return event != null ? event.getAttribute(LayoutDialect.DIALECT_PREFIX, TitlePatternProcessor.PROCESSOR_NAME) : null;
     }
 
     private static String titleValueRetriever(IModel titleModel) {
-        if (MetaClass.asBoolean(titleModel)) {
-            IProcessableElementTag event = (IProcessableElementTag) MetaClass.first(titleModel);
+        if (titleModel.asBoolean()) {
+            IProcessableElementTag event = (IProcessableElementTag) titleModel.first();
             String result = null;
             if (event != null) {
                 result = event.getAttributeValue(StandardDialect.PREFIX, StandardTextTagProcessor.ATTR_NAME);

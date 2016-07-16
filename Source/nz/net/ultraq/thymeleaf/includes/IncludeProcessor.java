@@ -23,7 +23,6 @@ import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
 import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
 import nz.net.ultraq.thymeleaf.fragments.FragmentParameterNamesExtractor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
-import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +49,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  * @deprecated Use {@link InsertProcessor} ({@code layout:insert}) instead.
  */
 @Deprecated
+@lombok.experimental.ExtensionMethod(nz.net.ultraq.thymeleaf.internal.MetaClass.class)
 public class IncludeProcessor extends AbstractAttributeModelProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(IncludeProcessor.class);
@@ -98,18 +98,18 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
 
         // Replace the children of this element with the children of the included page fragment
         IModel fragmentForInclusionUse = fragmentForInclusion.cloneModel();
-        MetaClass.clearChildren(model);
+        model.clearChildren();
 
         // Retrieving a model for a template can come with whitspace, so trim those
         // from the model so that we can use the child event iterator.
-        while (MetaClass.isWhitespace(MetaClass.first(fragmentForInclusionUse))) {
-            MetaClass.removeFirst(fragmentForInclusionUse);
+        while (fragmentForInclusionUse.first().isWhitespace()) {
+            fragmentForInclusionUse.removeFirst();
         }
-        while (MetaClass.isWhitespace(MetaClass.last(fragmentForInclusionUse))) {
-            MetaClass.removeLast(fragmentForInclusionUse);
+        while (fragmentForInclusionUse.last().isWhitespace()) {
+            fragmentForInclusionUse.removeLast();
         }
 
-        Iterator<ITemplateEvent> it = MetaClass.childEventIterator(fragmentForInclusionUse);
+        Iterator<ITemplateEvent> it = fragmentForInclusionUse.childEventIterator();
         if (it != null) {
             while (it.hasNext()) {
                 ITemplateEvent fragmentChildEvent = it.next();
@@ -120,7 +120,7 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
         // When fragment parameters aren't named, derive the name from the fragment definition
         // TODO: Common code across all the inclusion processors
         if (fragmentExpression.hasSyntheticParameters()) {
-            String fragmentDefinition = ((IProcessableElementTag) MetaClass.first(fragmentForInclusionUse)).getAttributeValue(getDialectPrefix(), FragmentProcessor.PROCESSOR_NAME);
+            String fragmentDefinition = ((IProcessableElementTag) fragmentForInclusionUse.first()).getAttributeValue(getDialectPrefix(), FragmentProcessor.PROCESSOR_NAME);
             List<String> parameterNames = new FragmentParameterNamesExtractor().extract(fragmentDefinition);
 
             AssignationSequence parameters = fragmentExpression.getParameters();

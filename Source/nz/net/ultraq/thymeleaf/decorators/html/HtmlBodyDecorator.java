@@ -16,7 +16,6 @@
 package nz.net.ultraq.thymeleaf.decorators.html;
 
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
-import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
@@ -26,6 +25,7 @@ import org.thymeleaf.model.IModelFactory;
  *
  * @author Emanuel Rabina
  */
+@lombok.experimental.ExtensionMethod(nz.net.ultraq.thymeleaf.internal.MetaClass.class)
 public class HtmlBodyDecorator implements Decorator {
 
     private final IModelFactory modelFactory;
@@ -50,8 +50,8 @@ public class HtmlBodyDecorator implements Decorator {
     public IModel decorate(IModel targetBodyModel, IModel sourceBodyModel) {
         // If one of the parameters is missing return a copy of the other, or
         // nothing if both parameters are missing.
-        if (!MetaClass.asBoolean(targetBodyModel) || !MetaClass.asBoolean(sourceBodyModel)) {
-            return MetaClass.asBoolean(targetBodyModel) ? targetBodyModel.cloneModel() : MetaClass.asBoolean(sourceBodyModel) ? sourceBodyModel.cloneModel() : null;
+        if (!targetBodyModel.asBoolean() || !sourceBodyModel.asBoolean()) {
+            return targetBodyModel.asBoolean() ? targetBodyModel.cloneModel() : sourceBodyModel.asBoolean() ? sourceBodyModel.cloneModel() : null;
         }
         return new AttributeMerger(modelFactory).merge(targetBodyModel, sourceBodyModel);
     }

@@ -17,7 +17,6 @@ package nz.net.ultraq.thymeleaf.fragments;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IOpenElementTag;
 import org.thymeleaf.model.IProcessableElementTag;
@@ -30,6 +29,7 @@ import org.thymeleaf.util.StringUtils;
  *
  * @author Emanuel Rabina
  */
+@lombok.experimental.ExtensionMethod(nz.net.ultraq.thymeleaf.internal.MetaClass.class)
 public class FragmentFinder {
 
     private final String dialectPrefix;
@@ -62,7 +62,7 @@ public class FragmentFinder {
             if (event instanceof IOpenElementTag) {
                 String fragmentName = ((IProcessableElementTag) event).getAttributeValue(dialectPrefix, FragmentProcessor.PROCESSOR_NAME);
                 if (!StringUtils.isEmpty(fragmentName)) {
-                    IModel fragment = MetaClass.getModel(model, eventIndex);
+                    IModel fragment = model.getModel(eventIndex);
                     fragments.put(fragmentName, fragment);
                     eventIndex += fragment.size();
                     continue;

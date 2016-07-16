@@ -15,7 +15,6 @@
  */
 package nz.net.ultraq.thymeleaf.fragments;
 
-import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.models.ElementMerger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +32,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  *
  * @author Emanuel Rabina
  */
+@lombok.experimental.ExtensionMethod(nz.net.ultraq.thymeleaf.internal.MetaClass.class)
 public class FragmentProcessor extends AbstractAttributeModelProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(FragmentProcessor.class);
@@ -77,8 +77,8 @@ public class FragmentProcessor extends AbstractAttributeModelProcessor {
         // Locate the fragment that corresponds to this decorator/include fragment
         IModel fragment = FragmentMap.get(context).get(attributeValue);
         // Replace this model with the fragment
-        if (MetaClass.asBoolean(fragment)) {
-            MetaClass.replaceModel(model, 0, new ElementMerger(context.getModelFactory()).merge(model, fragment));
+        if (fragment.asBoolean()) {
+            model.replaceModel(0, new ElementMerger(context.getModelFactory()).merge(model, fragment));
         }
     }
 
