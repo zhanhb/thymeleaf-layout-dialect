@@ -69,10 +69,10 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
             if (MetaClass.asBoolean(targetHeadModel)) {
                 MetaClass.replaceModel(targetDocumentModel, MetaProvider.INSTANCE.getProperty(targetHeadModel, "startIndex"), resultHeadModel);
             } else {
-                MetaClass.insertModelWithWhitespace(targetDocumentModel, (Integer) MetaProvider.INSTANCE.getProperty(MetaClass.find(targetDocumentModel, event -> {
+                MetaClass.insertModelWithWhitespace(targetDocumentModel, MetaClass.findIndexOf(targetDocumentModel, event -> {
                     return (event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName()))
                             || (event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName()));
-                }), "index") - 1, resultHeadModel);
+                }) - 1, resultHeadModel);
             }
         }
 
@@ -88,9 +88,9 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
             if (MetaClass.asBoolean(targetBodyModel)) {
                 MetaClass.replaceModel(targetDocumentModel, MetaProvider.INSTANCE.getProperty(targetBodyModel, "startIndex"), resultBodyModel);
             } else {
-                MetaClass.insertModelWithWhitespace(targetDocumentModel, (Integer) MetaProvider.INSTANCE.getProperty(MetaClass.find(targetDocumentModel, event -> {
+                MetaClass.insertModelWithWhitespace(targetDocumentModel, MetaClass.findIndexOf(targetDocumentModel, event -> {
                     return event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName());
-                }), "index") - 1, resultBodyModel);
+                }) - 1, resultBodyModel);
             }
         }
 

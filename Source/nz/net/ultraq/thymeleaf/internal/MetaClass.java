@@ -219,6 +219,26 @@ public class MetaClass {
     }
 
     /**
+     * Returns the index of the first event in the model that meets the criteria
+     * of the given closure.
+     *
+     * @param delegate
+     * @param closure
+     * @return The index of the first event to match the closure criteria, or
+     * {@code -1} if nothing matched.
+     */
+    public static int findIndexOf(IModel delegate, ITemplateEventPredicate closure) {
+        for (int i = 0; i < delegate.size(); i++) {
+            ITemplateEvent event = delegate.get(i);
+            boolean result = closure.test(event);
+            if (result) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
      * Returns the first instance of a model that meets the given closure
      * criteria.
      *
@@ -233,11 +253,11 @@ public class MetaClass {
      */
     @Nullable
     public static IModel findModel(@Nonnull IModel delegate, @Nonnull ITemplateEventPredicate closure) {
-        ITemplateEvent event = find(delegate, closure);
-        if (event != null) {
-            IModel model = getModel(delegate, MetaProvider.INSTANCE.getProperty(event, "index"));
-            MetaProvider.INSTANCE.setProperty(model, "startIndex", MetaProvider.INSTANCE.getProperty(event, "index"));
-            MetaProvider.INSTANCE.setProperty(model, "endIndex", (Integer) MetaProvider.INSTANCE.getProperty(event, "index") + model.size());
+        int eventIndex = findIndexOf(delegate, closure);
+        if (eventIndex != -1) {
+            IModel model = getModel(delegate, eventIndex);
+            MetaProvider.INSTANCE.setProperty(model, "startIndex", eventIndex);
+            MetaProvider.INSTANCE.setProperty(model, "endIndex", eventIndex + model.size());
             return model;
         }
         return null;

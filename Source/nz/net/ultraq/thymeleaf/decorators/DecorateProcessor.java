@@ -22,14 +22,12 @@ import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
 import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
-import nz.net.ultraq.thymeleaf.internal.MetaProvider;
 import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IOpenElementTag;
 import org.thymeleaf.model.IProcessableElementTag;
-import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import org.thymeleaf.standard.expression.FragmentExpression;
@@ -70,7 +68,7 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
      */
     protected DecorateProcessor(TemplateMode templateMode, String dialectPrefix, SortingStrategy sortingStrategy,
             String attributeName) {
-        super(templateMode, dialectPrefix, null, false, attributeName, true, PROCESSOR_PRECEDENCE, true);
+        super(templateMode, dialectPrefix, null, false, attributeName, true, PROCESSOR_PRECEDENCE, false);
         this.sortingStrategy = sortingStrategy;
     }
 
@@ -88,15 +86,16 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
     protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
             String attributeValue, IElementModelStructureHandler structureHandler) {
 
-        // Ensure the decorate attribute is in the root element of the document
-        if (context.getElementStack().size() != 1) {
-            throw new IllegalArgumentException("layout:decorate/data-layout-decorate must appear in the root element of your template");
+        // Ensure that every element to this point contained a decorate processor
+        for (IProcessableElementTag element : context.getElementStack()) {
+            if (element.getAttribute(getDialectPrefix(), PROCESSOR_NAME) == null) {
+                throw new IllegalArgumentException("layout:decorate/data-layout-decorate must appear in the root element of your template");
+            }
         }
 
         TemplateModelFinder templateModelFinder = new TemplateModelFinder(context);
 
-        // Remove the layout:decorate attribute for cases when the root element is
-        // also a potential fragment
+        // Remove the decorate processor from the root element
         IProcessableElementTag rootElement = (IProcessableElementTag) MetaClass.first(model);
         if (rootElement.hasAttribute(getDialectPrefix(), PROCESSOR_NAME)) {
             rootElement = context.getModelFactory().removeAttribute(rootElement, getDialectPrefix(), PROCESSOR_NAME);
@@ -107,10 +106,7 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
         // TODO: Can probably find a way of preventing this double-loading for #102
         String contentTemplateName = context.getTemplateData().getTemplate();
         IModel contentTemplate = templateModelFinder.findTemplate(contentTemplateName).cloneModel();
-        ITemplateEvent origRootElement = MetaClass.find(contentTemplate, event -> {
-            return event instanceof IOpenElementTag;
-        });
-        contentTemplate.replace(MetaProvider.INSTANCE.getProperty(origRootElement, "index"), rootElement);
+        contentTemplate.replace(MetaClass.findIndexOf(contentTemplate, event -> event instanceof IOpenElementTag), rootElement);
 
         // Locate the template to decorate
         FragmentExpression decorateTemplateExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);

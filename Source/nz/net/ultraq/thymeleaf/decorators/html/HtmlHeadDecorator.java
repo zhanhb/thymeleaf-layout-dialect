@@ -20,13 +20,11 @@ import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
-import nz.net.ultraq.thymeleaf.internal.MetaProvider;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IElementTag;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IOpenElementTag;
-import org.thymeleaf.model.ITemplateEvent;
 
 /**
  * A decorator specific to processing an HTML {@code <head>} element.
@@ -71,9 +69,9 @@ public class HtmlHeadDecorator implements Decorator {
 
         // New head model based off the target being decorated
         IModel resultHeadModel = new AttributeMerger(context.getModelFactory()).merge(targetHeadModel, sourceHeadModel);
-        ITemplateEvent titleInResult = MetaClass.find(resultHeadModel, isTitle);
-        if (titleInResult != null) {
-            MetaClass.removeModelWithWhitespace(resultHeadModel, MetaProvider.INSTANCE.getProperty(titleInResult, "index"));
+        int titleIndex = MetaClass.findIndexOf(resultHeadModel, isTitle);
+        if (titleIndex != -1) {
+            MetaClass.removeModelWithWhitespace(resultHeadModel, titleIndex);
         }
 
         // Get the source and target title elements to pass to the title decorator
