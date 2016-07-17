@@ -16,7 +16,7 @@
 
 package nz.net.ultraq.thymeleaf.decorators
 
-import nz.net.ultraq.thymeleaf.LayoutDialectContext
+import nz.net.ultraq.thymeleaf.context.LayoutContext
 import nz.net.ultraq.thymeleaf.fragments.mergers.AttributeMerger
 
 import org.thymeleaf.Arguments
@@ -98,7 +98,7 @@ class TitlePatternProcessor extends AbstractAttrProcessor {
 		if (title) {
 			element.addChild(new Text(title))
 			titleContainer.parent.insertAfter(titleContainer, element.cloneNode(null, false))
-			LayoutDialectContext.forContext(arguments.context) << [(RESULTING_TITLE): title]
+			LayoutContext.forContext(arguments.context) << [(RESULTING_TITLE): title]
 		}
 
 		// Remove the processing section
