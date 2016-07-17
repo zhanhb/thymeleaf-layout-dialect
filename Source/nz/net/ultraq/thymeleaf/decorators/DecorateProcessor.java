@@ -88,7 +88,7 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
 
         // Ensure that every element to this point contained a decorate processor
         for (IProcessableElementTag element : context.getElementStack()) {
-            if (element.getAttribute(getDialectPrefix(), PROCESSOR_NAME) == null) {
+            if (element.getAttribute(attributeName) == null) {
                 throw new IllegalArgumentException("layout:decorate/data-layout-decorate must appear in the root element of your template");
             }
         }
@@ -97,8 +97,8 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
 
         // Remove the decorate processor from the root element
         IProcessableElementTag rootElement = (IProcessableElementTag) model.first();
-        if (rootElement.hasAttribute(getDialectPrefix(), PROCESSOR_NAME)) {
-            rootElement = context.getModelFactory().removeAttribute(rootElement, getDialectPrefix(), PROCESSOR_NAME);
+        if (rootElement.hasAttribute(attributeName)) {
+            rootElement = context.getModelFactory().removeAttribute(rootElement, attributeName);
             model.replace(0, rootElement);
         }
 
