@@ -211,7 +211,7 @@ public class MetaClass {
             ITemplateEvent event = delegate.get(i);
             boolean result = closure.test(event);
             if (result) {
-                MetaProvider.INSTANCE.setProperty(event, "index", i);
+                setIndex(event, i);
                 return event;
             }
         }
@@ -256,8 +256,8 @@ public class MetaClass {
         int eventIndex = findIndexOf(delegate, closure);
         if (eventIndex != -1) {
             IModel model = getModel(delegate, eventIndex);
-            MetaProvider.INSTANCE.setProperty(model, "startIndex", eventIndex);
-            MetaProvider.INSTANCE.setProperty(model, "endIndex", eventIndex + model.size());
+            setStartIndex(model, eventIndex);
+            setEndIndex(model, eventIndex + model.size());
             return model;
         }
         return null;
@@ -589,6 +589,30 @@ public class MetaClass {
         }
 
         return 1;
+    }
+
+    public static void setIndex(ITemplateEvent delegate, int index) {
+        MetaProvider.INSTANCE.setProperty(delegate, "index", index);
+    }
+
+    public static int getIndex(ITemplateEvent delegate) {
+        return MetaProvider.INSTANCE.getProperty(delegate, "index");
+    }
+
+    public static void setStartIndex(IModel delegate, int startIndex) {
+        MetaProvider.INSTANCE.setProperty(delegate, "startIndex", startIndex);
+    }
+
+    public static int getStartIndex(IModel delegate) {
+        return MetaProvider.INSTANCE.getProperty(delegate, "startIndex");
+    }
+
+    public static void setEndIndex(IModel delegate, int endIndex) {
+        MetaProvider.INSTANCE.setProperty(delegate, "endIndex", endIndex);
+    }
+
+    public static int getEndIndex(IModel delegate) {
+        return MetaProvider.INSTANCE.getProperty(delegate, "endIndex");
     }
 
     private MetaClass() {

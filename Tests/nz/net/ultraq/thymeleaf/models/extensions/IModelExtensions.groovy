@@ -126,26 +126,4 @@ public class IModelExtensions {
         field.set(field, obj);
     }
 
-    private static class M implements MetaProvider {
-
-        private final MetaProvider old;
-        private final MetaProvider provider;
-
-        M(MetaProvider old, MetaProvider provider) {
-            this.old = old;
-            this.provider = provider;
-        }
-
-        @Override
-        public <T> T getProperty(Object object, String key) {
-            return old.getProperty(object, key);
-        }
-
-        @Override
-        public void setProperty(Object object, String key, Object value) {
-            old.setProperty(object, key, value);
-            provider.setProperty(object, key, value);
-        }
-    }
-
 }
