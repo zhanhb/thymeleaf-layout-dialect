@@ -55,7 +55,6 @@ public class FragmentFinder {
     public Map<String, IModel> findFragments(IModel model) {
         Map<String, IModel> fragments = new LinkedHashMap<>();
 
-        // TODO: Don't go into layout:include/replace/insert elements
         int eventIndex = 0;
         while (eventIndex < model.size()) {
             ITemplateEvent event = model.get(eventIndex);

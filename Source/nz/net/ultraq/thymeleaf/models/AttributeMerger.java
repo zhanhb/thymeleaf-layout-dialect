@@ -80,7 +80,6 @@ public class AttributeMerger implements ModelMerger {
                 mergedAttributeValue = sourceAttribute.getValue();
             }
 
-            // TODO: Create model extensions for manipulating first/last elements?
             mergedModel.replace(0, modelFactory.replaceAttribute(mergedEvent,
                     sourceAttribute.getAttributeName(), sourceAttribute.getAttributeCompleteName(),
                     mergedAttributeValue));
