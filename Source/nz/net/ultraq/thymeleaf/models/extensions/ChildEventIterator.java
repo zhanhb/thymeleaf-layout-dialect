@@ -16,7 +16,7 @@
 package nz.net.ultraq.thymeleaf.models.extensions;
 
 import java.util.Iterator;
-import nz.net.ultraq.thymeleaf.internal.MetaProvider;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.ITemplateEvent;
 
@@ -65,7 +65,7 @@ public class ChildEventIterator implements Iterator<ITemplateEvent> {
     @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     public ITemplateEvent next() {
         ITemplateEvent event = parent.get(currentIndex);
-        MetaProvider.INSTANCE.setProperty(event, "index", currentIndex++);
+        MetaClass.setIndex(event, currentIndex++);
         return event;
     }
 

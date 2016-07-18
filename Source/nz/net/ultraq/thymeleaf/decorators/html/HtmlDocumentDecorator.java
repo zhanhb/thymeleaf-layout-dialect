@@ -19,7 +19,6 @@ import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
-import nz.net.ultraq.thymeleaf.internal.MetaProvider;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.ICloseElementTag;
 import org.thymeleaf.model.IElementTag;
@@ -67,7 +66,7 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
         );
         if (MetaClass.asBoolean(resultHeadModel)) {
             if (MetaClass.asBoolean(targetHeadModel)) {
-                MetaClass.replaceModel(targetDocumentModel, MetaProvider.INSTANCE.getProperty(targetHeadModel, "startIndex"), resultHeadModel);
+                MetaClass.replaceModel(targetDocumentModel, MetaClass.getStartIndex(targetHeadModel), resultHeadModel);
             } else {
                 MetaClass.insertModelWithWhitespace(targetDocumentModel, MetaClass.findIndexOf(targetDocumentModel, event -> {
                     return (event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName()))
@@ -86,7 +85,7 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
         );
         if (MetaClass.asBoolean(resultBodyModel)) {
             if (MetaClass.asBoolean(targetBodyModel)) {
-                MetaClass.replaceModel(targetDocumentModel, MetaProvider.INSTANCE.getProperty(targetBodyModel, "startIndex"), resultBodyModel);
+                MetaClass.replaceModel(targetDocumentModel, MetaClass.getStartIndex(targetBodyModel), resultBodyModel);
             } else {
                 MetaClass.insertModelWithWhitespace(targetDocumentModel, MetaClass.findIndexOf(targetDocumentModel, event -> {
                     return event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName());
