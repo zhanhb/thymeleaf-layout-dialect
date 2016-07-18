@@ -89,6 +89,12 @@ public class TemplateModelFinder {
         return findFragment(templateName, execute != null ? execute.toString() : null, dialectPrefix);
     }
 
+    /**
+     * Return the model specified by the given fragment expression.
+     *
+     * @param fragmentExpression
+     * @return Fragment matching the fragment specification.
+     */
     public TemplateModel findFragment(FragmentExpression fragmentExpression) {
         return findFragment(fragmentExpression, null);
     }
@@ -118,10 +124,23 @@ public class TemplateModelFinder {
         );
     }
 
+    /**
+     * Return the model specified by the given fragment expression.
+     *
+     * @param templateName
+     * @param fragmentName
+     * @return Fragment matching the fragment specification.
+     */
     public TemplateModel findFragment(String templateName, String fragmentName) {
         return findFragment(templateName, fragmentName, null);
     }
 
+    /**
+     * Return the model specified by the given fragment expression.
+     *
+     * @param templateName
+     * @return Fragment matching the fragment specification.
+     */
     public TemplateModel findFragment(String templateName) {
         return findFragment(templateName, null, null);
     }

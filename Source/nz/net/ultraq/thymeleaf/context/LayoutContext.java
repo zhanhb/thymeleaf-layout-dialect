@@ -44,7 +44,6 @@ public class LayoutContext extends HashMap<String, Object> {
         try {
             return (LayoutContext) dialectContext;
         } catch (ClassCastException ex) {
-            // see https://github.com/ultraq/thymeleaf-layout-dialect/commit/4f170e090a5ff5967ed8fa8c5240ec48914233bd
             throw new IllegalStateException(
                     "Name collision on the Thymeleaf processing context.  "
                     + "An object with the key \"layout\" already exists, but is needs to be free for the Layout Dialect to work."

@@ -66,4 +66,5 @@ public class ContextCreationProcessor extends AbstractTemplateBoundariesProcesso
     public void doProcessTemplateEnd(ITemplateContext context, ITemplateEnd templateEnd,
             ITemplateBoundariesStructureHandler structureHandler) {
     }
+
 }

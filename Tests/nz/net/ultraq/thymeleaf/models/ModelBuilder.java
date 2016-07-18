@@ -121,7 +121,7 @@ public class ModelBuilder extends BuilderSupport {
      * @return New model with the given name, attributes, and content.
      */
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings("rawtypes")
     protected IModel createNode(Object name, Map attributes, Object value) {
         return builder.createNode(name, attributes, value);
     }
