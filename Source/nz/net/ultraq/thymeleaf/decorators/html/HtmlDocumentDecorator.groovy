@@ -47,13 +47,6 @@ class HtmlDocumentDecorator extends XmlDocumentDecorator {
 		new HtmlHeadDecorator(sortingStrategy).decorate(decoratorHtml, contentHtml.findElement('head'))
 		new HtmlBodyDecorator().decorate(decoratorHtml, contentHtml.findElement('body'))
 
-		// Set the doctype from the decorator if missing from the content page
-		def decoratorDocument = decoratorHtml.parent
-		def contentDocument   = contentHtml.parent
-		if (!contentDocument.docType && decoratorDocument.docType) {
-			contentDocument.docType = decoratorDocument.docType
-		}
-
 		super.decorate(decoratorHtml, contentHtml)
 	}
 }

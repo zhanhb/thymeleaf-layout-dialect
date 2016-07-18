@@ -38,6 +38,11 @@ class XmlDocumentDecorator implements Decorator {
 		def decoratorDocument = decoratorXml.parent
 		def contentDocument   = contentXml.parent
 
+		// Set the doctype from the decorator if missing from the content page
+		if (!contentDocument.docType && decoratorDocument.docType) {
+			contentDocument.docType = decoratorDocument.docType
+		}
+
 		// Copy text outside of the root element, keeping whitespace copied to a minimum
 		def beforeHtml = true
 		def allowNext = false

@@ -53,6 +53,5 @@ class FragmentMap extends HashMap<String,Element> {
 	static void updateForNode(Arguments arguments, Node node, Map<String,Element> fragments) {
 
 		node.setNodeLocalVariable(FRAGMENT_COLLECTION_KEY, get(arguments) << fragments)
-		
 	}
 }
