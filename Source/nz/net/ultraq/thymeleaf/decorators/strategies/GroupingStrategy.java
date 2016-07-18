@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ListIterator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
+import nz.net.ultraq.thymeleaf.internal.MetaProvider;
 import org.thymeleaf.model.IComment;
 import org.thymeleaf.model.IElementTag;
 import org.thymeleaf.model.IModel;
@@ -102,7 +103,7 @@ public class GroupingStrategy implements SortingStrategy {
                 IModel headSubModel = listIterator.previous();
                 if (type == findMatchingType(headSubModel)) {
                     if (headModel.asBoolean()) {
-                        return headSubModel.getEndIndex();
+                        return MetaProvider.INSTANCE.getProperty(headSubModel, "endIndex");
                     }
                     break;
                 }
