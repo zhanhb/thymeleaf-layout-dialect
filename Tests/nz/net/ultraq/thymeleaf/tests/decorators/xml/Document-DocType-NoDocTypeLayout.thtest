@@ -18,6 +18,7 @@
 
 
 %OUTPUT
+<?xml version="1.0"?>
 <!DOCTYPE root>
 <root xmlns="http://www.example.org/">
 </root>

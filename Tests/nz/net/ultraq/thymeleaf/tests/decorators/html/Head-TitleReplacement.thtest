@@ -2,7 +2,7 @@
 # Test that the standard behaviour of HTML document decoration means that the
 # child page title replaces the parent one.
 
-%TEMPLATE_MODE HTML
+%TEMPLATE_MODE HTML5
 
 
 %INPUT

@@ -1,7 +1,7 @@
 
 # Test appending of elements in the head section
 
-%TEMPLATE_MODE HTML
+%TEMPLATE_MODE HTML5
 
 
 %INPUT

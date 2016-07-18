@@ -2,7 +2,7 @@
 # An older method of doing fragment parameters from Thymeleaf 2.0, but still a
 # valid way of passing information between templates.
 
-%TEMPLATE_MODE HTML
+%TEMPLATE_MODE HTML5
 
 
 %INPUT

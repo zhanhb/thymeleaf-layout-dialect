@@ -1,7 +1,7 @@
 
 # Fragment parameter test for the layout:include processor.
 
-%TEMPLATE_MODE HTML
+%TEMPLATE_MODE HTML5
 
 
 %INPUT

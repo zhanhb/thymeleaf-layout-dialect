@@ -2,7 +2,7 @@
 # Test based on the first example in the readme for introducing the
 # layout:title-pattern processor
 
-%TEMPLATE_MODE HTML
+%TEMPLATE_MODE HTML5
 
 
 %INPUT
