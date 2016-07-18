@@ -19,6 +19,7 @@ import java.util.Iterator;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IElementTag;
@@ -30,11 +31,10 @@ import org.thymeleaf.model.IOpenElementTag;
  *
  * @author Emanuel Rabina
  */
-@lombok.experimental.ExtensionMethod(nz.net.ultraq.thymeleaf.internal.MetaClass.class)
 public class HtmlHeadDecorator implements Decorator {
 
     private static IModel titleRetriever(IModel headModel, ITemplateEventPredicate isTitle) {
-        return headModel.asBoolean() ? headModel.findModel(isTitle) : null;
+        return MetaClass.asBoolean(headModel) ? MetaClass.findModel(headModel, isTitle) : null;
     }
 
     private final ITemplateContext context;
@@ -61,7 +61,7 @@ public class HtmlHeadDecorator implements Decorator {
     @Override
     public IModel decorate(IModel targetHeadModel, IModel sourceHeadModel) {
         // If none of the parameters are present, return nothing
-        if (!targetHeadModel.asBoolean() && !sourceHeadModel.asBoolean()) {
+        if (!MetaClass.asBoolean(targetHeadModel) && !MetaClass.asBoolean(sourceHeadModel)) {
             return null;
         }
 
@@ -69,29 +69,29 @@ public class HtmlHeadDecorator implements Decorator {
 
         // New head model based off the target being decorated
         IModel resultHeadModel = new AttributeMerger(context.getModelFactory()).merge(targetHeadModel, sourceHeadModel);
-        int titleIndex = resultHeadModel.findIndexOf(isTitle);
+        int titleIndex = MetaClass.findIndexOf(resultHeadModel, isTitle);
         if (titleIndex != -1) {
-            resultHeadModel.removeModelWithWhitespace(titleIndex);
+            MetaClass.removeModelWithWhitespace(resultHeadModel, titleIndex);
         }
 
         // Get the source and target title elements to pass to the title decorator
         IModel resultTitle = new HtmlTitleDecorator(context).decorate(titleRetriever(targetHeadModel, isTitle),
                 titleRetriever(sourceHeadModel, isTitle));
-        resultHeadModel.insertModelWithWhitespace(1, resultTitle);
+        MetaClass.insertModelWithWhitespace(resultHeadModel, 1, resultTitle);
 
         // Merge the rest of the source <head> elements with the target <head>
         // elements using the current merging strategy
-        if (sourceHeadModel.asBoolean()) {
-            Iterator<IModel> it = sourceHeadModel.childModelIterator();
+        if (MetaClass.asBoolean(sourceHeadModel)) {
+            Iterator<IModel> it = MetaClass.childModelIterator(sourceHeadModel);
             if (it != null) {
                 while (it.hasNext()) {
                     IModel model = it.next();
-                    if (isTitle.test(model.first())) {
+                    if (isTitle.test(MetaClass.first(model))) {
                         continue;
                     }
                     int position = sortingStrategy.findPositionForModel(resultHeadModel, model);
                     if (position != -1) {
-                        resultHeadModel.insertModelWithWhitespace(position, model);
+                        MetaClass.insertModelWithWhitespace(resultHeadModel, position, model);
                     }
                 }
             }

@@ -22,6 +22,7 @@ import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
 import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
 import nz.net.ultraq.thymeleaf.fragments.FragmentParameterNamesExtractor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
@@ -43,7 +44,6 @@ import org.thymeleaf.templatemode.TemplateMode;
  *
  * @author Emanuel Rabina
  */
-@lombok.experimental.ExtensionMethod(nz.net.ultraq.thymeleaf.internal.MetaClass.class)
 public class ReplaceProcessor extends AbstractAttributeModelProcessor {
 
     public static final String PROCESSOR_NAME = "replace";
@@ -86,12 +86,12 @@ public class ReplaceProcessor extends AbstractAttributeModelProcessor {
 
         // Replace this element with the located fragment
         IModel fragmentForReplacementUse = fragmentForReplacement.cloneModel();
-        model.replaceModel(0, fragmentForReplacementUse);
+        MetaClass.replaceModel(model, 0, fragmentForReplacementUse);
 
         // When fragment parameters aren't named, derive the name from the fragment definition
         // TODO: Common code across all the inclusion processors
         if (fragmentExpression.hasSyntheticParameters()) {
-            String fragmentDefinition = ((IProcessableElementTag) fragmentForReplacementUse.first()).getAttributeValue(getDialectPrefix(), FragmentProcessor.PROCESSOR_NAME);
+            String fragmentDefinition = ((IProcessableElementTag) MetaClass.first(fragmentForReplacementUse)).getAttributeValue(getDialectPrefix(), FragmentProcessor.PROCESSOR_NAME);
             List<String> parameterNames = new FragmentParameterNamesExtractor().extract(fragmentDefinition);
 
             AssignationSequence parameters = fragmentExpression.getParameters();

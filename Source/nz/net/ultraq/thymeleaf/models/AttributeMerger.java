@@ -17,6 +17,7 @@ package nz.net.ultraq.thymeleaf.models;
 
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import org.thymeleaf.model.IAttribute;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
@@ -29,7 +30,6 @@ import org.thymeleaf.standard.processor.StandardWithTagProcessor;
  *
  * @author Emanuel Rabina
  */
-@lombok.experimental.ExtensionMethod(nz.net.ultraq.thymeleaf.internal.MetaClass.class)
 public class AttributeMerger implements ModelMerger {
 
     private final IModelFactory modelFactory;
@@ -58,8 +58,8 @@ public class AttributeMerger implements ModelMerger {
     public IModel merge(IModel targetModel, IModel sourceModel) {
         // If one of the parameters is missing return a copy of the other, or
         // nothing if both parameters are missing.
-        if (!targetModel.asBoolean() || !sourceModel.asBoolean()) {
-            return targetModel.asBoolean() ? targetModel.cloneModel() : sourceModel.asBoolean() ? sourceModel.cloneModel() : null;
+        if (!MetaClass.asBoolean(targetModel) || !MetaClass.asBoolean(sourceModel)) {
+            return MetaClass.asBoolean(targetModel) ? targetModel.cloneModel() : MetaClass.asBoolean(sourceModel) ? sourceModel.cloneModel() : null;
         }
 
         IModel mergedModel = targetModel.cloneModel();
@@ -67,13 +67,13 @@ public class AttributeMerger implements ModelMerger {
         // Merge attributes from the source model's root event to the target model's root event
         for (IAttribute sourceAttribute : ((IProcessableElementTag) sourceModel.get(0)).getAllAttributes()) {
             // Don't include layout:fragment processors
-            if (sourceAttribute.equalsName(LayoutDialect.DIALECT_PREFIX, FragmentProcessor.PROCESSOR_NAME)) {
+            if (MetaClass.equalsName(sourceAttribute, LayoutDialect.DIALECT_PREFIX, FragmentProcessor.PROCESSOR_NAME)) {
                 continue;
             }
 
-            IProcessableElementTag mergedEvent = (IProcessableElementTag) mergedModel.first();
+            IProcessableElementTag mergedEvent = (IProcessableElementTag) MetaClass.first(mergedModel);
             String mergedAttributeValue; // Merge th:with attributes
-            if (sourceAttribute.equalsName(StandardDialect.PREFIX, StandardWithTagProcessor.ATTR_NAME)) {
+            if (MetaClass.equalsName(sourceAttribute, StandardDialect.PREFIX, StandardWithTagProcessor.ATTR_NAME)) {
                 mergedAttributeValue = new VariableDeclarationMerger().merge(sourceAttribute.getValue(),
                         mergedEvent.getAttributeValue(StandardDialect.PREFIX, StandardWithTagProcessor.ATTR_NAME));
             } else { // Copy every other attribute straight
@@ -81,7 +81,7 @@ public class AttributeMerger implements ModelMerger {
             }
 
             mergedModel.replace(0, modelFactory.replaceAttribute(mergedEvent,
-                    sourceAttribute.getAttributeName(), sourceAttribute.getAttributeCompleteName(),
+                    MetaClass.getAttributeName(sourceAttribute), sourceAttribute.getAttributeCompleteName(),
                     mergedAttributeValue));
         }
 

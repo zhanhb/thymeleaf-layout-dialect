@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ListIterator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.internal.MetaProvider;
 import org.thymeleaf.model.IComment;
 import org.thymeleaf.model.IElementTag;
@@ -33,7 +34,6 @@ import org.thymeleaf.model.ITemplateEvent;
  * @author Emanuel Rabina
  * @since 1.2.6
  */
-@lombok.experimental.ExtensionMethod(nz.net.ultraq.thymeleaf.internal.MetaClass.class)
 public class GroupingStrategy implements SortingStrategy {
 
     /**
@@ -50,7 +50,7 @@ public class GroupingStrategy implements SortingStrategy {
         final int STYLESHEET = 5;
         final int OTHER = 6;
 
-        ITemplateEvent event = model.first();
+        ITemplateEvent event = MetaClass.first(model);
 
         if (event instanceof IComment) {
             return COMMENT;
@@ -87,12 +87,12 @@ public class GroupingStrategy implements SortingStrategy {
     @Override
     public int findPositionForModel(IModel headModel, IModel childModel) {
         // Discard text/whitespace nodes
-        if (childModel.isWhitespace()) {
+        if (MetaClass.isWhitespace(childModel)) {
             return -1;
         }
 
         int type = findMatchingType(childModel);
-        Iterator<IModel> it = headModel.childModelIterator();
+        Iterator<IModel> it = MetaClass.childModelIterator(headModel);
         if (it != null) {
             ArrayList<IModel> list = new ArrayList<>(20);
             while (it.hasNext()) {
@@ -102,7 +102,7 @@ public class GroupingStrategy implements SortingStrategy {
             while (listIterator.hasPrevious()) {
                 IModel headSubModel = listIterator.previous();
                 if (type == findMatchingType(headSubModel)) {
-                    if (headModel.asBoolean()) {
+                    if (MetaClass.asBoolean(headModel)) {
                         return MetaProvider.INSTANCE.getProperty(headSubModel, "endIndex");
                     }
                     break;

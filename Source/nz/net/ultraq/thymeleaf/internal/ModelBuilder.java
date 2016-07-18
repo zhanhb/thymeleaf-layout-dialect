@@ -34,7 +34,6 @@ import org.thymeleaf.util.StringUtils;
  *
  * @author Emanuel Rabina
  */
-@lombok.experimental.ExtensionMethod(nz.net.ultraq.thymeleaf.internal.MetaClass.class)
 public class ModelBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(ModelBuilder.class);
@@ -167,7 +166,7 @@ public class ModelBuilder {
      */
     public void nodeCompleted(Object parent, Object child) {
         IModel parentModel = (IModel) parent;
-        if (parentModel.asBoolean()) {
+        if (MetaClass.asBoolean(parentModel)) {
             parentModel.insertModel(parentModel.size() - 1, (IModel) child);
         }
     }

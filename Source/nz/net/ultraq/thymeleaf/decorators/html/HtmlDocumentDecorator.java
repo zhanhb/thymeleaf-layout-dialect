@@ -18,6 +18,7 @@ package nz.net.ultraq.thymeleaf.decorators.html;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
+import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.internal.MetaProvider;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.ICloseElementTag;
@@ -32,7 +33,6 @@ import org.thymeleaf.model.IOpenElementTag;
  *
  * @author Emanuel Rabina
  */
-@lombok.experimental.ExtensionMethod(nz.net.ultraq.thymeleaf.internal.MetaClass.class)
 public class HtmlDocumentDecorator extends XmlDocumentDecorator {
 
     private final SortingStrategy sortingStrategy;
@@ -61,15 +61,15 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
         ITemplateEventPredicate headModelFinder = event -> {
             return event instanceof IOpenElementTag && "head".equals(((IElementTag) event).getElementCompleteName());
         };
-        IModel targetHeadModel = targetDocumentModel.findModel(headModelFinder);
+        IModel targetHeadModel = MetaClass.findModel(targetDocumentModel, headModelFinder);
         IModel resultHeadModel = new HtmlHeadDecorator(context, sortingStrategy).decorate(targetHeadModel,
-                sourceDocumentModel.findModel(headModelFinder)
+                MetaClass.findModel(sourceDocumentModel, headModelFinder)
         );
-        if (resultHeadModel.asBoolean()) {
-            if (targetHeadModel.asBoolean()) {
-                targetDocumentModel.replaceModel(MetaProvider.INSTANCE.getProperty(targetHeadModel, "startIndex"), resultHeadModel);
+        if (MetaClass.asBoolean(resultHeadModel)) {
+            if (MetaClass.asBoolean(targetHeadModel)) {
+                MetaClass.replaceModel(targetDocumentModel, MetaProvider.INSTANCE.getProperty(targetHeadModel, "startIndex"), resultHeadModel);
             } else {
-                targetDocumentModel.insertModelWithWhitespace(targetDocumentModel.findIndexOf(event -> {
+                MetaClass.insertModelWithWhitespace(targetDocumentModel, MetaClass.findIndexOf(targetDocumentModel, event -> {
                     return (event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName()))
                             || (event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName()));
                 }) - 1, resultHeadModel);
@@ -80,15 +80,15 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
         ITemplateEventPredicate bodyModelFinder = event -> {
             return event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName());
         };
-        IModel targetBodyModel = targetDocumentModel.findModel(bodyModelFinder);
+        IModel targetBodyModel = MetaClass.findModel(targetDocumentModel, bodyModelFinder);
         IModel resultBodyModel = new HtmlBodyDecorator(context.getModelFactory()).decorate(targetBodyModel,
-                sourceDocumentModel.findModel(bodyModelFinder)
+                MetaClass.findModel(sourceDocumentModel, bodyModelFinder)
         );
-        if (resultBodyModel.asBoolean()) {
-            if (targetBodyModel.asBoolean()) {
-                targetDocumentModel.replaceModel(MetaProvider.INSTANCE.getProperty(targetBodyModel, "startIndex"), resultBodyModel);
+        if (MetaClass.asBoolean(resultBodyModel)) {
+            if (MetaClass.asBoolean(targetBodyModel)) {
+                MetaClass.replaceModel(targetDocumentModel, MetaProvider.INSTANCE.getProperty(targetBodyModel, "startIndex"), resultBodyModel);
             } else {
-                targetDocumentModel.insertModelWithWhitespace(targetDocumentModel.findIndexOf(event -> {
+                MetaClass.insertModelWithWhitespace(targetDocumentModel, MetaClass.findIndexOf(targetDocumentModel, event -> {
                     return event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName());
                 }) - 1, resultBodyModel);
             }
