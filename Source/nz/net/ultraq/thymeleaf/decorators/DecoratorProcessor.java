@@ -15,6 +15,7 @@
  */
 package nz.net.ultraq.thymeleaf.decorators;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.ITemplateContext;
@@ -34,6 +35,8 @@ import org.thymeleaf.templatemode.TemplateMode;
 public class DecoratorProcessor extends DecorateProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(DecoratorProcessor.class);
+
+    private static final AtomicBoolean warned = new AtomicBoolean();
 
     @SuppressWarnings("FieldNameHidesFieldInSuperclass")
     public static final String PROCESSOR_NAME = "decorator";
@@ -62,11 +65,13 @@ public class DecoratorProcessor extends DecorateProcessor {
     @Override
     protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
             String attributeValue, IElementModelStructureHandler structureHandler) {
-        logger.warn(
-                "The layout:decorator/data-layout-decorator processor has been deprecated and will be removed in the next major version of the layout dialect.  "
-                + "Please use layout:decorate/data-layout-decorate instead to future-proof your code.  "
-                + "See https://github.com/ultraq/thymeleaf-layout-dialect/issues/95 for more information."
-        );
+        if (warned.compareAndSet(false, true)) {
+            logger.warn(
+                    "The layout:decorator/data-layout-decorator processor has been deprecated and will be removed in the next major version of the layout dialect.  "
+                    + "Please use layout:decorate/data-layout-decorate instead to future-proof your code.  "
+                    + "See https://github.com/ultraq/thymeleaf-layout-dialect/issues/95 for more information."
+            );
+        }
 
         super.doProcess(context, model, attributeName, attributeValue, structureHandler);
     }

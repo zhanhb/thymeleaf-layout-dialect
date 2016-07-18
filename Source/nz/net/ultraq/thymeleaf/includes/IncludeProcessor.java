@@ -18,6 +18,7 @@ package nz.net.ultraq.thymeleaf.includes;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
 import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
@@ -54,6 +55,8 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(IncludeProcessor.class);
 
+    private static final AtomicBoolean warned = new AtomicBoolean();
+
     public static final String PROCESSOR_NAME = "include";
     public static final int PROCESSOR_PRECEDENCE = 0;
 
@@ -79,11 +82,13 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
     @Override
     protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
             String attributeValue, IElementModelStructureHandler structureHandler) {
-        logger.warn(
-                "The layout:include/data-layout-include processor is deprecated and will be removed in the next major version of the layout dialect.  "
-                + "Use the layout:insert/data-layout-insert processor instead.  "
-                + "See https://github.com/ultraq/thymeleaf-layout-dialect/issues/107 for more information."
-        );
+        if (warned.compareAndSet(false, true)) {
+            logger.warn(
+                    "The layout:include/data-layout-include processor is deprecated and will be removed in the next major version of the layout dialect.  "
+                    + "Use the layout:insert/data-layout-insert processor instead.  "
+                    + "See https://github.com/ultraq/thymeleaf-layout-dialect/issues/107 for more information."
+            );
+        }
         // Locate the page and fragment for inclusion
         FragmentExpression fragmentExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);
         TemplateModel fragmentForInclusion = new TemplateModelFinder(context).findFragment(fragmentExpression, getDialectPrefix());

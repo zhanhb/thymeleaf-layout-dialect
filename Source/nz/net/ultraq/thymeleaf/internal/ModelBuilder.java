@@ -17,6 +17,8 @@ package nz.net.ultraq.thymeleaf.internal;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.ITemplateContext;
@@ -37,6 +39,8 @@ import org.thymeleaf.util.StringUtils;
 public class ModelBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(ModelBuilder.class);
+
+    private static final ConcurrentMap<String, Boolean> encounteredVoidTags = new ConcurrentHashMap<>();
 
     private final ElementDefinitions elementDefinitions;
     private final IModelFactory modelFactory;
@@ -133,12 +137,14 @@ public class ModelBuilder {
                 attributes.remove("void");
                 model.add(modelFactory.createStandaloneElementTag(elementName, attributes, AttributeValueQuotes.DOUBLE, false, false));
             } else {
-                logger.warn(
-                        "Instructed to write a closing tag {} for an HTML void element.  "
-                        + "This might cause processing errors further down the track.  "
-                        + "To avoid this, either self close the opening element, remove the closing tag, or process this template using the XML processing mode.  "
-                        + "See https://html.spec.whatwg.org/multipage/syntax.html#void-elements for more information on HTML void elements.",
-                        name);
+                if (encounteredVoidTags.putIfAbsent(elementName, true) == null) {
+                    logger.warn(
+                            "Instructed to write a closing tag {} for an HTML void element.  "
+                            + "This might cause processing errors further down the track.  "
+                            + "To avoid this, either self close the opening element, remove the closing tag, or process this template using the XML processing mode.  "
+                            + "See https://html.spec.whatwg.org/multipage/syntax.html#void-elements for more information on HTML void elements.",
+                            name);
+                }
 
                 model.add(modelFactory.createStandaloneElementTag(elementName, attributes, AttributeValueQuotes.DOUBLE, false, false));
                 model.add(modelFactory.createCloseElementTag(elementName));

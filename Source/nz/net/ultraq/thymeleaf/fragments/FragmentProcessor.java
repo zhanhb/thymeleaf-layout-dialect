@@ -15,6 +15,7 @@
  */
 package nz.net.ultraq.thymeleaf.fragments;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.models.ElementMerger;
 import org.slf4j.Logger;
@@ -36,6 +37,8 @@ import org.thymeleaf.templatemode.TemplateMode;
 public class FragmentProcessor extends AbstractAttributeModelProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(FragmentProcessor.class);
+
+    private static final AtomicBoolean warned = new AtomicBoolean();
 
     public static final String PROCESSOR_NAME = "fragment";
     public static final int PROCESSOR_PRECEDENCE = 1;
@@ -64,7 +67,7 @@ public class FragmentProcessor extends AbstractAttributeModelProcessor {
     protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
             String attributeValue, IElementModelStructureHandler structureHandler) {
         // Emit a warning if found in the <head> section
-        if (getTemplateMode() == TemplateMode.HTML) {
+        if (warned.compareAndSet(false, true) && getTemplateMode() == TemplateMode.HTML) {
             for (IProcessableElementTag element : context.getElementStack()) {
                 if ("head".equals(element.getElementCompleteName())) {
                     logger.warn("You don't need to put the layout:fragment/data-layout-fragment attribute into the <head> section - "

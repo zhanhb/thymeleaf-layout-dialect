@@ -15,6 +15,7 @@
  */
 package nz.net.ultraq.thymeleaf.decorators;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import nz.net.ultraq.thymeleaf.context.LayoutContext;
 import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
 import org.slf4j.Logger;
@@ -43,6 +44,8 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
     private static final String PARAM_TITLE_DECORATOR = "$DECORATOR_TITLE";
     private static final String PARAM_TITLE_CONTENT = "$CONTENT_TITLE";
     private static final String PARAM_TITLE_LAYOUT = "$LAYOUT_TITLE";
+
+    private static final AtomicBoolean warned = new AtomicBoolean();
 
     public static final String PROCESSOR_NAME = "title-pattern";
     public static final int PROCESSOR_PRECEDENCE = 1;
@@ -96,7 +99,7 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
         String contentTitle = titleProcessor(CONTENT_TITLE_ATTRIBUTE, tag, structureHandler, expressionProcessor);
         String layoutTitle = titleProcessor(LAYOUT_TITLE_ATTRIBUTE, tag, structureHandler, expressionProcessor);
 
-        if (!StringUtils.isEmpty(titlePattern) && titlePattern.contains(PARAM_TITLE_DECORATOR)) {
+        if (warned.compareAndSet(false, true) && !StringUtils.isEmpty(titlePattern) && titlePattern.contains(PARAM_TITLE_DECORATOR)) {
             logger.warn(
                     "The $DECORATOR_TITLE token is deprecated and will be removed in the next major version of the layout dialect.  "
                     + "Please use the $LAYOUT_TITLE token instead to future-proof your code.  "
