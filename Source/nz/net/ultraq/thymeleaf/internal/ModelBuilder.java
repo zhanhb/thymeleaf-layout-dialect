@@ -15,10 +15,11 @@
  */
 package nz.net.ultraq.thymeleaf.internal;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.ITemplateContext;
@@ -40,7 +41,7 @@ public class ModelBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(ModelBuilder.class);
 
-    private static final ConcurrentMap<String, Boolean> encounteredVoidTags = new ConcurrentHashMap<>();
+    private static final Set<String> encounteredVoidTags = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     private final ElementDefinitions elementDefinitions;
     private final IModelFactory modelFactory;
@@ -137,7 +138,7 @@ public class ModelBuilder {
                 attributes.remove("void");
                 model.add(modelFactory.createStandaloneElementTag(elementName, attributes, AttributeValueQuotes.DOUBLE, false, false));
             } else {
-                if (encounteredVoidTags.putIfAbsent(elementName, true) == null) {
+                if (encounteredVoidTags.add(elementName)) {
                     logger.warn(
                             "Instructed to write a closing tag {} for an HTML void element.  "
                             + "This might cause processing errors further down the track.  "

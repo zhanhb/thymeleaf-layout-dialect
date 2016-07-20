@@ -15,8 +15,9 @@
  */
 package nz.net.ultraq.thymeleaf.expressions;
 
+import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ public class ExpressionProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(ExpressionProcessor.class);
     private static final Pattern THYMELEAF_3_FRAGMENT_EXPRESSION = Pattern.compile("^~\\{.+\\}$");
-    private static final ConcurrentMap<String, Boolean> oldFragmentExpressions = new ConcurrentHashMap<>();
+    private static final Set<String> oldFragmentExpressions = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     private final IExpressionContext context;
 
@@ -69,7 +70,7 @@ public class ExpressionProcessor {
      */
     public FragmentExpression parseFragmentExpression(String expression) {
         if (!THYMELEAF_3_FRAGMENT_EXPRESSION.matcher(expression).matches()) {
-            if (oldFragmentExpressions.putIfAbsent(expression, true) == null) {
+            if (oldFragmentExpressions.add(expression)) {
                 logger.warn(
                         "Fragment expression \"{}\" is being wrapped as a Thymeleaf 3 fragment expression (~{...}) for backwards compatibility purposes.  "
                         + "This wrapping will be dropped in the next major version of the expression processor, so please rewrite as a Thymeleaf 3 fragment expression to future-proof your code.  "
