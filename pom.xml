@@ -97,6 +97,12 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>net.sourceforge.nekohtml</groupId>
+            <artifactId>nekohtml</artifactId>
+            <version>1.9.22</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>nz.net.ultraq.thymeleaf</groupId>
             <artifactId>thymeleaf-testing-junit</artifactId>
             <version>1.1.1</version>
