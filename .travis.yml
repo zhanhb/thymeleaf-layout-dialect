@@ -7,8 +7,6 @@ cache:
   - $HOME/.m2
 jdk:
 - openjdk6
-- oraclejdk7
-- oraclejdk8
 install:
 - true
 script:
