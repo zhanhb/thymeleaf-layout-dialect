@@ -52,9 +52,6 @@ public class IModelExtensions {
             asBoolean << {
                 Z.asBoolean(delegate)
             }
-            childEventIterator << {
-                Z.childEventIterator(delegate)
-            }
             childModelIterator << {
                 Z.childModelIterator(delegate)
             }

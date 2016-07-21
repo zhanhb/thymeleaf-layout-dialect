@@ -33,7 +33,6 @@ import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IProcessableElementTag;
-import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import org.thymeleaf.standard.expression.Assignation;
@@ -114,11 +113,11 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
             MetaClass.removeLast(fragmentForInclusionUse);
         }
 
-        Iterator<ITemplateEvent> it = MetaClass.childEventIterator(fragmentForInclusionUse);
+        Iterator<IModel> it = MetaClass.childModelIterator(fragmentForInclusionUse);
         if (it != null) {
             while (it.hasNext()) {
-                ITemplateEvent fragmentChildEvent = it.next();
-                model.insert(model.size() - 1, fragmentChildEvent);
+                IModel fragmentChildModel = it.next();
+                model.insertModel(model.size() - 1, fragmentChildModel);
             }
         }
 

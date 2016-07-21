@@ -63,6 +63,7 @@ public class MetaClass {
      * @return An iterator over this model's child events, or an empty iterator
      * for all other model types.
      */
+    @Deprecated
     @Nullable
     public static Iterator<ITemplateEvent> childEventIterator(@Nonnull IModel delegate) {
         return isElement(delegate) ? new ChildEventIterator(delegate) : null;
@@ -205,13 +206,14 @@ public class MetaClass {
      * @return The first event to match the closure criteria, or {@code null} if
      * nothing matched.
      */
+    @Deprecated
     @Nullable
     public static ITemplateEvent find(@Nonnull IModel delegate, @Nonnull ITemplateEventPredicate closure) {
         for (int i = 0; i < delegate.size(); i++) {
             ITemplateEvent event = delegate.get(i);
             boolean result = closure.test(event);
             if (result) {
-                setIndex(event, i);
+                MetaProvider.INSTANCE.setProperty(event, "index", i);
                 return event;
             }
         }
@@ -589,14 +591,6 @@ public class MetaClass {
         }
 
         return 1;
-    }
-
-    public static void setIndex(ITemplateEvent delegate, int index) {
-        MetaProvider.INSTANCE.setProperty(delegate, "index", index);
-    }
-
-    public static int getIndex(ITemplateEvent delegate) {
-        return MetaProvider.INSTANCE.getProperty(delegate, "index");
     }
 
     public static void setStartIndex(IModel delegate, int startIndex) {
