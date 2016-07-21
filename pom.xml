@@ -224,6 +224,9 @@
                     <excludes>
                         <exclude>**/Abstract*.class</exclude>
                     </excludes>
+                    <systemPropertyVariables>
+                        <slf4j.detectLoggerNameMismatch>true</slf4j.detectLoggerNameMismatch>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
