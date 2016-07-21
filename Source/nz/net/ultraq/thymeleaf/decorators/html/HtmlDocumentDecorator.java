@@ -18,7 +18,6 @@ package nz.net.ultraq.thymeleaf.decorators.html;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
-import org.thymeleaf.dom.Document;
 import org.thymeleaf.dom.Element;
 
 /**
@@ -47,13 +46,6 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
 
         new HtmlHeadDecorator(sortingStrategy).decorate(decoratorHtml, MetaClass.findElement(contentHtml, "head"));
         new HtmlBodyDecorator().decorate(decoratorHtml, MetaClass.findElement(contentHtml, "body"));
-
-        // Set the doctype from the decorator if missing from the content page
-        Document decoratorDocument = (Document) decoratorHtml.getParent();
-        Document contentDocument = (Document) contentHtml.getParent();
-        if (contentDocument.getDocType() == null && decoratorDocument.getDocType() != null) {
-            contentDocument.setDocType(decoratorDocument.getDocType());
-        }
 
         super.decorate(decoratorHtml, contentHtml);
     }

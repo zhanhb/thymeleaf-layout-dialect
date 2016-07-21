@@ -18,6 +18,7 @@ package nz.net.ultraq.thymeleaf.decorators.xml;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.fragments.mergers.ElementMerger;
 import org.thymeleaf.dom.Comment;
+import org.thymeleaf.dom.Document;
 import org.thymeleaf.dom.Element;
 import org.thymeleaf.dom.NestableNode;
 import org.thymeleaf.dom.Node;
@@ -35,8 +36,13 @@ public class XmlDocumentDecorator implements Decorator {
     @Override
     public void decorate(Element decoratorXml, Element contentXml) {
 
-        NestableNode decoratorDocument = decoratorXml.getParent();
-        NestableNode contentDocument = contentXml.getParent();
+        Document decoratorDocument = (Document) decoratorXml.getParent();
+        Document contentDocument = (Document) contentXml.getParent();
+
+        // Set the doctype from the decorator if missing from the content page
+        if (contentDocument.getDocType() == null && decoratorDocument.getDocType() != null) {
+            contentDocument.setDocType(decoratorDocument.getDocType());
+        }
 
         // Copy text outside of the root element, keeping whitespace copied to a minimum
         boolean beforeHtml = true;

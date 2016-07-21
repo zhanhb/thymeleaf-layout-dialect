@@ -17,7 +17,7 @@ package nz.net.ultraq.thymeleaf.decorators;
 
 import java.util.Collections;
 import java.util.List;
-import nz.net.ultraq.thymeleaf.LayoutDialectContext;
+import nz.net.ultraq.thymeleaf.context.LayoutContext;
 import nz.net.ultraq.thymeleaf.fragments.mergers.AttributeMerger;
 import org.thymeleaf.Arguments;
 import org.thymeleaf.dom.AbstractTextNode;
@@ -113,7 +113,7 @@ public class TitlePatternProcessor extends AbstractAttrProcessor {
         if (!StringUtils.isEmpty(title)) {
             element.addChild(new Text(title));
             titleContainer.getParent().insertAfter(titleContainer, element.cloneNode(null, false));
-            LayoutDialectContext.forContext(arguments.getContext()).put(RESULTING_TITLE, title);
+            LayoutContext.forContext(arguments.getContext()).put(RESULTING_TITLE, title);
         }
 
         // Remove the processing section

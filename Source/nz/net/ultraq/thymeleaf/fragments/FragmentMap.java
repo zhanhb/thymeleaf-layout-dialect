@@ -41,8 +41,8 @@ public class FragmentMap extends HashMap<String, Element> {
      * @return A new or existing fragment collection for the context.
      */
     public static FragmentMap get(Arguments arguments) {
-        Object localVariable = arguments.getLocalVariable(FRAGMENT_COLLECTION_KEY);
-        return localVariable != null ? (FragmentMap) localVariable : new FragmentMap();
+        FragmentMap localVariable = (FragmentMap) arguments.getLocalVariable(FRAGMENT_COLLECTION_KEY);
+        return localVariable != null && !localVariable.isEmpty() ? localVariable : new FragmentMap();
     }
 
     /**
