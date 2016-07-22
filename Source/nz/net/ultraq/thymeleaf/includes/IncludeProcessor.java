@@ -46,6 +46,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  * you want to reuse, but whose contents are too complex to determine or
  * construct with context variables alone.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  * @deprecated Use {@link InsertProcessor} ({@code layout:insert}) instead.
  */

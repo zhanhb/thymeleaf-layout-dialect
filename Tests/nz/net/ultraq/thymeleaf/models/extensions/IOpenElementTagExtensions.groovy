@@ -3,6 +3,10 @@ package nz.net.ultraq.thymeleaf.models.extensions
 import nz.net.ultraq.thymeleaf.internal.MetaClass as Z;
 import org.thymeleaf.model.IOpenElementTag
 
+/**
+ *
+ * @author zhanhb
+ */
 class IOpenElementTagExtensions {
 	static void apply() {
         IOpenElementTag.metaClass {

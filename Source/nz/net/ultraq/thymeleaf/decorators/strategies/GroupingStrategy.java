@@ -30,6 +30,7 @@ import org.thymeleaf.model.ITemplateEvent;
 /**
  * The {@code <head>} merging strategy which groups like elements together.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  * @since 1.2.6
  */

@@ -27,6 +27,7 @@ import org.thymeleaf.util.StringUtils;
  * A simple API for retrieving (immutable template) models using Thymeleaf's
  * template manager.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class TemplateModelFinder {

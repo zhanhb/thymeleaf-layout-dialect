@@ -25,6 +25,7 @@ import org.thymeleaf.processor.element.IElementModelStructureHandler;
  * Holds the layout fragments encountered across layout/decorator and content
  * templates for use later.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 @SuppressWarnings({"serial", "CloneableImplementsClone"})

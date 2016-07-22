@@ -21,6 +21,7 @@ import org.thymeleaf.model.IModel;
  * Interface for controlling the sort order in which {@code <head>} elements
  * from one source are placed into another.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public interface SortingStrategy {

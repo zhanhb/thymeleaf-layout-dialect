@@ -36,6 +36,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 /**
  * Specifies the name of the template to decorate using the current template.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class DecorateProcessor extends AbstractAttributeModelProcessor {

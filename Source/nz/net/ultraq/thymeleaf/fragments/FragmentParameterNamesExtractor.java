@@ -24,6 +24,7 @@ import javax.annotation.Nonnull;
  * Extracts just the parameter names from a fragment definition. Used for when
  * unnamed fragment parameters need to be mapped to their respective names.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class FragmentParameterNamesExtractor {

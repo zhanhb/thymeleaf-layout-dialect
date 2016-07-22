@@ -27,6 +27,7 @@ import org.thymeleaf.model.IModel;
  * within the event queue of the parent model, accessible via their
  * {@code startIndex}/{@code endIndex} properties.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class ChildModelIterator implements Iterator<IModel> {

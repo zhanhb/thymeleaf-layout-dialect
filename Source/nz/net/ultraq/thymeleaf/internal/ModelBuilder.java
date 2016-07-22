@@ -35,6 +35,7 @@ import org.thymeleaf.util.StringUtils;
 /**
  * Create Thymeleaf 3 models using the Groovy builder syntax.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class ModelBuilder {

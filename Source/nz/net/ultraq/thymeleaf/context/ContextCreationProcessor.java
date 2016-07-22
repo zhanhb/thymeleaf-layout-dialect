@@ -26,6 +26,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 /**
  * A processor whose only job is to initialize the layout context.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class ContextCreationProcessor extends AbstractTemplateBoundariesProcessor {

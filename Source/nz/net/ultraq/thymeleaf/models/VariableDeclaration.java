@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
  * Representation of a scoped variable declaration made through {@code th:with}
  * attributes.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class VariableDeclaration {

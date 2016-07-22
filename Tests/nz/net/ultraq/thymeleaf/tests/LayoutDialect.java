@@ -43,14 +43,8 @@ public class LayoutDialect extends nz.net.ultraq.thymeleaf.LayoutDialect {
             "nz.net.ultraq.thymeleaf.models.extensions.ITextExtensions",
             "nz.net.ultraq.thymeleaf.models.extensions.TemplateModelExtensions"
         }) {
-            Class<?> cl;
             try {
-                cl = Class.forName(className);
-            } catch (ClassNotFoundException | Error ex) {
-                continue;
-            }
-            try {
-                publicLookup.findStatic(cl, "apply", MethodType.methodType(Void.TYPE)).invoke();
+                publicLookup.findStatic(Class.forName(className), "apply", MethodType.methodType(Void.TYPE)).invoke();
             } catch (Throwable ex) {
                 throw new ExceptionInInitializerError(ex);
             }

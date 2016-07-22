@@ -22,6 +22,7 @@ import org.thymeleaf.context.IContext;
  * Map of data and values that are passed around the layout dialect, exposed so
  * that others can make use of the properties.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 @SuppressWarnings({"serial", "CloneableImplementsClone"})

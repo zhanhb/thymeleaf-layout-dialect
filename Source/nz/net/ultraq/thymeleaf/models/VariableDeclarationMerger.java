@@ -25,6 +25,7 @@ import org.thymeleaf.util.StringUtils;
  * the declarations in the target and combining them with the declarations in
  * the source, overriding any same-named declarations in the target.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class VariableDeclarationMerger {

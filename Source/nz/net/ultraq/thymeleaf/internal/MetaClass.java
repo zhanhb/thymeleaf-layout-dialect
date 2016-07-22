@@ -42,6 +42,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  * meta-programming.
  *
  * @author zhanhb
+ * @author Emanuel Rabina
  */
 public class MetaClass {
 

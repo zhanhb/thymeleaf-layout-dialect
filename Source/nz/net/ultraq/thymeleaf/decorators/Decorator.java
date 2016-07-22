@@ -22,6 +22,7 @@ import org.thymeleaf.model.IModel;
  * all the decorations to apply. What exactly "decoration" means can vary per
  * implementation.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public interface Decorator {

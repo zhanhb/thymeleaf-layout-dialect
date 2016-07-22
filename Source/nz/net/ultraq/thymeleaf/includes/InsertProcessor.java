@@ -42,6 +42,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  * you want to reuse, but whose contents are too complex to determine or
  * construct with context variables alone.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class InsertProcessor extends AbstractAttributeModelProcessor {

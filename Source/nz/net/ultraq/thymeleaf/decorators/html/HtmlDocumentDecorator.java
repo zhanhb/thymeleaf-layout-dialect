@@ -30,6 +30,7 @@ import org.thymeleaf.model.IOpenElementTag;
  * involves 2 sub-decorators: a special one for the {@code <head>} element, and
  * a standard one for the {@code <body>} element.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class HtmlDocumentDecorator extends XmlDocumentDecorator {

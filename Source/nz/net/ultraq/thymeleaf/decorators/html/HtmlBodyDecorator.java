@@ -24,6 +24,7 @@ import org.thymeleaf.model.IModelFactory;
 /**
  * A decorator specific to processing an HTML {@code <body>} element.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class HtmlBodyDecorator implements Decorator {

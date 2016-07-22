@@ -29,6 +29,7 @@ import org.thymeleaf.standard.expression.StandardExpressions;
 /**
  * A simplified API for working with Thymeleaf expressions.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class ExpressionProcessor {

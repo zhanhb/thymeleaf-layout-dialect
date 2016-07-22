@@ -27,6 +27,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 /**
  * Create Thymeleaf 3.0 models using a simplified syntax.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class ModelBuilder extends BuilderSupport {

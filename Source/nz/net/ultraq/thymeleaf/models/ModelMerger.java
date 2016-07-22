@@ -21,6 +21,7 @@ import org.thymeleaf.model.IModel;
  * Merges template models by applying the source model to the target model, with
  * the result being implementation-dependant.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public interface ModelMerger {

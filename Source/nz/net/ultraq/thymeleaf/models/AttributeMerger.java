@@ -28,6 +28,7 @@ import org.thymeleaf.standard.processor.StandardWithTagProcessor;
 /**
  * Merges attributes from one element into another.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class AttributeMerger implements ModelMerger {

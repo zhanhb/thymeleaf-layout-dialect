@@ -22,15 +22,9 @@ import nz.net.ultraq.thymeleaf.internal.ITemplateEventConsumer;
 import nz.net.ultraq.thymeleaf.internal.ITemplateEventIntPredicate;
 import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
 import nz.net.ultraq.thymeleaf.internal.MetaProvider;
-import org.thymeleaf.engine.TemplateModel;
-import org.thymeleaf.model.IAttribute;
-import org.thymeleaf.model.ICloseElementTag;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
-import org.thymeleaf.model.IOpenElementTag;
-import org.thymeleaf.model.IStandaloneElementTag;
 import org.thymeleaf.model.ITemplateEvent;
-import org.thymeleaf.model.IText;
 
 /**
  *

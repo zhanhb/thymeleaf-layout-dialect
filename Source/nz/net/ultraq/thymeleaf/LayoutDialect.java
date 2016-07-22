@@ -35,6 +35,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  * A dialect for Thymeleaf that lets you build layouts and reusable templates in
  * order to improve code reuse
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class LayoutDialect extends AbstractProcessorDialect {

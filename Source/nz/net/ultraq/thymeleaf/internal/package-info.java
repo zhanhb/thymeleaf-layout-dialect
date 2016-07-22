@@ -16,5 +16,5 @@
 package nz.net.ultraq.thymeleaf.internal;
 
 /**
- * Internal use only.
+ * Internal use only, may be removed in the future.
  */

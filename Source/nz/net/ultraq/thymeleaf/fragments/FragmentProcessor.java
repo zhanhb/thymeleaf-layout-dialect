@@ -32,6 +32,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  * This processor serves a dual purpose: to mark sections of the template that
  * can be replaced, and to do the replacing when they're encountered.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class FragmentProcessor extends AbstractAttributeModelProcessor {

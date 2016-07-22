@@ -30,6 +30,7 @@ import org.thymeleaf.model.ITemplateEvent;
 /**
  * A decorator made to work over an XML document.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class XmlDocumentDecorator implements Decorator {

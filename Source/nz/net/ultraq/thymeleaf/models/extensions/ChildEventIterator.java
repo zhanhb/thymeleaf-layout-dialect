@@ -27,6 +27,7 @@ import org.thymeleaf.model.ITemplateEvent;
  * Models returned by this iterator are also aware of their position within the
  * event queue of the parent model, accessible via their {@code index} property.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 @Deprecated

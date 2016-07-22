@@ -28,6 +28,7 @@ import org.thymeleaf.model.ITemplateEvent;
 /**
  * Merges an element and all its children into an existing element.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class ElementMerger implements ModelMerger {

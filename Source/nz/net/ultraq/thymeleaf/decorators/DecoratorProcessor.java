@@ -29,6 +29,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  * {@code layout:decorator}/{@code data-layout-decorator} processor has been
  * renamed.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 @Deprecated

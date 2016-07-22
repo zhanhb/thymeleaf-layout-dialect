@@ -20,8 +20,11 @@ import nz.net.ultraq.thymeleaf.internal.MetaClass as Z;
 import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.model.IText;
 
+/**
+ *
+ * @author zhanhb
+ */
 class ITemplateEventExtensions {
-
 	static void apply() {
         ITemplateEvent.metaClass {
             isWhitespace << {

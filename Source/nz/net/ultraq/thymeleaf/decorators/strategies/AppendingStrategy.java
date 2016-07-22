@@ -23,6 +23,7 @@ import org.thymeleaf.model.IModel;
  * The standard {@code <head>} merging strategy, which simply appends the
  * content elements to the layout ones.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class AppendingStrategy implements SortingStrategy {

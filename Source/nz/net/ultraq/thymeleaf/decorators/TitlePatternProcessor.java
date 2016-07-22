@@ -34,6 +34,7 @@ import org.unbescape.html.HtmlEscape;
  * specifying a pattern with some special tokens. This can be used to extend the
  * layout's title with the content's one, instead of simply overriding it.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class TitlePatternProcessor extends AbstractAttributeTagProcessor {

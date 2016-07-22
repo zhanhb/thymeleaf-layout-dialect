@@ -29,6 +29,7 @@ import org.thymeleaf.model.IOpenElementTag;
 /**
  * A decorator specific to processing an HTML {@code <head>} element.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class HtmlHeadDecorator implements Decorator {

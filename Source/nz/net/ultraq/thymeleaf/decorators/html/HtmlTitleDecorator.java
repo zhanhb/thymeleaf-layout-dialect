@@ -36,6 +36,7 @@ import org.unbescape.html.HtmlEscape;
  * Decorator for the {@code <title>} part of the template to handle the special
  * processing required for the {@code layout:title-pattern} processor.
  *
+ * @author zhanhb
  * @author Emanuel Rabina
  */
 public class HtmlTitleDecorator implements Decorator {
