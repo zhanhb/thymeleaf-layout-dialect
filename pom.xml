@@ -208,6 +208,9 @@
                     <additionalJOption>-J-Dfile.encoding=${file.encoding}</additionalJOption>
                     <excludePackageNames>*.internal.*</excludePackageNames>
                     <locale>en_US</locale>
+                    <links>
+                        <link>http://www.thymeleaf.org/apidocs/thymeleaf/3.0.0.RELEASE/</link>
+                    </links>
                 </configuration>
             </plugin>
             <plugin>
