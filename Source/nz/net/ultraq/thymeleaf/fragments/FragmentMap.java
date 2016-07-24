@@ -41,14 +41,8 @@ public class FragmentMap extends HashMap<String, IModel> {
      * @return A new or existing fragment collection for the context.
      */
     public static FragmentMap get(IContext context) {
-        Object variable = context.getVariable(FRAGMENT_COLLECTION_KEY);
-        if (variable instanceof FragmentMap) {
-            FragmentMap map = (FragmentMap) variable;
-            if (!map.isEmpty()) {
-                return map;
-            }
-        }
-        return new FragmentMap();
+        FragmentMap localVariable = (FragmentMap) context.getVariable(FRAGMENT_COLLECTION_KEY);
+        return localVariable != null && !localVariable.isEmpty() ? localVariable : new FragmentMap();
     }
 
     /**
