@@ -9,8 +9,6 @@
         <goals>
             <goal>-Prelease-profile</goal>
             <goal>clean</goal>
-            <goal>source:jar</goal>
-            <goal>javadoc:jar</goal>
             <goal>deploy</goal>
         </goals>
     </action>
