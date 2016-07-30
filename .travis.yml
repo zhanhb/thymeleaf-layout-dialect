@@ -13,8 +13,7 @@ script:
 - jdk_switcher use oraclejdk7 && mvn -Djava.version=1.7 surefire:test
 after_success:
 - bash <(curl -s https://codecov.io/bash)
-- chmod +x .travis/publish.sh
-- jdk_switcher use oraclejdk8 && .travis/publish.sh
+- jdk_switcher use oraclejdk8 && source .travis/publish.sh
 env:
   global:
   - secure: MnRk6WkpdRg2TZSFUAIRXRSG0Ixd05QpXqzUor6Mw6xmYejOJbkkr/wy20080gr8HVSykY3sOw2rcrTPWyWiwHYjz2wAjXhhZebzYTdzicHOwHK8LaSa10O+/fuCEGRFxFP/pA3L7X9kgzq7EYVbGfFfOniOtT1TSWXeZNpmxcTNNYqpj7TjvL/dSI70XR9tzKru1fWTSQyitg8bi4vyx9QyAeqLV5ptkd9gjDNwm9RZuGv227CDAHJtWUwKGoTtUQz4o+hNJO8L/+hVEK3/ISWKcM0WmQRKaYQoMWzhYDei/a7htAasDhdcwQTPYNF9uM2adnE4Ws+HjUSKXdOEt6PD4wGzILvJ91P4VTK7g38k47egkT9L+4vtNqWEhNSfSuEM+0m4/AQpsg1vczdFKx3KpD5Ix19HJA2CPckaSYBbQbsM67Vb5Bb1IGDtpcdb43hkpFNLpvGztnaIjUCC/e5VkDdL9xnucaHJruH+aWlaJH+RjyX379xjwxPpoKrapCNbXtWaz7M7jg2hv/1/ZMbTBzD+sPhFfthw2jWdWRLlq5zMNedkzqpuDdmkCa0uhu/uAHoEA6Hxh8TfpeFPIMZnXT5jI7XFGxDKETaq9r71MFx+Jkl6zYck+FfoIFbm12RsY9duRVSonFjM1ny0yhS/wODxcorUl8pSW3ccq/s=
