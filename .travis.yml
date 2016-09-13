@@ -1,6 +1,6 @@
 language: java
 before_cache:
-- rm -rf $HOME/.m2/repository/com/github/zhanhb/thymeleaf-layout-dialect
+- mvn build-helper:remove-project-artifact
 - find $HOME/.m2/ -type d -name '*-SNAPSHOT' -exec rm -rf {} \; 2>/dev/null
 cache:
   directories:
