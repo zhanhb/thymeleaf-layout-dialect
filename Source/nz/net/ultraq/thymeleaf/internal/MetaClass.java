@@ -19,7 +19,6 @@ import java.util.Iterator;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import nz.net.ultraq.thymeleaf.models.extensions.ChildEventIterator;
 import nz.net.ultraq.thymeleaf.models.extensions.ChildModelIterator;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.engine.HTMLElementDefinition;
@@ -54,20 +53,6 @@ public class MetaClass {
      */
     public static boolean asBoolean(@Nullable IModel delegate) {
         return delegate != null && delegate.size() > 0;
-    }
-
-    /**
-     * If this model represents an element, then this method returns an iterator
-     * over those child events.
-     *
-     * @param delegate
-     * @return An iterator over this model's child events, or an empty iterator
-     * for all other model types.
-     */
-    @Deprecated
-    @Nullable
-    public static Iterator<ITemplateEvent> childEventIterator(@Nonnull IModel delegate) {
-        return isElement(delegate) ? new ChildEventIterator(delegate) : null;
     }
 
     /**
@@ -192,33 +177,6 @@ public class MetaClass {
             }
         }
         return true;
-    }
-
-    /**
-     * Returns the first event in the model that meets the criteria of the given
-     * closure.
-     *
-     * Models returned via this method are also aware of their position in the
-     * event queue of the parent model, accessible via their {@code index}
-     * property.
-     *
-     * @param delegate
-     * @param closure
-     * @return The first event to match the closure criteria, or {@code null} if
-     * nothing matched.
-     */
-    @Deprecated
-    @Nullable
-    public static ITemplateEvent find(@Nonnull IModel delegate, @Nonnull ITemplateEventPredicate closure) {
-        for (int i = 0; i < delegate.size(); i++) {
-            ITemplateEvent event = delegate.get(i);
-            boolean result = closure.test(event);
-            if (result) {
-                MetaProvider.INSTANCE.setProperty(event, "index", i);
-                return event;
-            }
-        }
-        return null;
     }
 
     /**
