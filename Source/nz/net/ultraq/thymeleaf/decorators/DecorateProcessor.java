@@ -103,11 +103,11 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
             model.replace(0, rootElement);
         }
 
-        // Load the entirety of this template
+        // Load the entirety of this template so we can access items outside of the root element
         // TODO: Can probably find a way of preventing this double-loading for #102
         String contentTemplateName = context.getTemplateData().getTemplate();
         IModel contentTemplate = templateModelFinder.findTemplate(contentTemplateName).cloneModel();
-        contentTemplate.replace(MetaClass.findIndexOf(contentTemplate, event -> event instanceof IOpenElementTag), rootElement);
+        MetaClass.replaceModel(contentTemplate, MetaClass.findIndexOf(contentTemplate, event -> event instanceof IOpenElementTag), model);
 
         // Locate the template to decorate
         FragmentExpression decorateTemplateExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);

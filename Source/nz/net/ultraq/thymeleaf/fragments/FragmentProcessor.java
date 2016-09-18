@@ -16,6 +16,7 @@
 package nz.net.ultraq.thymeleaf.fragments;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import nz.net.ultraq.thymeleaf.LayoutDialect;
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import nz.net.ultraq.thymeleaf.models.ElementMerger;
 import org.slf4j.Logger;
@@ -23,9 +24,10 @@ import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.model.IProcessableElementTag;
-import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
-import org.thymeleaf.processor.element.IElementModelStructureHandler;
+import org.thymeleaf.processor.element.AbstractAttributeTagProcessor;
+import org.thymeleaf.processor.element.IElementTagStructureHandler;
 import org.thymeleaf.templatemode.TemplateMode;
 
 /**
@@ -35,7 +37,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  * @author zhanhb
  * @author Emanuel Rabina
  */
-public class FragmentProcessor extends AbstractAttributeModelProcessor {
+public class FragmentProcessor extends AbstractAttributeTagProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(FragmentProcessor.class);
 
@@ -59,14 +61,14 @@ public class FragmentProcessor extends AbstractAttributeModelProcessor {
      * placeholder.
      *
      * @param context
-     * @param model
+     * @param tag
      * @param attributeName
      * @param attributeValue
      * @param structureHandler
      */
     @Override
-    protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
-            String attributeValue, IElementModelStructureHandler structureHandler) {
+    protected void doProcess(ITemplateContext context, IProcessableElementTag tag,
+            AttributeName attributeName, String attributeValue, IElementTagStructureHandler structureHandler) {
         // Emit a warning if found in the <head> section
         if (warned.compareAndSet(false, true) && getTemplateMode() == TemplateMode.HTML) {
             for (IProcessableElementTag element : context.getElementStack()) {
@@ -80,9 +82,17 @@ public class FragmentProcessor extends AbstractAttributeModelProcessor {
 
         // Locate the fragment that corresponds to this decorator/include fragment
         IModel fragment = FragmentMap.get(context).get(attributeValue);
-        // Replace this model with the fragment
+        // Replace the tag body with the fragment
         if (MetaClass.asBoolean(fragment)) {
-            MetaClass.replaceModel(model, 0, new ElementMerger(context.getModelFactory()).merge(model, fragment));
+            IModelFactory modelFactory = context.getModelFactory();
+            IModel replacementModel = new ElementMerger(context).merge(modelFactory.createModel(tag), fragment);
+
+            // Remove the layout:fragment attribute - Thymeleaf won't do it for us
+            // when using StructureHandler.replaceWith(...)
+            replacementModel.replace(0, modelFactory.removeAttribute((IProcessableElementTag) MetaClass.first(replacementModel),
+                    MetaClass.getPrefixForDialect(context, LayoutDialect.class), PROCESSOR_NAME));
+
+            structureHandler.replaceWith(replacementModel, true);
         }
     }
 

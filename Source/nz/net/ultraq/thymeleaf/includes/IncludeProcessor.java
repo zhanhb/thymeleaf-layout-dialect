@@ -107,12 +107,7 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
 
         // Retrieving a model for a template can come with whitspace, so trim those
         // from the model so that we can use the child event iterator.
-        while (MetaClass.isWhitespace(MetaClass.first(fragmentForInclusionUse))) {
-            MetaClass.removeFirst(fragmentForInclusionUse);
-        }
-        while (MetaClass.isWhitespace(MetaClass.last(fragmentForInclusionUse))) {
-            MetaClass.removeLast(fragmentForInclusionUse);
-        }
+        MetaClass.trim(fragmentForInclusionUse);
 
         Iterator<IModel> it = MetaClass.childModelIterator(fragmentForInclusionUse);
         if (it != null) {

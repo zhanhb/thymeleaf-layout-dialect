@@ -81,7 +81,7 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
             return event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName());
         };
         IModel targetBodyModel = MetaClass.findModel(targetDocumentModel, bodyModelFinder);
-        IModel resultBodyModel = new HtmlBodyDecorator(context.getModelFactory()).decorate(targetBodyModel,
+        IModel resultBodyModel = new HtmlBodyDecorator(context).decorate(targetBodyModel,
                 MetaClass.findModel(sourceDocumentModel, bodyModelFinder)
         );
         if (MetaClass.asBoolean(resultBodyModel)) {

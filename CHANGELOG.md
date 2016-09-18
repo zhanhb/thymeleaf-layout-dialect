@@ -2,6 +2,18 @@
 Changelog
 =========
 
+As of 1.3.0, this project follows [Semantic Versioning](http://semver.org/).
+
+### 2.0.2
+ - Convert `FragmentProcessor` from a model processor to a tag processor to get
+   around model level problems when inserting fragments that may alter the model
+   level
+   ([#129](https://github.com/ultraq/thymeleaf-layout-dialect/issues/129))
+ - Fix the merging of the `<head>` section in multi-level layouts
+   ([#130](https://github.com/ultraq/thymeleaf-layout-dialect/issues/130))
+ - Respect the runtime-configured prefix
+   ([#103](https://github.com/ultraq/thymeleaf-layout-dialect/issues/103))
+
 ### 2.0.1
  - Fix `NullPointerException` when using any of the `include`/`insert`/`replace`
    processors with a full template fragment expression
@@ -14,6 +26,8 @@ Changelog
  - Improved memory usage by not being so wasteful of objects in a few parts of
    the codebase, which in turn fixed a potential memory leak
    ([#122](https://github.com/ultraq/thymeleaf-layout-dialect/issues/122))
+ - Fixed a backwards compatibility problem when using `layout:decorator`
+   ([#125](https://github.com/ultraq/thymeleaf-layout-dialect/issues/125))
 
 ### 2.0.0
  - Layout dialect rewritten to support Thymeleaf 3

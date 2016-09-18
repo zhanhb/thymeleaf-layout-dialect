@@ -16,6 +16,7 @@
 package nz.net.ultraq.thymeleaf.decorators.html;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor;
@@ -26,6 +27,7 @@ import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IAttribute;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IProcessableElementTag;
+import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.model.IText;
 import org.thymeleaf.standard.StandardDialect;
 import org.thymeleaf.standard.processor.StandardTextTagProcessor;
@@ -42,29 +44,30 @@ import org.unbescape.html.HtmlEscape;
 public class HtmlTitleDecorator implements Decorator {
 
     // Get the title pattern to use
-    private static IAttribute titlePatternProcessorRetriever(IModel titleModel) {
+    private static IAttribute titlePatternProcessorRetriever(IModel titleModel, String attributeName) {
         if (!MetaClass.asBoolean(titleModel)) {
             return null;
         }
         IProcessableElementTag event = (IProcessableElementTag) MetaClass.first(titleModel);
-        return event != null ? event.getAttribute(LayoutDialect.DIALECT_PREFIX, TitlePatternProcessor.PROCESSOR_NAME) : null;
+        return event != null ? event.getAttribute(attributeName, TitlePatternProcessor.PROCESSOR_NAME) : null;
     }
 
-    private static String titleValueRetriever(IModel titleModel) {
-        if (MetaClass.asBoolean(titleModel)) {
-            IProcessableElementTag event = (IProcessableElementTag) MetaClass.first(titleModel);
-            String result = null;
-            if (event != null) {
-                result = event.getAttributeValue(StandardDialect.PREFIX, StandardTextTagProcessor.ATTR_NAME);
+    private static void titleValueExtractor(IModel titleModel, String titleAttribute, String standardDialectPrefix, Map<String, Object> titleValuesMap) {
+        ITemplateEvent titleTag = MetaClass.asBoolean(titleModel) ? MetaClass.first(titleModel) : null;
+        if (titleTag != null) {
+            String titleValue = ((IProcessableElementTag) titleTag).getAttributeValue(titleAttribute);
+            if (StringUtils.isEmpty(titleValue)) {
+                titleValue = ((IProcessableElementTag) titleTag).getAttributeValue(standardDialectPrefix, StandardTextTagProcessor.ATTR_NAME);
             }
-            if (!StringUtils.isEmpty(result)) {
-                return result;
+            if (StringUtils.isEmpty(titleValue)) {
+                titleValue = MetaClass.asBoolean(titleModel) && titleModel.size() > 2 ? "'"
+                        + HtmlEscape.escapeHtml5Xml(((IText) titleModel.get(1)).getText())
+                        + "'" : null;
             }
-            if (titleModel.size() > 2) {
-                return "'" + HtmlEscape.escapeHtml5Xml(((IText) titleModel.get(1)).getText()) + "'";
+            if (!StringUtils.isEmpty(titleValue)) {
+                titleValuesMap.put(titleAttribute, titleValue);
             }
         }
-        return null;
     }
 
     private final ITemplateContext context;
@@ -89,9 +92,12 @@ public class HtmlTitleDecorator implements Decorator {
      */
     @Override
     public IModel decorate(IModel targetTitleModel, IModel sourceTitleModel) {
-        IAttribute titlePatternProcessor = titlePatternProcessorRetriever(sourceTitleModel);
+        String layoutDialectPrefix = MetaClass.getPrefixForDialect(context, LayoutDialect.class);
+        String standardDialectPrefix = MetaClass.getPrefixForDialect(context, StandardDialect.class);
+
+        IAttribute titlePatternProcessor = titlePatternProcessorRetriever(sourceTitleModel, layoutDialectPrefix);
         if (titlePatternProcessor == null) {
-            titlePatternProcessor = titlePatternProcessorRetriever(targetTitleModel);
+            titlePatternProcessor = titlePatternProcessorRetriever(targetTitleModel, layoutDialectPrefix);
         }
 
         IModel resultTitle;
@@ -100,20 +106,15 @@ public class HtmlTitleDecorator implements Decorator {
         // title result parts that we want to use on the pattern.
         if (titlePatternProcessor != null) {
             LinkedHashMap<String, Object> titleValuesMap = new LinkedHashMap<>(2);
-            String contentTitle = titleValueRetriever(sourceTitleModel);
-            if (!StringUtils.isEmpty(contentTitle)) {
-                titleValuesMap.put(TitlePatternProcessor.CONTENT_TITLE_ATTRIBUTE, contentTitle);
-            }
-            String layoutTitle = titleValueRetriever(targetTitleModel);
-            if (!StringUtils.isEmpty(layoutTitle)) {
-                titleValuesMap.put(TitlePatternProcessor.LAYOUT_TITLE_ATTRIBUTE, layoutTitle);
-            }
+            titleValueExtractor(sourceTitleModel, TitlePatternProcessor.CONTENT_TITLE_ATTRIBUTE, standardDialectPrefix, titleValuesMap);
+            titleValueExtractor(targetTitleModel, TitlePatternProcessor.LAYOUT_TITLE_ATTRIBUTE, standardDialectPrefix, titleValuesMap);
+
             LinkedHashMap<String, Object> linkedHashMap = new LinkedHashMap<>(3);
             linkedHashMap.put(titlePatternProcessor.getAttributeCompleteName(), titlePatternProcessor.getValue());
             linkedHashMap.putAll(titleValuesMap);
             resultTitle = new ModelBuilder(context).createNode("title", linkedHashMap);
         } else {
-            resultTitle = new ElementMerger(context.getModelFactory()).merge(targetTitleModel, sourceTitleModel);
+            resultTitle = new ElementMerger(context).merge(targetTitleModel, sourceTitleModel);
         }
         return resultTitle;
     }

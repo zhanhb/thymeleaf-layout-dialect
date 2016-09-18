@@ -69,7 +69,7 @@ public class HtmlHeadDecorator implements Decorator {
         ITemplateEventPredicate isTitle = event -> event instanceof IOpenElementTag && "title".equals(((IElementTag) event).getElementCompleteName());
 
         // New head model based off the target being decorated
-        IModel resultHeadModel = new AttributeMerger(context.getModelFactory()).merge(targetHeadModel, sourceHeadModel);
+        IModel resultHeadModel = new AttributeMerger(context).merge(targetHeadModel, sourceHeadModel);
         int titleIndex = MetaClass.findIndexOf(resultHeadModel, isTitle);
         if (titleIndex != -1) {
             MetaClass.removeModelWithWhitespace(resultHeadModel, titleIndex);

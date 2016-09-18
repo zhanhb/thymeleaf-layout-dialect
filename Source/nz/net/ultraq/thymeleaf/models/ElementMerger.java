@@ -16,6 +16,7 @@
 package nz.net.ultraq.thymeleaf.models;
 
 import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.AttributeValueQuotes;
 import org.thymeleaf.model.IElementTag;
 import org.thymeleaf.model.IModel;
@@ -33,15 +34,15 @@ import org.thymeleaf.model.ITemplateEvent;
  */
 public class ElementMerger implements ModelMerger {
 
-    private final IModelFactory modelFactory;
+    private final ITemplateContext context;
 
     /**
-     * Constructor, sets up the element merger tools.
+     * Constructor, sets up the element merger context.
      *
-     * @param modelFactory
+     * @param context
      */
-    public ElementMerger(IModelFactory modelFactory) {
-        this.modelFactory = modelFactory;
+    public ElementMerger(ITemplateContext context) {
+        this.context = context;
     }
 
     /**
@@ -57,8 +58,11 @@ public class ElementMerger implements ModelMerger {
         // If one of the parameters is missing return a copy of the other, or
         // nothing if both parameters are missing.
         if (!MetaClass.asBoolean(targetModel) || !MetaClass.asBoolean(sourceModel)) {
-            return MetaClass.asBoolean(targetModel) ? targetModel.cloneModel() : MetaClass.asBoolean(sourceModel) ? sourceModel.cloneModel() : null;
+            IModel result = MetaClass.asBoolean(targetModel) ? targetModel.cloneModel() : null;
+            return MetaClass.asBoolean(result) ? result : MetaClass.asBoolean(sourceModel) ? sourceModel.cloneModel() : null;
         }
+
+        IModelFactory modelFactory = context.getModelFactory();
 
         // The result we want is the source model, but merged into the target root element attributes
         ITemplateEvent sourceRootEvent = MetaClass.first(sourceModel);
@@ -72,7 +76,7 @@ public class ElementMerger implements ModelMerger {
                                 ? modelFactory.createStandaloneElementTag(((IElementTag) sourceRootEvent).getElementCompleteName(),
                                         targetRootEvent.getAttributeMap(), AttributeValueQuotes.DOUBLE, false, ((IStandaloneElementTag) sourceRootEvent).isMinimized())
                                 : null);
-        IModel mergedRootElement = new AttributeMerger(modelFactory).merge(targetRootElement, sourceRootElement);
+        IModel mergedRootElement = new AttributeMerger(context).merge(targetRootElement, sourceRootElement);
         IModel mergedModel = sourceModel.cloneModel();
         mergedModel.replace(0, MetaClass.first(mergedRootElement));
         return mergedModel;

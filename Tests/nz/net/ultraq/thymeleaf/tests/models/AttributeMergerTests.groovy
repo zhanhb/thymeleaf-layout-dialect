@@ -24,7 +24,7 @@ import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
 import org.thymeleaf.TemplateEngine
-import org.thymeleaf.model.IModelFactory
+import org.thymeleaf.context.ITemplateContext
 import org.thymeleaf.templatemode.TemplateMode
 
 /**
@@ -35,8 +35,8 @@ import org.thymeleaf.templatemode.TemplateMode
  */
 class AttributeMergerTests {
 
+	private static ITemplateContext mockContext
 	private static ModelBuilder modelBuilder
-	private static IModelFactory modelFactory
 
 	private AttributeMerger attributeMerger
 
@@ -48,11 +48,20 @@ class AttributeMergerTests {
 
 		def templateEngine = new TemplateEngine(
 			additionalDialects: [
-			  new LayoutDialect()
+				new LayoutDialect()
 			]
 		)
-		modelFactory = templateEngine.configuration.getModelFactory(TemplateMode.HTML)
+		def modelFactory = templateEngine.configuration.getModelFactory(TemplateMode.HTML)
+
 		modelBuilder = new ModelBuilder(modelFactory, templateEngine.configuration.elementDefinitions, TemplateMode.HTML)
+		mockContext = [
+			getConfiguration: { ->
+				return templateEngine.configuration
+			},
+			getModelFactory: { ->
+				return modelFactory
+			}
+		] as ITemplateContext
 	}
 
 	/**
@@ -61,7 +70,7 @@ class AttributeMergerTests {
 	@Before
 	void setupAttributeMerger() {
 
-		attributeMerger = new AttributeMerger(modelFactory)
+		attributeMerger = new AttributeMerger(mockContext)
 	}
 
 	/**
@@ -88,7 +97,7 @@ class AttributeMergerTests {
 
 	/**
 	 * Test that attributes in the source element override those of the target.
- 	 */
+	 */
 	@Test
 	@SuppressWarnings('ExplicitCallToDivMethod')
 	void mergeAttributes() {

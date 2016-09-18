@@ -17,9 +17,13 @@ package nz.net.ultraq.thymeleaf.internal;
 
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import nz.net.ultraq.thymeleaf.models.extensions.ChildModelIterator;
+import org.thymeleaf.DialectConfiguration;
+import org.thymeleaf.context.IExpressionContext;
+import org.thymeleaf.dialect.IProcessorDialect;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.engine.HTMLElementDefinition;
 import org.thymeleaf.engine.HTMLElementType;
@@ -403,6 +407,21 @@ public class MetaClass {
     }
 
     /**
+     * Removes whitespace events from the head and tail of the model's
+     * underlying event queue.
+     *
+     * @param delegate
+     */
+    public static void trim(IModel delegate) {
+        while (isWhitespace(first(delegate))) {
+            removeFirst(delegate);
+        }
+        while (isWhitespace(last(delegate))) {
+            removeLast(delegate);
+        }
+    }
+
+    /**
      * Shortcut to the template name found on the template data object. Only
      * works if the template was resolved via a name, rather than a string (eg:
      * anonymous template), in which case this can return the entire template!
@@ -509,6 +528,31 @@ public class MetaClass {
      */
     public static boolean isWhitespace(@Nonnull IText delegate) {
         return delegate.getText().trim().isEmpty();
+    }
+
+    /**
+     * Returns the configured prefix for the given dialect. If the dialect
+     * prefix has not been configured, then the dialect prefix is returned.
+     *
+     * @param context
+     * @param dialect
+     * @return The configured prefix for the dialect, or {@code null} if the
+     * dialect being queried hasn't been configured.
+     */
+    public static String getPrefixForDialect(IExpressionContext context, Class<? extends IProcessorDialect> dialect) {
+        DialectConfiguration dialectConfiguration = null;
+        Set<DialectConfiguration> dialectConfigurations = context.getConfiguration().getDialectConfigurations();
+        for (DialectConfiguration dialectConfig : dialectConfigurations) {
+            if (dialect.isInstance(dialectConfig.getDialect())) {
+                dialectConfiguration = dialectConfig;
+                break;
+            }
+        }
+        return dialectConfiguration != null
+                ? dialectConfiguration.isPrefixSpecified()
+                        ? dialectConfiguration.getPrefix()
+                        : ((IProcessorDialect) dialectConfiguration.getDialect()).getPrefix()
+                : null;
     }
 
     /**
