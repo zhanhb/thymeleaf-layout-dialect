@@ -222,7 +222,7 @@
                     <excludePackageNames>*.internal.*</excludePackageNames>
                     <locale>en_US</locale>
                     <links>
-                        <link>http://www.thymeleaf.org/apidocs/thymeleaf/3.0.0.RELEASE/</link>
+                        <link>http://www.thymeleaf.org/apidocs/thymeleaf/${thymeleaf.version}/</link>
                     </links>
                 </configuration>
             </plugin>
