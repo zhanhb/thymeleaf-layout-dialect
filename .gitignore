@@ -16,3 +16,5 @@ npm-debug.log
 /nbproject/
 *.original~
 pom.xml.bak
+pom.xml.releaseBackup
+release.properties
