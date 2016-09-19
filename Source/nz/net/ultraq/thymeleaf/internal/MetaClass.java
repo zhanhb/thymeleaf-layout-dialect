@@ -17,7 +17,8 @@ package nz.net.ultraq.thymeleaf.internal;
 
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import nz.net.ultraq.thymeleaf.models.extensions.ChildModelIterator;
@@ -48,6 +49,8 @@ import org.thymeleaf.templatemode.TemplateMode;
  * @author Emanuel Rabina
  */
 public class MetaClass {
+
+    private static final String DIALECT_PREFIX_CACHE = "DialectPrefixCache";
 
     /**
      * Set that a model evaluates to 'false' if it has no events.
@@ -534,25 +537,31 @@ public class MetaClass {
      * Returns the configured prefix for the given dialect. If the dialect
      * prefix has not been configured, then the dialect prefix is returned.
      *
-     * @param context
-     * @param dialect
+     * @param delegate
+     * @param dialectClass
      * @return The configured prefix for the dialect, or {@code null} if the
      * dialect being queried hasn't been configured.
      */
-    public static String getPrefixForDialect(IExpressionContext context, Class<? extends IProcessorDialect> dialect) {
-        DialectConfiguration dialectConfiguration = null;
-        Set<DialectConfiguration> dialectConfigurations = context.getConfiguration().getDialectConfigurations();
-        for (DialectConfiguration dialectConfig : dialectConfigurations) {
-            if (dialect.isInstance(dialectConfig.getDialect())) {
-                dialectConfiguration = dialectConfig;
-                break;
+    public static String getPrefixForDialect(IExpressionContext delegate, Class<? extends IProcessorDialect> dialectClass) {
+        ConcurrentMap<Class<?>, String> dialectPrefixCache = DialectPrefixCacheHolder.getDialectPrefixCache(delegate);
+
+        String dialectPrefix = dialectPrefixCache.get(dialectClass);
+        if (dialectPrefix == null) {
+            DialectConfiguration dialectConfiguration = null;
+            for (DialectConfiguration dialectConfig : delegate.getConfiguration().getDialectConfigurations()) {
+                if (dialectClass.isInstance(dialectConfig.getDialect())) {
+                    dialectConfiguration = dialectConfig;
+                    break;
+                }
+            }
+            dialectPrefix = dialectConfiguration != null
+                    ? dialectConfiguration.isPrefixSpecified() ? dialectConfiguration.getPrefix() : ((IProcessorDialect) dialectConfiguration.getDialect()).getPrefix()
+                    : null;
+            if (dialectPrefix != null) {
+                dialectPrefixCache.putIfAbsent(dialectClass, dialectPrefix);
             }
         }
-        return dialectConfiguration != null
-                ? dialectConfiguration.isPrefixSpecified()
-                        ? dialectConfiguration.getPrefix()
-                        : ((IProcessorDialect) dialectConfiguration.getDialect()).getPrefix()
-                : null;
+        return dialectPrefix;
     }
 
     /**
@@ -610,6 +619,20 @@ public class MetaClass {
 
     public static int getEndIndex(IModel delegate) {
         return MetaProvider.INSTANCE.getProperty(delegate, "endIndex");
+    }
+
+    private static class DialectPrefixCacheHolder {
+
+        private static final ConcurrentWeakIdentityHashMap<IExpressionContext, ConcurrentMap<Class<?>, String>> CACHE = new ConcurrentWeakIdentityHashMap<>(2);
+
+        static ConcurrentMap<Class<?>, String> getDialectPrefixCache(IExpressionContext delegate) {
+            ConcurrentMap<Class<?>, String> dialectPrefixCache, newCache;
+            return (dialectPrefixCache = CACHE.get(delegate)) == null
+                    && (dialectPrefixCache = CACHE.putIfAbsent(delegate,
+                            newCache = new ConcurrentHashMap<>())) == null
+                            ? newCache : dialectPrefixCache;
+        }
+
     }
 
     private MetaClass() {
