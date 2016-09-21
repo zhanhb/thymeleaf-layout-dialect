@@ -621,9 +621,16 @@ public class MetaClass {
         return MetaProvider.INSTANCE.getProperty(delegate, "endIndex");
     }
 
+    private MetaClass() {
+        throw new AssertionError();
+    }
+
+    @SuppressWarnings({"UtilityClassWithoutPrivateConstructor",
+        "NestedAssignment", "CollectionWithoutInitialCapacity"})
     private static class DialectPrefixCacheHolder {
 
-        private static final ConcurrentWeakIdentityHashMap<IExpressionContext, ConcurrentMap<Class<?>, String>> CACHE = new ConcurrentWeakIdentityHashMap<>(2);
+        private static final ConcurrentWeakIdentityHashMap<IExpressionContext, ConcurrentMap<Class<?>, String>> CACHE
+                = new ConcurrentWeakIdentityHashMap<>(2);
 
         static ConcurrentMap<Class<?>, String> getDialectPrefixCache(IExpressionContext delegate) {
             ConcurrentMap<Class<?>, String> dialectPrefixCache, newCache;
@@ -633,10 +640,6 @@ public class MetaClass {
                             ? newCache : dialectPrefixCache;
         }
 
-    }
-
-    private MetaClass() {
-        throw new AssertionError();
     }
 
 }
