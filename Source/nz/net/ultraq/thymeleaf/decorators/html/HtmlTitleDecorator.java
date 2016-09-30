@@ -27,12 +27,16 @@ import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IAttribute;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IProcessableElementTag;
-import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.model.IText;
 import org.thymeleaf.standard.StandardDialect;
 import org.thymeleaf.standard.processor.StandardTextTagProcessor;
-import org.thymeleaf.util.StringUtils;
+import org.thymeleaf.standard.processor.StandardUtextTagProcessor;
 import org.unbescape.html.HtmlEscape;
+
+import static nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor.CONTENT_TITLE_ATTRIBUTE;
+import static nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor.CONTENT_TITLE_ATTRIBUTE_UNESCAPED;
+import static nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor.LAYOUT_TITLE_ATTRIBUTE;
+import static nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor.LAYOUT_TITLE_ATTRIBUTE_UNESCAPED;
 
 /**
  * Decorator for the {@code <title>} part of the template to handle the special
@@ -52,20 +56,25 @@ public class HtmlTitleDecorator implements Decorator {
         return event != null ? event.getAttribute(attributeName, TitlePatternProcessor.PROCESSOR_NAME) : null;
     }
 
-    private static void titleValueExtractor(IModel titleModel, String titleAttribute, String standardDialectPrefix, Map<String, Object> titleValuesMap) {
-        ITemplateEvent titleTag = MetaClass.asBoolean(titleModel) ? MetaClass.first(titleModel) : null;
+    private static void titleValueExtractor(IModel titleModel,
+            String titleAttribute,
+            String titleAttributeUnescaped,
+            String standardDialectPrefix,
+            Map<String, Object> titleValuesMap) {
+        IProcessableElementTag titleTag = MetaClass.asBoolean(titleModel) ? (IProcessableElementTag) MetaClass.first(titleModel) : null;
         if (titleTag != null) {
-            String titleValue = ((IProcessableElementTag) titleTag).getAttributeValue(titleAttribute);
-            if (StringUtils.isEmpty(titleValue)) {
-                titleValue = ((IProcessableElementTag) titleTag).getAttributeValue(standardDialectPrefix, StandardTextTagProcessor.ATTR_NAME);
-            }
-            if (StringUtils.isEmpty(titleValue)) {
-                titleValue = MetaClass.asBoolean(titleModel) && titleModel.size() > 2 ? "'"
+            if (titleTag.hasAttribute(titleAttribute)) {
+                titleValuesMap.put(titleAttribute, titleTag.getAttributeValue(titleAttribute));
+            } else if (titleTag.hasAttribute(standardDialectPrefix, StandardTextTagProcessor.ATTR_NAME)) {
+                titleValuesMap.put(titleAttribute,
+                        titleTag.getAttributeValue(standardDialectPrefix, StandardTextTagProcessor.ATTR_NAME));
+            } else if (titleTag.hasAttribute(standardDialectPrefix, StandardUtextTagProcessor.ATTR_NAME)) {
+                titleValuesMap.put(titleAttributeUnescaped,
+                        titleTag.getAttributeValue(standardDialectPrefix, StandardUtextTagProcessor.ATTR_NAME));
+            } else if (titleModel != null && titleModel.size() > 2) {
+                titleValuesMap.put(titleAttributeUnescaped, "'"
                         + HtmlEscape.escapeHtml5Xml(((IText) titleModel.get(1)).getText())
-                        + "'" : null;
-            }
-            if (!StringUtils.isEmpty(titleValue)) {
-                titleValuesMap.put(titleAttribute, titleValue);
+                        + "'");
             }
         }
     }
@@ -105,9 +114,14 @@ public class HtmlTitleDecorator implements Decorator {
         // Set the title pattern to use on a new model, as well as the important
         // title result parts that we want to use on the pattern.
         if (titlePatternProcessor != null) {
+            // TODO: This title values map is being used as a way to communicate
+            //       between this class and the title pattern processor, and being
+            //       exposed on the Thymeleaf model as a result.  I should find a
+            //       better way of passing these values around, maybe via the layout
+            //       context.
             LinkedHashMap<String, Object> titleValuesMap = new LinkedHashMap<>(2);
-            titleValueExtractor(sourceTitleModel, TitlePatternProcessor.CONTENT_TITLE_ATTRIBUTE, standardDialectPrefix, titleValuesMap);
-            titleValueExtractor(targetTitleModel, TitlePatternProcessor.LAYOUT_TITLE_ATTRIBUTE, standardDialectPrefix, titleValuesMap);
+            titleValueExtractor(sourceTitleModel, CONTENT_TITLE_ATTRIBUTE, CONTENT_TITLE_ATTRIBUTE_UNESCAPED, standardDialectPrefix, titleValuesMap);
+            titleValueExtractor(targetTitleModel, LAYOUT_TITLE_ATTRIBUTE, LAYOUT_TITLE_ATTRIBUTE_UNESCAPED, standardDialectPrefix, titleValuesMap);
 
             LinkedHashMap<String, Object> linkedHashMap = new LinkedHashMap<>(3);
             linkedHashMap.put(titlePatternProcessor.getAttributeCompleteName(), titlePatternProcessor.getValue());
