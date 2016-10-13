@@ -7,9 +7,8 @@
             <packaging>jar</packaging>
         </packagings>
         <goals>
-            <goal>-Prelease-profile</goal>
-            <goal>clean</goal>
-            <goal>deploy</goal>
+            <goal>release:perform</goal>
+            <goal>"-Darguments=-Prelease-profile -Duser.name=zhanhb"</goal>
         </goals>
     </action>
     <action>
