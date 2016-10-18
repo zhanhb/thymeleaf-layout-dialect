@@ -78,18 +78,15 @@ class ChildModelIteratorTests {
 
 		def nextModel = childModelIterator.next()
 		assert nextModel.equalsIgnoreWhitespace(pModel1)
-		assert nextModel.startIndex == 1
-		assert nextModel.endIndex == 4
+		assert model.indexOf(nextModel) == 1
 
 		nextModel = childModelIterator.next()
 		assert nextModel.equalsIgnoreWhitespace(hrModel)
-		assert nextModel.startIndex == 4
-		assert nextModel.endIndex == 5
+		assert model.indexOf(nextModel) == 4
 
 		nextModel = childModelIterator.next()
 		assert nextModel.equalsIgnoreWhitespace(pModel2)
-		assert nextModel.startIndex == 5
-		assert nextModel.endIndex == 8
+		assert model.indexOf(nextModel) == 5
 
 		assert childModelIterator.hasNext() == false
 	}

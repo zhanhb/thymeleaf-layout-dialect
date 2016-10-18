@@ -21,7 +21,6 @@ import nz.net.ultraq.thymeleaf.internal.Extensions as Z;
 import nz.net.ultraq.thymeleaf.internal.ITemplateEventConsumer;
 import nz.net.ultraq.thymeleaf.internal.ITemplateEventIntPredicate;
 import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
-import nz.net.ultraq.thymeleaf.internal.MetaProvider;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.model.ITemplateEvent;
@@ -31,15 +30,6 @@ import org.thymeleaf.model.ITemplateEvent;
  * @author zhanhb
  */
 public class IModelExtensions {
-
-    static {
-        try {
-            Field field = MetaProvider.class.getField("INSTANCE");
-            setStaticFinalField(field, new M(MetaProvider.INSTANCE, new GroovyMetaProvider()));
-        } catch (Throwable ex) {
-            throw new ExceptionInInitializerError(ex);
-        }
-    }
 
     public static void apply() {
         IModel.metaClass {
@@ -75,6 +65,9 @@ public class IModelExtensions {
             }
             getModel << { int pos ->
                 Z.getModel(delegate, pos)
+            }
+            indexOf << { IModel model ->
+                Z.indexOf(delegate, model)
             }
             insertModelWithWhitespace << { int pos, IModel model ->
                 Z.insertModelWithWhitespace(delegate, pos, model)
