@@ -17,6 +17,8 @@ package nz.net.ultraq.thymeleaf.models;
 
 import java.util.Collections;
 import java.util.Objects;
+import nz.net.ultraq.thymeleaf.LayoutDialect;
+import nz.net.ultraq.thymeleaf.internal.Extensions;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.standard.expression.FragmentExpression;
@@ -68,10 +70,11 @@ public class TemplateModelFinder {
      * @param dialectPrefix
      * @return Fragment matching the fragment specification.
      */
-    public TemplateModel findFragment(FragmentExpression fragmentExpression, String dialectPrefix) {
+    public TemplateModel findFragment(FragmentExpression fragmentExpression) {
         // TODO: Simplify this method signature by deriving the layout dialect
         //       prefix from the context.
         String templateName = "this";
+        String dialectPrefix = Extensions.getPrefixForDialect(context, LayoutDialect.class);
         IStandardExpression expression = fragmentExpression.getTemplateName();
         if (expression != null) {
             Object result = expression.execute(context);
@@ -88,16 +91,6 @@ public class TemplateModelFinder {
             execute = fragmentSelector.execute(context);
         }
         return findFragment(templateName, execute != null ? execute.toString() : null, dialectPrefix);
-    }
-
-    /**
-     * Return the model specified by the given fragment expression.
-     *
-     * @param fragmentExpression
-     * @return Fragment matching the fragment specification.
-     */
-    public TemplateModel findFragment(FragmentExpression fragmentExpression) {
-        return findFragment(fragmentExpression, null);
     }
 
     /**

@@ -64,9 +64,7 @@ public class ChildModelIterator implements Iterator<IModel> {
     public IModel next() {
         IModel subModel = Extensions.getModel(parent, currentIndex);
 
-        Extensions.setStartIndex(subModel, currentIndex);
         currentIndex += subModel.size();
-        Extensions.setEndIndex(subModel, currentIndex);
 
         return subModel;
     }

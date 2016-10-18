@@ -103,7 +103,7 @@ public class GroupingStrategy implements SortingStrategy {
                 IModel headSubModel = listIterator.previous();
                 if (type == findMatchingType(headSubModel)) {
                     if (Extensions.asBoolean(headModel)) {
-                        return Extensions.getEndIndex(headSubModel);
+                        return Extensions.indexOf(headModel, headSubModel) + headSubModel.size();
                     }
                     break;
                 }

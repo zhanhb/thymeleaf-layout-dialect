@@ -67,7 +67,7 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
         );
         if (Extensions.asBoolean(resultHeadModel)) {
             if (Extensions.asBoolean(targetHeadModel)) {
-                Extensions.replaceModel(targetDocumentModel, Extensions.getStartIndex(targetHeadModel), resultHeadModel);
+                Extensions.replaceModel(targetDocumentModel, Extensions.indexOf(targetDocumentModel, targetHeadModel), resultHeadModel);
             } else {
                 Extensions.insertModelWithWhitespace(targetDocumentModel, Extensions.findIndexOf(targetDocumentModel, event -> {
                     return (event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName()))
@@ -86,7 +86,7 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
         );
         if (Extensions.asBoolean(resultBodyModel)) {
             if (Extensions.asBoolean(targetBodyModel)) {
-                Extensions.replaceModel(targetDocumentModel, Extensions.getStartIndex(targetBodyModel), resultBodyModel);
+                Extensions.replaceModel(targetDocumentModel, Extensions.indexOf(targetDocumentModel, targetBodyModel), resultBodyModel);
             } else {
                 Extensions.insertModelWithWhitespace(targetDocumentModel, Extensions.findIndexOf(targetDocumentModel, event -> {
                     return event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName());

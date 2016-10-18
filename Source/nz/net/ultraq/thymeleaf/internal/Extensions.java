@@ -50,8 +50,6 @@ import org.thymeleaf.templatemode.TemplateMode;
  */
 public class Extensions {
 
-    private static final String DIALECT_PREFIX_CACHE = "DialectPrefixCache";
-
     /**
      * Set that a model evaluates to 'false' if it has no events.
      *
@@ -210,10 +208,6 @@ public class Extensions {
      * Returns the first instance of a model that meets the given closure
      * criteria.
      *
-     * Models returned via this method are also aware of their position in the
-     * event queue of the parent model, accessible via their {@code index}
-     * property.
-     *
      * @param delegate
      * @param closure
      * @return A model over the event that matches the closure criteria, or
@@ -223,10 +217,7 @@ public class Extensions {
     public static IModel findModel(@Nonnull IModel delegate, @Nonnull ITemplateEventPredicate closure) {
         int eventIndex = findIndexOf(delegate, closure);
         if (eventIndex != -1) {
-            IModel model = getModel(delegate, eventIndex);
-            setStartIndex(model, eventIndex);
-            setEndIndex(model, eventIndex + model.size());
-            return model;
+            return getModel(delegate, eventIndex);
         }
         return null;
     }
@@ -265,6 +256,23 @@ public class Extensions {
             removeLast(subModel);
         }
         return subModel;
+    }
+
+    /**
+     * Returns the index of the given model within this model.
+     *
+     * This is not an equality check, but an object reference check, so if a
+     * submodel is ever located from a parent (eg: any of the {@code find}
+     * methods, you can use this method to find the location of that submodel
+     * within the event queue.
+     *
+     * @param delegate
+     * @param model
+     * @return Index of an extracted submodel within this model.
+     */
+    public static int indexOf(IModel delegate, IModel model) {
+        ITemplateEvent modelEvent = first(model);
+        return findIndexOf(delegate, event -> event == modelEvent);
     }
 
     /**
@@ -603,22 +611,6 @@ public class Extensions {
         }
 
         return 1;
-    }
-
-    public static void setStartIndex(IModel delegate, int startIndex) {
-        MetaProvider.INSTANCE.setProperty(delegate, "startIndex", startIndex);
-    }
-
-    public static int getStartIndex(IModel delegate) {
-        return MetaProvider.INSTANCE.getProperty(delegate, "startIndex");
-    }
-
-    public static void setEndIndex(IModel delegate, int endIndex) {
-        MetaProvider.INSTANCE.setProperty(delegate, "endIndex", endIndex);
-    }
-
-    public static int getEndIndex(IModel delegate) {
-        return MetaProvider.INSTANCE.getProperty(delegate, "endIndex");
     }
 
     private Extensions() {
