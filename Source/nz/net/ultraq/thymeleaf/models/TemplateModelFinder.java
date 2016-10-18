@@ -67,7 +67,6 @@ public class TemplateModelFinder {
      * Return the model specified by the given fragment expression.
      *
      * @param fragmentExpression
-     * @param dialectPrefix
      * @return Fragment matching the fragment specification.
      */
     public TemplateModel findFragment(FragmentExpression fragmentExpression) {
