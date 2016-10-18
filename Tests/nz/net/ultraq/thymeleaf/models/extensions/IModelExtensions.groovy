@@ -17,7 +17,7 @@ package nz.net.ultraq.thymeleaf.models.extensions;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import nz.net.ultraq.thymeleaf.internal.MetaClass as Z;
+import nz.net.ultraq.thymeleaf.internal.Extensions as Z;
 import nz.net.ultraq.thymeleaf.internal.ITemplateEventConsumer;
 import nz.net.ultraq.thymeleaf.internal.ITemplateEventIntPredicate;
 import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;

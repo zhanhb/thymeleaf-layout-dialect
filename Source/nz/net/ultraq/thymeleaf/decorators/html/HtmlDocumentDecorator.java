@@ -17,8 +17,8 @@ package nz.net.ultraq.thymeleaf.decorators.html;
 
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
+import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
-import nz.net.ultraq.thymeleaf.internal.MetaClass;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.ICloseElementTag;
 import org.thymeleaf.model.IElementTag;
@@ -61,15 +61,15 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
         ITemplateEventPredicate headModelFinder = event -> {
             return event instanceof IOpenElementTag && "head".equals(((IElementTag) event).getElementCompleteName());
         };
-        IModel targetHeadModel = MetaClass.findModel(targetDocumentModel, headModelFinder);
+        IModel targetHeadModel = Extensions.findModel(targetDocumentModel, headModelFinder);
         IModel resultHeadModel = new HtmlHeadDecorator(context, sortingStrategy).decorate(targetHeadModel,
-                MetaClass.findModel(sourceDocumentModel, headModelFinder)
+                Extensions.findModel(sourceDocumentModel, headModelFinder)
         );
-        if (MetaClass.asBoolean(resultHeadModel)) {
-            if (MetaClass.asBoolean(targetHeadModel)) {
-                MetaClass.replaceModel(targetDocumentModel, MetaClass.getStartIndex(targetHeadModel), resultHeadModel);
+        if (Extensions.asBoolean(resultHeadModel)) {
+            if (Extensions.asBoolean(targetHeadModel)) {
+                Extensions.replaceModel(targetDocumentModel, Extensions.getStartIndex(targetHeadModel), resultHeadModel);
             } else {
-                MetaClass.insertModelWithWhitespace(targetDocumentModel, MetaClass.findIndexOf(targetDocumentModel, event -> {
+                Extensions.insertModelWithWhitespace(targetDocumentModel, Extensions.findIndexOf(targetDocumentModel, event -> {
                     return (event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName()))
                             || (event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName()));
                 }) - 1, resultHeadModel);
@@ -80,15 +80,15 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
         ITemplateEventPredicate bodyModelFinder = event -> {
             return event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName());
         };
-        IModel targetBodyModel = MetaClass.findModel(targetDocumentModel, bodyModelFinder);
+        IModel targetBodyModel = Extensions.findModel(targetDocumentModel, bodyModelFinder);
         IModel resultBodyModel = new HtmlBodyDecorator(context).decorate(targetBodyModel,
-                MetaClass.findModel(sourceDocumentModel, bodyModelFinder)
+                Extensions.findModel(sourceDocumentModel, bodyModelFinder)
         );
-        if (MetaClass.asBoolean(resultBodyModel)) {
-            if (MetaClass.asBoolean(targetBodyModel)) {
-                MetaClass.replaceModel(targetDocumentModel, MetaClass.getStartIndex(targetBodyModel), resultBodyModel);
+        if (Extensions.asBoolean(resultBodyModel)) {
+            if (Extensions.asBoolean(targetBodyModel)) {
+                Extensions.replaceModel(targetDocumentModel, Extensions.getStartIndex(targetBodyModel), resultBodyModel);
             } else {
-                MetaClass.insertModelWithWhitespace(targetDocumentModel, MetaClass.findIndexOf(targetDocumentModel, event -> {
+                Extensions.insertModelWithWhitespace(targetDocumentModel, Extensions.findIndexOf(targetDocumentModel, event -> {
                     return event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName());
                 }) - 1, resultBodyModel);
             }

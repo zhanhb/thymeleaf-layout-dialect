@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ListIterator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
-import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import nz.net.ultraq.thymeleaf.internal.Extensions;
 import org.thymeleaf.model.IComment;
 import org.thymeleaf.model.IElementTag;
 import org.thymeleaf.model.IModel;
@@ -50,7 +50,7 @@ public class GroupingStrategy implements SortingStrategy {
         final int STYLESHEET = 5;
         final int OTHER = 6;
 
-        ITemplateEvent event = MetaClass.first(model);
+        ITemplateEvent event = Extensions.first(model);
 
         if (event instanceof IComment) {
             return COMMENT;
@@ -87,12 +87,12 @@ public class GroupingStrategy implements SortingStrategy {
     @Override
     public int findPositionForModel(IModel headModel, IModel childModel) {
         // Discard text/whitespace nodes
-        if (MetaClass.isWhitespace(childModel)) {
+        if (Extensions.isWhitespace(childModel)) {
             return -1;
         }
 
         int type = findMatchingType(childModel);
-        Iterator<IModel> it = MetaClass.childModelIterator(headModel);
+        Iterator<IModel> it = Extensions.childModelIterator(headModel);
         if (it != null) {
             ArrayList<IModel> list = new ArrayList<>(20);
             while (it.hasNext()) {
@@ -102,8 +102,8 @@ public class GroupingStrategy implements SortingStrategy {
             while (listIterator.hasPrevious()) {
                 IModel headSubModel = listIterator.previous();
                 if (type == findMatchingType(headSubModel)) {
-                    if (MetaClass.asBoolean(headModel)) {
-                        return MetaClass.getEndIndex(headSubModel);
+                    if (Extensions.asBoolean(headModel)) {
+                        return Extensions.getEndIndex(headSubModel);
                     }
                     break;
                 }

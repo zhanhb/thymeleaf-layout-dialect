@@ -17,7 +17,7 @@ package nz.net.ultraq.thymeleaf.fragments;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
-import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.models.ElementMerger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,14 +83,14 @@ public class FragmentProcessor extends AbstractAttributeTagProcessor {
         // Locate the fragment that corresponds to this decorator/include fragment
         IModel fragment = FragmentMap.get(context).get(attributeValue);
         // Replace the tag body with the fragment
-        if (MetaClass.asBoolean(fragment)) {
+        if (Extensions.asBoolean(fragment)) {
             IModelFactory modelFactory = context.getModelFactory();
             IModel replacementModel = new ElementMerger(context).merge(modelFactory.createModel(tag), fragment);
 
             // Remove the layout:fragment attribute - Thymeleaf won't do it for us
             // when using StructureHandler.replaceWith(...)
-            replacementModel.replace(0, modelFactory.removeAttribute((IProcessableElementTag) MetaClass.first(replacementModel),
-                    MetaClass.getPrefixForDialect(context, LayoutDialect.class), PROCESSOR_NAME));
+            replacementModel.replace(0, modelFactory.removeAttribute((IProcessableElementTag) Extensions.first(replacementModel),
+                    Extensions.getPrefixForDialect(context, LayoutDialect.class), PROCESSOR_NAME));
 
             structureHandler.replaceWith(replacementModel, true);
         }

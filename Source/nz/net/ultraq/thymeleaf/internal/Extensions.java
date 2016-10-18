@@ -48,7 +48,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  * @author zhanhb
  * @author Emanuel Rabina
  */
-public class MetaClass {
+public class Extensions {
 
     private static final String DIALECT_PREFIX_CACHE = "DialectPrefixCache";
 
@@ -621,7 +621,7 @@ public class MetaClass {
         return MetaProvider.INSTANCE.getProperty(delegate, "endIndex");
     }
 
-    private MetaClass() {
+    private Extensions() {
         throw new AssertionError();
     }
 

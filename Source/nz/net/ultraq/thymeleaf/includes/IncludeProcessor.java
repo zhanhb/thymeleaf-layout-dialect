@@ -24,7 +24,7 @@ import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
 import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
 import nz.net.ultraq.thymeleaf.fragments.FragmentParameterNamesExtractor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
-import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,13 +103,13 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
 
         // Replace the children of this element with the children of the included page fragment
         IModel fragmentForInclusionUse = fragmentForInclusion.cloneModel();
-        MetaClass.clearChildren(model);
+        Extensions.clearChildren(model);
 
         // Retrieving a model for a template can come with whitspace, so trim those
         // from the model so that we can use the child event iterator.
-        MetaClass.trim(fragmentForInclusionUse);
+        Extensions.trim(fragmentForInclusionUse);
 
-        Iterator<IModel> it = MetaClass.childModelIterator(fragmentForInclusionUse);
+        Iterator<IModel> it = Extensions.childModelIterator(fragmentForInclusionUse);
         if (it != null) {
             while (it.hasNext()) {
                 IModel fragmentChildModel = it.next();
@@ -120,7 +120,7 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
         // When fragment parameters aren't named, derive the name from the fragment definition
         // TODO: Common code across all the inclusion processors
         if (fragmentExpression.hasSyntheticParameters()) {
-            String fragmentDefinition = ((IProcessableElementTag) MetaClass.first(fragmentForInclusionUse)).getAttributeValue(getDialectPrefix(), FragmentProcessor.PROCESSOR_NAME);
+            String fragmentDefinition = ((IProcessableElementTag) Extensions.first(fragmentForInclusionUse)).getAttributeValue(getDialectPrefix(), FragmentProcessor.PROCESSOR_NAME);
             List<String> parameterNames = new FragmentParameterNamesExtractor().extract(fragmentDefinition);
 
             AssignationSequence parameters = fragmentExpression.getParameters();

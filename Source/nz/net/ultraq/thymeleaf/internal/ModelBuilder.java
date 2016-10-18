@@ -174,7 +174,7 @@ public class ModelBuilder {
      */
     public void nodeCompleted(Object parent, Object child) {
         IModel parentModel = (IModel) parent;
-        if (MetaClass.asBoolean(parentModel)) {
+        if (Extensions.asBoolean(parentModel)) {
             parentModel.insertModel(parentModel.size() - 1, (IModel) child);
         }
     }

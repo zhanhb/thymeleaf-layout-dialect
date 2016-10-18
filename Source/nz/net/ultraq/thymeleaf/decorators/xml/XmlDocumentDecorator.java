@@ -16,7 +16,7 @@
 package nz.net.ultraq.thymeleaf.decorators.xml;
 
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
-import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.ICloseElementTag;
@@ -37,7 +37,7 @@ public class XmlDocumentDecorator implements Decorator {
 
     // Find the root element of each document to work with
     private static IModel rootModelFinder(IModel documentModel) {
-        return MetaClass.findModel(documentModel, documentEvent -> {
+        return Extensions.findModel(documentModel, documentEvent -> {
             return documentEvent instanceof IOpenElementTag;
         });
     }
@@ -89,10 +89,10 @@ public class XmlDocumentDecorator implements Decorator {
             // Only copy doctypes if the source document doesn't already have one
             if (event instanceof IDocType) {
                 if (!documentContainsDocType(sourceDocumentModel)) {
-                    MetaClass.insertWithWhitespace(resultDocumentModel, 0, event, modelFactory);
+                    Extensions.insertWithWhitespace(resultDocumentModel, 0, event, modelFactory);
                 }
             } else if (event instanceof IComment) {
-                MetaClass.insertWithWhitespace(resultDocumentModel, 0, event, modelFactory);
+                Extensions.insertWithWhitespace(resultDocumentModel, 0, event, modelFactory);
             } else if (event instanceof IOpenElementTag) {
                 break;
             }
@@ -100,7 +100,7 @@ public class XmlDocumentDecorator implements Decorator {
         for (int i = targetDocumentModel.size() - 1; i >= 0; i--) {
             ITemplateEvent event = targetDocumentModel.get(i);
             if (event instanceof IComment) {
-                MetaClass.insertWithWhitespace(resultDocumentModel, resultDocumentModel.size(), event, modelFactory);
+                Extensions.insertWithWhitespace(resultDocumentModel, resultDocumentModel.size(), event, modelFactory);
             } else if (event instanceof ICloseElementTag) {
                 break;
             }

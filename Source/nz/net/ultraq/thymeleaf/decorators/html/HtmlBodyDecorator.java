@@ -16,7 +16,7 @@
 package nz.net.ultraq.thymeleaf.decorators.html;
 
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
-import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
@@ -51,9 +51,9 @@ public class HtmlBodyDecorator implements Decorator {
     public IModel decorate(IModel targetBodyModel, IModel sourceBodyModel) {
         // If one of the parameters is missing return a copy of the other, or
         // nothing if both parameters are missing.
-        if (!MetaClass.asBoolean(targetBodyModel) || !MetaClass.asBoolean(sourceBodyModel)) {
-            IModel result = MetaClass.asBoolean(targetBodyModel) ? targetBodyModel.cloneModel() : null;
-            return MetaClass.asBoolean(result) ? result : MetaClass.asBoolean(sourceBodyModel) ? sourceBodyModel.cloneModel() : null;
+        if (!Extensions.asBoolean(targetBodyModel) || !Extensions.asBoolean(sourceBodyModel)) {
+            IModel result = Extensions.asBoolean(targetBodyModel) ? targetBodyModel.cloneModel() : null;
+            return Extensions.asBoolean(result) ? result : Extensions.asBoolean(sourceBodyModel) ? sourceBodyModel.cloneModel() : null;
         }
         return new AttributeMerger(context).merge(targetBodyModel, sourceBodyModel);
     }

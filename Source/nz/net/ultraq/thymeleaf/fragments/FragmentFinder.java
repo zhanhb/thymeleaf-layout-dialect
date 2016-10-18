@@ -17,7 +17,7 @@ package nz.net.ultraq.thymeleaf.fragments;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import nz.net.ultraq.thymeleaf.internal.Extensions;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IOpenElementTag;
 import org.thymeleaf.model.IProcessableElementTag;
@@ -62,7 +62,7 @@ public class FragmentFinder {
             if (event instanceof IOpenElementTag) {
                 String fragmentName = ((IProcessableElementTag) event).getAttributeValue(dialectPrefix, FragmentProcessor.PROCESSOR_NAME);
                 if (!StringUtils.isEmpty(fragmentName)) {
-                    IModel fragment = MetaClass.getModel(model, eventIndex);
+                    IModel fragment = Extensions.getModel(model, eventIndex);
                     fragments.put(fragmentName, fragment);
                     eventIndex += fragment.size();
                     continue;

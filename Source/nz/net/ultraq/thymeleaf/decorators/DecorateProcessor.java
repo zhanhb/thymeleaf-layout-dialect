@@ -21,7 +21,7 @@ import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
 import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
-import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
@@ -97,7 +97,7 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
         TemplateModelFinder templateModelFinder = new TemplateModelFinder(context);
 
         // Remove the decorate processor from the root element
-        IProcessableElementTag rootElement = (IProcessableElementTag) MetaClass.first(model);
+        IProcessableElementTag rootElement = (IProcessableElementTag) Extensions.first(model);
         if (rootElement.hasAttribute(attributeName)) {
             rootElement = context.getModelFactory().removeAttribute(rootElement, attributeName);
             model.replace(0, rootElement);
@@ -107,7 +107,7 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
         // TODO: Can probably find a way of preventing this double-loading for #102
         String contentTemplateName = context.getTemplateData().getTemplate();
         IModel contentTemplate = templateModelFinder.findTemplate(contentTemplateName).cloneModel();
-        MetaClass.replaceModel(contentTemplate, MetaClass.findIndexOf(contentTemplate, event -> event instanceof IOpenElementTag), model);
+        Extensions.replaceModel(contentTemplate, Extensions.findIndexOf(contentTemplate, event -> event instanceof IOpenElementTag), model);
 
         // Locate the template to decorate
         FragmentExpression decorateTemplateExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);
@@ -129,7 +129,7 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
             );
         }
         IModel resultTemplate = decorator.decorate(decorateTemplate, contentTemplate);
-        MetaClass.replaceModel(model, 0, resultTemplate);
+        Extensions.replaceModel(model, 0, resultTemplate);
 
         // Save layout fragments for use later by layout:fragment processors
         FragmentMap.setForNode(context, structureHandler, pageFragments);

@@ -15,7 +15,7 @@
  */
 package nz.net.ultraq.thymeleaf.models;
 
-import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import nz.net.ultraq.thymeleaf.internal.Extensions;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.AttributeValueQuotes;
 import org.thymeleaf.model.IElementTag;
@@ -57,17 +57,17 @@ public class ElementMerger implements ModelMerger {
     public IModel merge(IModel targetModel, IModel sourceModel) {
         // If one of the parameters is missing return a copy of the other, or
         // nothing if both parameters are missing.
-        if (!MetaClass.asBoolean(targetModel) || !MetaClass.asBoolean(sourceModel)) {
-            IModel result = MetaClass.asBoolean(targetModel) ? targetModel.cloneModel() : null;
-            return MetaClass.asBoolean(result) ? result : MetaClass.asBoolean(sourceModel) ? sourceModel.cloneModel() : null;
+        if (!Extensions.asBoolean(targetModel) || !Extensions.asBoolean(sourceModel)) {
+            IModel result = Extensions.asBoolean(targetModel) ? targetModel.cloneModel() : null;
+            return Extensions.asBoolean(result) ? result : Extensions.asBoolean(sourceModel) ? sourceModel.cloneModel() : null;
         }
 
         IModelFactory modelFactory = context.getModelFactory();
 
         // The result we want is the source model, but merged into the target root element attributes
-        ITemplateEvent sourceRootEvent = MetaClass.first(sourceModel);
+        ITemplateEvent sourceRootEvent = Extensions.first(sourceModel);
         IModel sourceRootElement = modelFactory.createModel(sourceRootEvent);
-        IProcessableElementTag targetRootEvent = (IProcessableElementTag) MetaClass.first(targetModel);
+        IProcessableElementTag targetRootEvent = (IProcessableElementTag) Extensions.first(targetModel);
         IModel targetRootElement = modelFactory.createModel(
                 sourceRootEvent instanceof IOpenElementTag
                         ? modelFactory.createOpenElementTag(((IElementTag) sourceRootEvent).getElementCompleteName(),
@@ -78,7 +78,7 @@ public class ElementMerger implements ModelMerger {
                                 : null);
         IModel mergedRootElement = new AttributeMerger(context).merge(targetRootElement, sourceRootElement);
         IModel mergedModel = sourceModel.cloneModel();
-        mergedModel.replace(0, MetaClass.first(mergedRootElement));
+        mergedModel.replace(0, Extensions.first(mergedRootElement));
         return mergedModel;
     }
 

@@ -20,7 +20,7 @@ import java.util.Map;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor;
-import nz.net.ultraq.thymeleaf.internal.MetaClass;
+import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.internal.ModelBuilder;
 import nz.net.ultraq.thymeleaf.models.ElementMerger;
 import org.thymeleaf.context.ITemplateContext;
@@ -49,10 +49,10 @@ public class HtmlTitleDecorator implements Decorator {
 
     // Get the title pattern to use
     private static IAttribute titlePatternProcessorRetriever(IModel titleModel, String attributeName) {
-        if (!MetaClass.asBoolean(titleModel)) {
+        if (!Extensions.asBoolean(titleModel)) {
             return null;
         }
-        IProcessableElementTag event = (IProcessableElementTag) MetaClass.first(titleModel);
+        IProcessableElementTag event = (IProcessableElementTag) Extensions.first(titleModel);
         return event != null ? event.getAttribute(attributeName, TitlePatternProcessor.PROCESSOR_NAME) : null;
     }
 
@@ -61,7 +61,7 @@ public class HtmlTitleDecorator implements Decorator {
             String titleAttributeUnescaped,
             String standardDialectPrefix,
             Map<String, Object> titleValuesMap) {
-        IProcessableElementTag titleTag = MetaClass.asBoolean(titleModel) ? (IProcessableElementTag) MetaClass.first(titleModel) : null;
+        IProcessableElementTag titleTag = Extensions.asBoolean(titleModel) ? (IProcessableElementTag) Extensions.first(titleModel) : null;
         if (titleTag != null) {
             if (titleTag.hasAttribute(titleAttribute)) {
                 titleValuesMap.put(titleAttribute, titleTag.getAttributeValue(titleAttribute));
@@ -101,8 +101,8 @@ public class HtmlTitleDecorator implements Decorator {
      */
     @Override
     public IModel decorate(IModel targetTitleModel, IModel sourceTitleModel) {
-        String layoutDialectPrefix = MetaClass.getPrefixForDialect(context, LayoutDialect.class);
-        String standardDialectPrefix = MetaClass.getPrefixForDialect(context, StandardDialect.class);
+        String layoutDialectPrefix = Extensions.getPrefixForDialect(context, LayoutDialect.class);
+        String standardDialectPrefix = Extensions.getPrefixForDialect(context, StandardDialect.class);
 
         IAttribute titlePatternProcessor = titlePatternProcessorRetriever(sourceTitleModel, layoutDialectPrefix);
         if (titlePatternProcessor == null) {
