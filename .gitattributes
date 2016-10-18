@@ -1,0 +1,49 @@
+# Auto detect text files and perform LF normalization
+# disable auto normalization of platform line ending.
+# * text=auto
+* text eol=lf
+
+# Custom for Visual Studio
+*.cs   text    diff=csharp
+
+# binary files.
+*.doc binary  diff=word
+*.DOC binary  diff=word
+*.docx binary diff=word
+*.DOCX binary diff=word
+*.dot binary
+*.DOT binary
+*.pdf binary
+*.PDF binary
+*.rtf binary
+*.RTF binary
+*.ttf binary
+*.eot binary
+*.woff binary
+*.woff2 binary
+*.ico binary
+
+*.java  text    diff=java
+*.html  text    diff=html
+*.xml   text    diff=xml
+*.jspx  text    diff=xml
+*.tagx  text    diff=xml
+*.svg   text    diff=xml
+*.css   text
+*.js    text
+*.jsp   text
+*.tag   text
+*.yaml  text
+*.yml   text
+*.sql   text
+*.properties text
+*.txt   text
+*.groovy text
+*.cpp text
+*.c   text
+*.tld text diff=xml
+*.in  text
+*.out text
+*.gif binary diff=image
+*.jpg binary diff=image
+*.png binary diff=image
