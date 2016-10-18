@@ -60,7 +60,7 @@ public class HtmlTitleDecorator implements Decorator {
             String titleAttribute,
             String titleAttributeUnescaped,
             String standardDialectPrefix,
-            Map<String, Object> titleValuesMap) {
+            Map<String, ? super String> titleValuesMap) {
         IProcessableElementTag titleTag = Extensions.asBoolean(titleModel) ? (IProcessableElementTag) Extensions.first(titleModel) : null;
         if (titleTag != null) {
             if (titleTag.hasAttribute(titleAttribute)) {
@@ -119,14 +119,12 @@ public class HtmlTitleDecorator implements Decorator {
             //       exposed on the Thymeleaf model as a result.  I should find a
             //       better way of passing these values around, maybe via the layout
             //       context.
-            LinkedHashMap<String, Object> titleValuesMap = new LinkedHashMap<>(2);
+            LinkedHashMap<String, String> titleValuesMap = new LinkedHashMap<>(3);
+
+            titleValuesMap.put(titlePatternProcessor.getAttributeCompleteName(), titlePatternProcessor.getValue());
             titleValueExtractor(sourceTitleModel, CONTENT_TITLE_ATTRIBUTE, CONTENT_TITLE_ATTRIBUTE_UNESCAPED, standardDialectPrefix, titleValuesMap);
             titleValueExtractor(targetTitleModel, LAYOUT_TITLE_ATTRIBUTE, LAYOUT_TITLE_ATTRIBUTE_UNESCAPED, standardDialectPrefix, titleValuesMap);
-
-            LinkedHashMap<String, Object> linkedHashMap = new LinkedHashMap<>(3);
-            linkedHashMap.put(titlePatternProcessor.getAttributeCompleteName(), titlePatternProcessor.getValue());
-            linkedHashMap.putAll(titleValuesMap);
-            resultTitle = new ModelBuilder(context).createNode("title", linkedHashMap);
+            resultTitle = new ModelBuilder(context).createNode("title", titleValuesMap);
         } else {
             resultTitle = new ElementMerger(context).merge(targetTitleModel, sourceTitleModel);
         }

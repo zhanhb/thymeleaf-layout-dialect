@@ -76,7 +76,7 @@ public class ModelBuilder {
      * @param name Element name.
      * @return New model representing an element with the given name.
      */
-    public IModel createNode(Object name) {
+    public IModel createNode(String name) {
         return createNode(name, null, null);
     }
 
@@ -88,7 +88,7 @@ public class ModelBuilder {
      * @return New model representing an element with the given name and
      * content.
      */
-    public IModel createNode(Object name, Object value) {
+    public IModel createNode(String name, String value) {
         return createNode(name, null, value);
     }
 
@@ -101,7 +101,7 @@ public class ModelBuilder {
      * attributes.
      */
     @SuppressWarnings("rawtypes")
-    public IModel createNode(Object name, Map attributes) {
+    public IModel createNode(String name, Map<String, String> attributes) {
         return createNode(name, attributes, null);
     }
 
@@ -115,17 +115,10 @@ public class ModelBuilder {
      * attributes, and content.
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public IModel createNode(Object name, Map attributes, Object value) {
+    public IModel createNode(String name, Map<String, String> attributes, String value) {
         // Normalize values for Java implementations as the model factory doesn't
         // know what to do with Groovy versions of things
         String elementName = String.valueOf(name);
-        String elementText = !Objects.equals(value, null) ? value.toString() : null;
-        if (attributes != null) {
-            Map<?, Object> map = attributes;
-            for (Map.Entry<?, Object> entry : map.entrySet()) {
-                entry.setValue(String.valueOf(entry.getValue()));
-            }
-        }
 
         IModel model = modelFactory.createModel();
         HTMLElementDefinition elementDefinition = (HTMLElementDefinition) elementDefinitions.forName(templateMode, elementName);
@@ -145,7 +138,7 @@ public class ModelBuilder {
                             + "This might cause processing errors further down the track.  "
                             + "To avoid this, either self close the opening element, remove the closing tag, or process this template using the XML processing mode.  "
                             + "See https://html.spec.whatwg.org/multipage/syntax.html#void-elements for more information on HTML void elements.",
-                            name);
+                            elementName);
                 }
 
                 model.add(modelFactory.createStandaloneElementTag(elementName, attributes, AttributeValueQuotes.DOUBLE, false, false));
@@ -156,8 +149,8 @@ public class ModelBuilder {
             model.add(modelFactory.createStandaloneElementTag(elementName, attributes, AttributeValueQuotes.DOUBLE, false, true));
         } else { // Open/close element and potential text content
             model.add(modelFactory.createOpenElementTag(elementName, attributes, AttributeValueQuotes.DOUBLE, false));
-            if (!StringUtils.isEmpty(elementText)) {
-                model.add(modelFactory.createText(elementText));
+            if (!StringUtils.isEmpty(value)) {
+                model.add(modelFactory.createText(value));
             }
             model.add(modelFactory.createCloseElementTag(elementName));
         }
@@ -172,10 +165,9 @@ public class ModelBuilder {
      * @param parent
      * @param child
      */
-    public void nodeCompleted(Object parent, Object child) {
-        IModel parentModel = (IModel) parent;
-        if (Extensions.asBoolean(parentModel)) {
-            parentModel.insertModel(parentModel.size() - 1, (IModel) child);
+    public void nodeCompleted(IModel parent, IModel child) {
+        if (Extensions.asBoolean(parent)) {
+            parent.insertModel(parent.size() - 1, child);
         }
     }
 
@@ -188,7 +180,7 @@ public class ModelBuilder {
      * @param parent
      * @param child
      */
-    public void setParent(Object parent, Object child) {
+    public void setParent(IModel parent, IModel child) {
     }
 
 }

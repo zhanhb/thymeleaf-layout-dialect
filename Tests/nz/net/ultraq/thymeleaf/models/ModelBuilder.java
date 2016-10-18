@@ -30,6 +30,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  * @author zhanhb
  * @author Emanuel Rabina
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ModelBuilder extends BuilderSupport {
 
     private final nz.net.ultraq.thymeleaf.internal.ModelBuilder builder;
@@ -84,7 +85,7 @@ public class ModelBuilder extends BuilderSupport {
      */
     @Override
     protected Object createNode(Object name) {
-        return builder.createNode(name);
+        return builder.createNode(String.valueOf(name));
     }
 
     /**
@@ -96,7 +97,7 @@ public class ModelBuilder extends BuilderSupport {
      */
     @Override
     protected Object createNode(Object name, Object value) {
-        return builder.createNode(name, value);
+        return builder.createNode(String.valueOf(name), (String) value);
     }
 
     /**
@@ -107,9 +108,8 @@ public class ModelBuilder extends BuilderSupport {
      * @return New model with the given name and attributes.
      */
     @Override
-    @SuppressWarnings("rawtypes")
     protected Object createNode(Object name, Map attributes) {
-        return builder.createNode(name, attributes);
+        return builder.createNode(String.valueOf(name), attributes);
     }
 
     /**
@@ -122,9 +122,8 @@ public class ModelBuilder extends BuilderSupport {
      * @return New model with the given name, attributes, and content.
      */
     @Override
-    @SuppressWarnings("rawtypes")
     protected IModel createNode(Object name, Map attributes, Object value) {
-        return builder.createNode(name, attributes, value);
+        return builder.createNode(String.valueOf(name), attributes, (String) value);
     }
 
     /**
@@ -136,7 +135,7 @@ public class ModelBuilder extends BuilderSupport {
      */
     @Override
     protected void nodeCompleted(Object parent, Object child) {
-        builder.nodeCompleted(parent, child);
+        builder.nodeCompleted((IModel) parent, (IModel) child);
     }
 
     /**
@@ -150,7 +149,7 @@ public class ModelBuilder extends BuilderSupport {
      */
     @Override
     protected void setParent(Object parent, Object child) {
-        builder.setParent(parent, child);
+        builder.setParent((IModel) parent, (IModel) child);
     }
 
 }
