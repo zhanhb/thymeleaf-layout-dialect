@@ -47,3 +47,4 @@
 *.gif binary diff=image
 *.jpg binary diff=image
 *.png binary diff=image
+*.thtest text
