@@ -362,6 +362,15 @@
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
+                        <manifestSections>
+                            <manifestSection>
+                                <name>nz/net/ultraq/thymeleaf/expressions/</name>
+                                <manifestEntries>
+                                    <Specification-Version>1.1.2</Specification-Version>
+                                    <Implementation-Version>1.1.2</Implementation-Version>
+                                </manifestEntries>
+                            </manifestSection>
+                        </manifestSections>
                     </archive>
                 </configuration>
             </plugin>
