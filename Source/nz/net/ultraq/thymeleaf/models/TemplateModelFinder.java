@@ -70,8 +70,6 @@ public class TemplateModelFinder {
      * @return Fragment matching the fragment specification.
      */
     public TemplateModel findFragment(FragmentExpression fragmentExpression) {
-        // TODO: Simplify this method signature by deriving the layout dialect
-        //       prefix from the context.
         String templateName = "this";
         String dialectPrefix = Extensions.getPrefixForDialect(context, LayoutDialect.class);
         IStandardExpression expression = fragmentExpression.getTemplateName();
