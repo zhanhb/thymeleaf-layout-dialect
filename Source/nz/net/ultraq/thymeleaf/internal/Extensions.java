@@ -42,11 +42,19 @@ import org.thymeleaf.model.IText;
 import org.thymeleaf.templatemode.TemplateMode;
 
 /**
- * Additional methods applied to the Thymeleaf {@link IModel} class via Groovy
- * meta-programming.
+ * Additional methods applied to the Thymeleaf class via extension programming.
  *
  * @author zhanhb
  * @author Emanuel Rabina
+ * @see IModel
+ * @see TemplateModel
+ * @see ITemplateEvent
+ * @see IOpenElementTag
+ * @see ICloseElementTag
+ * @see IStandaloneElementTag
+ * @see IAttribute
+ * @see IText
+ * @see IExpressionContext
  */
 public class Extensions {
 
@@ -622,13 +630,13 @@ public class Extensions {
     private static class DialectPrefixCacheHolder {
 
         private static final ConcurrentWeakIdentityHashMap<IExpressionContext, ConcurrentMap<Class<?>, String>> CACHE
-                = new ConcurrentWeakIdentityHashMap<>(2);
+                = new ConcurrentWeakIdentityHashMap<>(20);
 
         static ConcurrentMap<Class<?>, String> getDialectPrefixCache(IExpressionContext delegate) {
             ConcurrentMap<Class<?>, String> dialectPrefixCache, newCache;
             return (dialectPrefixCache = CACHE.get(delegate)) == null
                     && (dialectPrefixCache = CACHE.putIfAbsent(delegate,
-                            newCache = new ConcurrentHashMap<>())) == null
+                            newCache = new ConcurrentHashMap<>(4))) == null
                             ? newCache : dialectPrefixCache;
         }
 

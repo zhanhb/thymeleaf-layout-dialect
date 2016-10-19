@@ -102,12 +102,4 @@ public class IModelExtensions {
         }
     }
 
-    private static void setStaticFinalField(Field field, Object obj) throws Throwable {
-        Field field1 = Field.class.getDeclaredField("modifiers");
-        field1.setAccessible(true);
-        field1.set(field, field.getModifiers() & ~Modifier.FINAL);
-        field.setAccessible(true);
-        field.set(field, obj);
-    }
-
 }

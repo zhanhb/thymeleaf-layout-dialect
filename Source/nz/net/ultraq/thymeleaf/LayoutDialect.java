@@ -74,7 +74,7 @@ public class LayoutDialect extends AbstractProcessorDialect {
     @Override
     @SuppressWarnings("deprecation")
     public Set<IProcessor> getProcessors(String dialectPrefix) {
-        return new LinkedHashSet<>(Arrays.<IProcessor>asList(
+        return new LinkedHashSet<>(Arrays.asList(
                 // Processors available in the HTML template mode
                 new StandardXmlNsTagProcessor(TemplateMode.HTML, dialectPrefix),
                 new ContextCreationProcessor(TemplateMode.HTML),

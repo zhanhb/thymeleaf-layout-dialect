@@ -100,7 +100,6 @@ public class ModelBuilder {
      * @return New model representing an element with the given name and
      * attributes.
      */
-    @SuppressWarnings("rawtypes")
     public IModel createNode(String name, Map<String, String> attributes) {
         return createNode(name, attributes, null);
     }
@@ -114,7 +113,6 @@ public class ModelBuilder {
      * @return New model representing an element with the given name,
      * attributes, and content.
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public IModel createNode(String name, Map<String, String> attributes, String value) {
         Objects.requireNonNull(name);
 
