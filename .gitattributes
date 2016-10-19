@@ -48,3 +48,5 @@
 *.jpg binary diff=image
 *.png binary diff=image
 *.thtest text
+*.md text
+*.MD text
