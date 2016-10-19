@@ -277,7 +277,6 @@
                 </excludes>
             </testResource>
         </testResources>
-        <directory>${project.basedir}/build</directory>
 
         <pluginManagement>
             <plugins>

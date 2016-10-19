@@ -3,6 +3,7 @@
 /.gradle
 /_book
 /build
+/target
 /Classes
 /node_modules
 npm-debug.log
