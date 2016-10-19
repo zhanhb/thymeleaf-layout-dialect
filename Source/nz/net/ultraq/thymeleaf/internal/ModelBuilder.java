@@ -116,43 +116,41 @@ public class ModelBuilder {
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public IModel createNode(String name, Map<String, String> attributes, String value) {
-        // Normalize values for Java implementations as the model factory doesn't
-        // know what to do with Groovy versions of things
-        String elementName = String.valueOf(name);
+        Objects.requireNonNull(name);
 
         IModel model = modelFactory.createModel();
-        HTMLElementDefinition elementDefinition = (HTMLElementDefinition) elementDefinitions.forName(templateMode, elementName);
+        HTMLElementDefinition elementDefinition = (HTMLElementDefinition) elementDefinitions.forName(templateMode, name);
 
         // Standalone element
         if (elementDefinition.getType() == HTMLElementType.VOID) {
             if (attributes != null && attributes.containsKey("standalone")) {
                 attributes.remove("standalone");
-                model.add(modelFactory.createStandaloneElementTag(elementName, attributes, AttributeValueQuotes.DOUBLE, false, true));
+                model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, true));
             } else if (attributes != null && attributes.containsKey("void")) {
                 attributes.remove("void");
-                model.add(modelFactory.createStandaloneElementTag(elementName, attributes, AttributeValueQuotes.DOUBLE, false, false));
+                model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, false));
             } else {
-                if (encounteredVoidTags.add(elementName)) {
+                if (encounteredVoidTags.add(name)) {
                     logger.warn(
                             "Instructed to write a closing tag {} for an HTML void element.  "
                             + "This might cause processing errors further down the track.  "
                             + "To avoid this, either self close the opening element, remove the closing tag, or process this template using the XML processing mode.  "
                             + "See https://html.spec.whatwg.org/multipage/syntax.html#void-elements for more information on HTML void elements.",
-                            elementName);
+                            name);
                 }
 
-                model.add(modelFactory.createStandaloneElementTag(elementName, attributes, AttributeValueQuotes.DOUBLE, false, false));
-                model.add(modelFactory.createCloseElementTag(elementName));
+                model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, false));
+                model.add(modelFactory.createCloseElementTag(name));
             }
         } else if (attributes != null && attributes.containsKey("standalone")) { // Other standalone element
             attributes.remove("standalone");
-            model.add(modelFactory.createStandaloneElementTag(elementName, attributes, AttributeValueQuotes.DOUBLE, false, true));
+            model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, true));
         } else { // Open/close element and potential text content
-            model.add(modelFactory.createOpenElementTag(elementName, attributes, AttributeValueQuotes.DOUBLE, false));
+            model.add(modelFactory.createOpenElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false));
             if (!StringUtils.isEmpty(value)) {
                 model.add(modelFactory.createText(value));
             }
-            model.add(modelFactory.createCloseElementTag(elementName));
+            model.add(modelFactory.createCloseElementTag(name));
         }
 
         return model;
