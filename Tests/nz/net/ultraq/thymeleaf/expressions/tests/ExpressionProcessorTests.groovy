@@ -35,6 +35,7 @@ import static org.junit.Assert.*
 class ExpressionProcessorTests {
 
 	private static TemplateEngine templateEngine
+	private ExpressionContext expressionContext
 	private ExpressionProcessor expressionProcessor
 
 	/**
@@ -52,7 +53,8 @@ class ExpressionProcessorTests {
 	@Before
 	void setupExpressionProcessor() {
 
-		expressionProcessor = new ExpressionProcessor(new ExpressionContext(templateEngine.configuration))
+		expressionContext = new ExpressionContext(templateEngine.configuration)
+		expressionProcessor = new ExpressionProcessor(expressionContext)
 	}
 
 	/**
@@ -71,8 +73,39 @@ class ExpressionProcessorTests {
 	@Test
 	void parseFragmentExpression() {
 
-		def fragmentExpression = expressionProcessor.parseFragmentExpression('hello.html')
+		def fragmentExpression
+
+		fragmentExpression = expressionProcessor.parseFragmentExpression('~{hello.html}')
 		assertTrue(fragmentExpression instanceof FragmentExpression)
+		assertEquals(fragmentExpression.templateName.execute(expressionContext), 'hello.html');
+
+		// Backwards compatibility test
+		fragmentExpression = expressionProcessor.parseFragmentExpression('hello.html')
+		assertTrue(fragmentExpression instanceof FragmentExpression)
+		assertEquals('hello.html', fragmentExpression.templateName.execute(expressionContext));
+	}
+
+	/**
+	 * Tests multi-line fragment expressions.
+	 */
+	@Test
+	void parseFragmentExpressionMultiline() {
+
+		def fragmentExpression
+
+		fragmentExpression = expressionProcessor.parseFragmentExpression('''~{hello::fragment(
+			'blah',
+			1)
+			}''')
+		assertTrue(fragmentExpression instanceof FragmentExpression)
+		assertEquals('hello', fragmentExpression.templateName.execute(expressionContext))
+
+		// Backwards compatibility test
+		fragmentExpression = expressionProcessor.parseFragmentExpression('''hello::fragment(
+			'blah',
+			1)''')
+		assertTrue(fragmentExpression instanceof FragmentExpression)
+		assertEquals('hello', fragmentExpression.templateName.execute(expressionContext))
 	}
 
 	/**
