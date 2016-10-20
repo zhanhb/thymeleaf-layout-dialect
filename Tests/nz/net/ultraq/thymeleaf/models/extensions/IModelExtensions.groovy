@@ -54,8 +54,8 @@ public class IModelExtensions {
             everyWithIndex << { Closure closure ->
                 Z.everyWithIndex(delegate, closure as ITemplateEventIntPredicate)
             }
-            find << { Closure closure ->
-                Z.find(delegate, closure as ITemplateEventPredicate)
+            findIndexOf << { Closure closure ->
+                Z.findIndexOf(delegate, closure as ITemplateEventPredicate)
             }
             findModel << { Closure closure ->
                 Z.findModel(delegate, closure as ITemplateEventPredicate)

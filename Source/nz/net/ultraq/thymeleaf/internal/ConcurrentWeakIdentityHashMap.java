@@ -45,8 +45,10 @@ class ConcurrentWeakIdentityHashMap<K, V> {
     @SuppressWarnings("NestedAssignment")
     private void purgeKeys() {
         Reference<? extends K> reference;
-        while ((reference = queue.poll()) != null) {
-            map.remove(reference);
+        ReferenceQueue<K> q = this.queue;
+        ConcurrentMap<Object, V> m = this.map;
+        while ((reference = q.poll()) != null) {
+            m.remove(reference);
         }
     }
 

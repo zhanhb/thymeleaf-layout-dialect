@@ -43,7 +43,7 @@ public class XmlDocumentDecorator implements Decorator {
     }
 
     private static boolean documentContainsDocType(IModel document) {
-        for (int i = 0; i < document.size(); i++) {
+        for (int i = 0, size = document.size(); i < size; i++) {
             ITemplateEvent event = document.get(i);
             if (event instanceof IDocType) {
                 return true;
@@ -84,7 +84,8 @@ public class XmlDocumentDecorator implements Decorator {
         IModel resultDocumentModel = new AttributeMerger(context).merge(targetDocumentRootModel, sourceDocumentRootModel);
 
         // Copy comments outside of the root element, keeping whitespace copied to a minimum
-        for (int i = 0; i < targetDocumentModel.size(); i++) {
+        final int size = targetDocumentModel.size();
+        for (int i = 0; i < size; i++) {
             ITemplateEvent event = targetDocumentModel.get(i);
             // Only copy doctypes if the source document doesn't already have one
             if (event instanceof IDocType) {
@@ -97,7 +98,7 @@ public class XmlDocumentDecorator implements Decorator {
                 break;
             }
         }
-        for (int i = targetDocumentModel.size() - 1; i >= 0; i--) {
+        for (int i = size - 1; i >= 0; i--) {
             ITemplateEvent event = targetDocumentModel.get(i);
             if (event instanceof IComment) {
                 Extensions.insertWithWhitespace(resultDocumentModel, resultDocumentModel.size(), event, modelFactory);

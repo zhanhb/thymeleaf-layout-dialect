@@ -102,7 +102,7 @@ public class Extensions {
      */
     public static void each(@Nullable IModel delegate, @Nonnull ITemplateEventConsumer closure) {
         if (delegate != null) {
-            for (int i = 0; i < delegate.size(); i++) {
+            for (int i = 0, size = delegate.size(); i < size; i++) {
                 closure.accept(delegate.get(i));
             }
         }
@@ -154,7 +154,8 @@ public class Extensions {
         int thisEventIndex = 0;
         int otherEventIndex = 0;
 
-        while (thisEventIndex < delegate.size() || otherEventIndex < other.size()) {
+        final int size1 = delegate.size(), size2 = other.size();
+        for (; thisEventIndex < size1 || otherEventIndex < size2;) {
             ITemplateEvent thisEvent = delegate.get(thisEventIndex);
             ITemplateEvent otherEvent = other.get(otherEventIndex);
             if (isWhitespace(thisEvent)) {
@@ -171,7 +172,7 @@ public class Extensions {
             otherEventIndex++;
         }
 
-        return thisEventIndex == delegate.size() && otherEventIndex == other.size();
+        return thisEventIndex == size1 && otherEventIndex == size2;
 
     }
 
@@ -184,7 +185,7 @@ public class Extensions {
      * @return {@code true} if every event satisfies the closure.
      */
     public static boolean everyWithIndex(IModel delegate, @Nonnull ITemplateEventIntPredicate closure) {
-        for (int i = 0; i < delegate.size(); i++) {
+        for (int i = 0, size = delegate.size(); i < size; i++) {
             if (!closure.test(delegate.get(i), i)) {
                 return false;
             }
@@ -202,7 +203,7 @@ public class Extensions {
      * {@code -1} if nothing matched.
      */
     public static int findIndexOf(IModel delegate, ITemplateEventPredicate closure) {
-        for (int i = 0; i < delegate.size(); i++) {
+        for (int i = 0, size = delegate.size(); i < size; i++) {
             ITemplateEvent event = delegate.get(i);
             boolean result = closure.test(event);
             if (result) {
