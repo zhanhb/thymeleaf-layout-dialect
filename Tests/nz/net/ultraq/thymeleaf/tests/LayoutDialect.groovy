@@ -23,7 +23,7 @@ import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
  *
  * @author zhanhb
  */
-class LayoutDialect extends nz.net.ultraq.thymeleaf.LayoutDialect {
+public class LayoutDialect extends nz.net.ultraq.thymeleaf.LayoutDialect {
 
     /**
      * Apply model extensions.
@@ -44,10 +44,10 @@ class LayoutDialect extends nz.net.ultraq.thymeleaf.LayoutDialect {
         ]*.apply()
     }
 
-    LayoutDialect() {
+    public LayoutDialect() {
     }
 
-    LayoutDialect(SortingStrategy sortingStrategy) {
+    public LayoutDialect(SortingStrategy sortingStrategy) {
         super(sortingStrategy);
     }
 

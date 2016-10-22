@@ -18,6 +18,7 @@ package nz.net.ultraq.thymeleaf.models;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.thymeleaf.context.IExpressionContext;
 import org.thymeleaf.util.StringUtils;
 
 /**
@@ -30,13 +31,15 @@ import org.thymeleaf.util.StringUtils;
  */
 public class VariableDeclarationMerger {
 
-    private static List<VariableDeclaration> deriveDeclarations(String declarationString) {
-        String[] attributeTokens = declarationString.split(",");
-        ArrayList<VariableDeclaration> arrayList = new ArrayList<>(attributeTokens.length);
-        for (String attributeToken : attributeTokens) {
-            arrayList.add(new VariableDeclaration(attributeToken));
-        }
-        return arrayList;
+    private final IExpressionContext context;
+
+    /**
+     * Constructor, sets the processing context for the merger.
+     *
+     * @param context
+     */
+    public VariableDeclarationMerger(IExpressionContext context) {
+        this.context = context;
     }
 
     /**
@@ -54,8 +57,9 @@ public class VariableDeclarationMerger {
         if (StringUtils.isEmpty(source)) {
             return target;
         }
-        List<VariableDeclaration> targetDeclarations = deriveDeclarations(target);
-        List<VariableDeclaration> sourceDeclarations = deriveDeclarations(source);
+        VariableDeclarationParser declarationParser = new VariableDeclarationParser(context);
+        List<VariableDeclaration> targetDeclarations = declarationParser.parse(target);
+        List<VariableDeclaration> sourceDeclarations = declarationParser.parse(source);
 
         List<VariableDeclaration> newDeclarations = new ArrayList<>(targetDeclarations.size() + sourceDeclarations.size());
         for (VariableDeclaration targetDeclaration : targetDeclarations) {
