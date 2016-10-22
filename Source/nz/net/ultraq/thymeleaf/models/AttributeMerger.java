@@ -78,7 +78,7 @@ public class AttributeMerger implements ModelMerger {
             IProcessableElementTag mergedEvent = (IProcessableElementTag) MetaClass.first(mergedModel);
             String mergedAttributeValue; // Merge th:with attributes
             if (MetaClass.equalsName(sourceAttribute, standardDialectPrefix, StandardWithTagProcessor.ATTR_NAME)) {
-                mergedAttributeValue = new VariableDeclarationMerger().merge(sourceAttribute.getValue(),
+                mergedAttributeValue = new VariableDeclarationMerger(context).merge(sourceAttribute.getValue(),
                         mergedEvent.getAttributeValue(standardDialectPrefix, StandardWithTagProcessor.ATTR_NAME));
             } else { // Copy every other attribute straight
                 mergedAttributeValue = sourceAttribute.getValue();
