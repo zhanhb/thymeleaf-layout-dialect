@@ -56,8 +56,7 @@ public class FragmentFinder {
     public Map<String, IModel> findFragments(IModel model) {
         Map<String, IModel> fragments = new LinkedHashMap<>();
 
-        int eventIndex = 0;
-        while (eventIndex < model.size()) {
+        for (int eventIndex = 0, size = model.size(); eventIndex < size;) {
             ITemplateEvent event = model.get(eventIndex);
             if (event instanceof IOpenElementTag) {
                 String fragmentName = ((IProcessableElementTag) event).getAttributeValue(dialectPrefix, FragmentProcessor.PROCESSOR_NAME);
