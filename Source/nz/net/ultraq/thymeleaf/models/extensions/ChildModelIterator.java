@@ -23,10 +23,6 @@ import org.thymeleaf.model.IModel;
  * This class provides a way for working with a model's immediate children, by
  * converting events into sub-models of their own.
  *
- * Models returned by this iterator are also aware of their start/end positions
- * within the event queue of the parent model, accessible via their
- * {@code startIndex}/{@code endIndex} properties.
- *
  * @author zhanhb
  * @author Emanuel Rabina
  */
@@ -63,9 +59,7 @@ public class ChildModelIterator implements Iterator<IModel> {
     @Override
     public IModel next() {
         IModel subModel = Extensions.getModel(parent, currentIndex);
-
         currentIndex += subModel.size();
-
         return subModel;
     }
 
