@@ -68,6 +68,11 @@
         <url>https://github.com/zhanhb/thymeleaf-layout-dialect</url>
     </scm>
 
+    <ciManagement>
+        <system>Travis CI</system>
+        <url>https://travis-ci.org/zhanhb/thymeleaf-layout-dialect</url>
+    </ciManagement>
+
     <distributionManagement>
         <repository>
             <id>ossrh</id>
