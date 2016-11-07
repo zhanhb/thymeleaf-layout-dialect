@@ -40,6 +40,7 @@ import org.thymeleaf.model.IStandaloneElementTag;
 import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.model.IText;
 import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.util.StringUtils;
 
 /**
  * Additional methods applied to the Thymeleaf class via extension programming.
@@ -563,7 +564,7 @@ public class Extensions {
         ConcurrentMap<Class<?>, String> dialectPrefixCache = DialectPrefixCacheHolder.getDialectPrefixCache(delegate);
 
         String dialectPrefix = dialectPrefixCache.get(dialectClass);
-        if (dialectPrefix == null) {
+        if (StringUtils.isEmpty(dialectPrefix)) {
             DialectConfiguration dialectConfiguration = null;
             for (DialectConfiguration dialectConfig : delegate.getConfiguration().getDialectConfigurations()) {
                 if (dialectClass.isInstance(dialectConfig.getDialect())) {
@@ -602,13 +603,16 @@ public class Extensions {
                 event = model.get(eventIndex++);
                 if (event instanceof IOpenElementTag) {
                     level++;
-                }
-                if (event instanceof ICloseElementTag) {
+                } else if (event instanceof ICloseElementTag) {
                     ICloseElementTag tag = (ICloseElementTag) event;
                     if (tag.getTemplateMode() == TemplateMode.HTML && ((HTMLElementDefinition) tag.getElementDefinition()).getType() == HTMLElementType.VOID) {
                         // Do nothing.  This is to capture closing tags for HTML void
                         // elements which shouldn't be specified according to the HTML spec.
-                        // https://html.spec.whatwg.org/multipage/syntax.html#void-elements
+                        // https://html.spec.whatwg.org/multipage/syntax.html#void-elementselse
+                    } else if (tag.isSynthetic()) {
+                        // Do nothing.  This is to capture what attoparser calls 'synthetic'
+                        // closing tags, which it inserts in the model to balance them out
+                        // to normalize some of the tags in HTML.
                     } else if (level == 0) {
                         break;
                     } else {

@@ -51,23 +51,18 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
     public static final String PROCESSOR_NAME = "title-pattern";
     public static final int PROCESSOR_PRECEDENCE = 1;
 
+    public static final String CONTEXT_CONTENT_TITLE = "contentTitle";
+    public static final String CONTEXT_LAYOUT_TITLE = "layoutTitle";
     public static final String CONTEXT_RESULTING_TITLE = "resultingTitle";
 
-    public static final String CONTENT_TITLE_ATTRIBUTE = "data-layout-content-title";
-    public static final String CONTENT_TITLE_ATTRIBUTE_UNESCAPED = "data-layout-content-title-unescaped";
-    public static final String LAYOUT_TITLE_ATTRIBUTE = "data-layout-layout-title";
-    public static final String LAYOUT_TITLE_ATTRIBUTE_UNESCAPED = "data-layout-layout-title-unescaped";
+    public static final String CONTENT_TITLE_KEY = "LayoutDialect::ContentTitle";
+    public static final String LAYOUT_TITLE_KEY = "LayoutDialect::LayoutTitle";
 
-    private static String titleProcessor(String dataAttributeName,
-            boolean escape,
-            IProcessableElementTag tag,
-            IElementTagStructureHandler structureHandler,
-            ExpressionProcessor expressionProcessor) {
-        String titleExpression = tag.getAttributeValue(dataAttributeName);
-        if (!StringUtils.isEmpty(titleExpression)) {
-            structureHandler.removeAttribute(dataAttributeName);
-            String titleValue = HtmlEscape.unescapeHtml(expressionProcessor.processAsString(titleExpression));
-            return escape ? HtmlEscape.escapeHtml5Xml(titleValue) : titleValue;
+    private static String titleProcessor(String contextKey, ITemplateContext context, ExpressionProcessor expressionProcessor) {
+        Title titleObject = (Title) context.getVariable(contextKey);
+        if (titleObject != null) {
+            String titleValue = HtmlEscape.unescapeHtml(expressionProcessor.processAsString(titleObject.getTitle()));
+            return titleObject.isEscape() ? HtmlEscape.escapeHtml5Xml(titleValue) : titleValue;
         }
         return null;
     }
@@ -104,14 +99,8 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
         String titlePattern = attributeValue;
         ExpressionProcessor expressionProcessor = new ExpressionProcessor(context);
 
-        String contentTitle = titleProcessor(CONTENT_TITLE_ATTRIBUTE, true, tag, structureHandler, expressionProcessor);
-        if (StringUtils.isEmpty(contentTitle)) {
-            contentTitle = titleProcessor(CONTENT_TITLE_ATTRIBUTE_UNESCAPED, false, tag, structureHandler, expressionProcessor);
-        }
-        String layoutTitle = titleProcessor(LAYOUT_TITLE_ATTRIBUTE, true, tag, structureHandler, expressionProcessor);
-        if (StringUtils.isEmpty(layoutTitle)) {
-            layoutTitle = titleProcessor(LAYOUT_TITLE_ATTRIBUTE_UNESCAPED, false, tag, structureHandler, expressionProcessor);
-        }
+        String contentTitle = titleProcessor(CONTENT_TITLE_KEY, context, expressionProcessor);
+        String layoutTitle = titleProcessor(LAYOUT_TITLE_KEY, context, expressionProcessor);
 
         if (warned.compareAndSet(false, true) && !StringUtils.isEmpty(titlePattern) && titlePattern.contains(PARAM_TITLE_DECORATOR)) {
             logger.warn(
@@ -135,6 +124,8 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
 
         // Save the title to the layout context
         LayoutContext layoutContext = LayoutContext.forContext(context);
+        layoutContext.put(CONTEXT_CONTENT_TITLE, contentTitle);
+        layoutContext.put(CONTEXT_LAYOUT_TITLE, layoutTitle);
         layoutContext.put(CONTEXT_RESULTING_TITLE, title);
     }
 

@@ -58,8 +58,7 @@ public class LayoutDialect extends AbstractProcessorDialect {
     }
 
     /**
-     * Constructor, configure the layout dialect with the appending
-     * strategy.
+     * Constructor, configure the layout dialect with the appending strategy.
      */
     public LayoutDialect() {
         this(new AppendingStrategy());

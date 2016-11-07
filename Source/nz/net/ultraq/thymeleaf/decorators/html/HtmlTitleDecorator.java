@@ -15,28 +15,26 @@
  */
 package nz.net.ultraq.thymeleaf.decorators.html;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Collections;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
+import nz.net.ultraq.thymeleaf.decorators.Title;
 import nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor;
 import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.internal.ModelBuilder;
 import nz.net.ultraq.thymeleaf.models.ElementMerger;
+import org.thymeleaf.context.IEngineContext;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IAttribute;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IProcessableElementTag;
+import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.model.IText;
 import org.thymeleaf.standard.StandardDialect;
 import org.thymeleaf.standard.processor.StandardTextTagProcessor;
 import org.thymeleaf.standard.processor.StandardUtextTagProcessor;
+import org.thymeleaf.util.StringUtils;
 import org.unbescape.html.HtmlEscape;
-
-import static nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor.CONTENT_TITLE_ATTRIBUTE;
-import static nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor.CONTENT_TITLE_ATTRIBUTE_UNESCAPED;
-import static nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor.LAYOUT_TITLE_ATTRIBUTE;
-import static nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor.LAYOUT_TITLE_ATTRIBUTE_UNESCAPED;
 
 /**
  * Decorator for the {@code <title>} part of the template to handle the special
@@ -48,33 +46,42 @@ import static nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor.LAYOUT_TI
 public class HtmlTitleDecorator implements Decorator {
 
     // Get the title pattern to use
-    private static IAttribute titlePatternProcessorRetriever(IModel titleModel, String attributeName) {
-        if (!Extensions.asBoolean(titleModel)) {
-            return null;
+    private static IAttribute titlePatternProcessorRetriever(IModel titleModel, String layoutDialectPrefix) {
+        if (Extensions.asBoolean(titleModel)) {
+            ITemplateEvent event = Extensions.first(titleModel);
+            if (event != null) {
+                return ((IProcessableElementTag) event).getAttribute(layoutDialectPrefix, TitlePatternProcessor.PROCESSOR_NAME);
+            }
         }
-        IProcessableElementTag event = (IProcessableElementTag) Extensions.first(titleModel);
-        return event != null ? event.getAttribute(attributeName, TitlePatternProcessor.PROCESSOR_NAME) : null;
+        return null;
     }
 
-    private static void titleValueExtractor(IModel titleModel,
-            String titleAttribute,
-            String titleAttributeUnescaped,
-            String standardDialectPrefix,
-            Map<String, ? super String> titleValuesMap) {
+    private static void extractTitle(IModel titleModel, String contextKey, ITemplateContext context, String standardDialectPrefix) {
         IProcessableElementTag titleTag = Extensions.asBoolean(titleModel) ? (IProcessableElementTag) Extensions.first(titleModel) : null;
-        if (titleTag != null) {
-            if (titleTag.hasAttribute(titleAttribute)) {
-                titleValuesMap.put(titleAttribute, titleTag.getAttributeValue(titleAttribute));
-            } else if (titleTag.hasAttribute(standardDialectPrefix, StandardTextTagProcessor.ATTR_NAME)) {
-                titleValuesMap.put(titleAttribute,
-                        titleTag.getAttributeValue(standardDialectPrefix, StandardTextTagProcessor.ATTR_NAME));
-            } else if (titleTag.hasAttribute(standardDialectPrefix, StandardUtextTagProcessor.ATTR_NAME)) {
-                titleValuesMap.put(titleAttributeUnescaped,
-                        titleTag.getAttributeValue(standardDialectPrefix, StandardUtextTagProcessor.ATTR_NAME));
-            } else if (titleModel != null && titleModel.size() > 2) {
-                titleValuesMap.put(titleAttributeUnescaped, "'"
+        Title title = (Title) context.getVariable(contextKey);
+        String escapeTitle = null;
+        if (title != null) {
+            escapeTitle = title.getTitle();
+        }
+        if (StringUtils.isEmpty(escapeTitle)) {
+            if (titleTag != null) {
+                escapeTitle = titleTag.getAttributeValue(standardDialectPrefix, StandardTextTagProcessor.ATTR_NAME);
+            }
+        }
+        if (!StringUtils.isEmpty(escapeTitle)) {
+            ((IEngineContext) context).setVariable(contextKey, new Title(escapeTitle, true));
+        } else {
+            String unescapeTitle = null;
+            if (titleTag != null) {
+                unescapeTitle = titleTag.getAttributeValue(standardDialectPrefix, StandardUtextTagProcessor.ATTR_NAME);
+            }
+            if (StringUtils.isEmpty(unescapeTitle)) {
+                unescapeTitle = titleModel != null && titleModel.size() > 2 ? "'"
                         + HtmlEscape.escapeHtml5Xml(((IText) titleModel.get(1)).getText())
-                        + "'");
+                        + "'" : null;
+            }
+            if (!StringUtils.isEmpty(unescapeTitle)) {
+                ((IEngineContext) context).setVariable(contextKey, new Title(unescapeTitle));
             }
         }
     }
@@ -100,6 +107,7 @@ public class HtmlTitleDecorator implements Decorator {
      * {@code <title>}.
      */
     @Override
+    @SuppressWarnings("SpaceAroundOperator")
     public IModel decorate(IModel targetTitleModel, IModel sourceTitleModel) {
         String layoutDialectPrefix = Extensions.getPrefixForDialect(context, LayoutDialect.class);
         String standardDialectPrefix = Extensions.getPrefixForDialect(context, StandardDialect.class);
@@ -114,17 +122,11 @@ public class HtmlTitleDecorator implements Decorator {
         // Set the title pattern to use on a new model, as well as the important
         // title result parts that we want to use on the pattern.
         if (titlePatternProcessor != null) {
-            // TODO: This title values map is being used as a way to communicate
-            //       between this class and the title pattern processor, and being
-            //       exposed on the Thymeleaf model as a result.  I should find a
-            //       better way of passing these values around, maybe via the layout
-            //       context.
-            LinkedHashMap<String, String> titleValuesMap = new LinkedHashMap<>(3);
+            extractTitle(sourceTitleModel, TitlePatternProcessor.CONTENT_TITLE_KEY, context, standardDialectPrefix);
+            extractTitle(targetTitleModel, TitlePatternProcessor.LAYOUT_TITLE_KEY, context, standardDialectPrefix);
 
-            titleValuesMap.put(titlePatternProcessor.getAttributeCompleteName(), titlePatternProcessor.getValue());
-            titleValueExtractor(sourceTitleModel, CONTENT_TITLE_ATTRIBUTE, CONTENT_TITLE_ATTRIBUTE_UNESCAPED, standardDialectPrefix, titleValuesMap);
-            titleValueExtractor(targetTitleModel, LAYOUT_TITLE_ATTRIBUTE, LAYOUT_TITLE_ATTRIBUTE_UNESCAPED, standardDialectPrefix, titleValuesMap);
-            resultTitle = new ModelBuilder(context).createNode("title", titleValuesMap);
+            resultTitle = new ModelBuilder(context).createNode("title",
+                    Collections.singletonMap(titlePatternProcessor.getAttributeCompleteName(), titlePatternProcessor.getValue()));
         } else {
             resultTitle = new ElementMerger(context).merge(targetTitleModel, sourceTitleModel);
         }

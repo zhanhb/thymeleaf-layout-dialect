@@ -57,19 +57,20 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
      */
     @Override
     public IModel decorate(IModel targetDocumentModel, IModel sourceDocumentModel) {
+        IModel resultDocumentModel = targetDocumentModel.cloneModel();
         // Head decoration
         ITemplateEventPredicate headModelFinder = event -> {
             return event instanceof IOpenElementTag && "head".equals(((IElementTag) event).getElementCompleteName());
         };
-        IModel targetHeadModel = Extensions.findModel(targetDocumentModel, headModelFinder);
+        IModel targetHeadModel = Extensions.findModel(resultDocumentModel, headModelFinder);
         IModel resultHeadModel = new HtmlHeadDecorator(context, sortingStrategy).decorate(targetHeadModel,
                 Extensions.findModel(sourceDocumentModel, headModelFinder)
         );
         if (Extensions.asBoolean(resultHeadModel)) {
             if (Extensions.asBoolean(targetHeadModel)) {
-                Extensions.replaceModel(targetDocumentModel, Extensions.indexOf(targetDocumentModel, targetHeadModel), resultHeadModel);
+                Extensions.replaceModel(resultDocumentModel, Extensions.indexOf(resultDocumentModel, targetHeadModel), resultHeadModel);
             } else {
-                Extensions.insertModelWithWhitespace(targetDocumentModel, Extensions.findIndexOf(targetDocumentModel, event -> {
+                Extensions.insertModelWithWhitespace(resultDocumentModel, Extensions.findIndexOf(resultDocumentModel, event -> {
                     return (event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName()))
                             || (event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName()));
                 }) - 1, resultHeadModel);
@@ -80,21 +81,21 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
         ITemplateEventPredicate bodyModelFinder = event -> {
             return event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName());
         };
-        IModel targetBodyModel = Extensions.findModel(targetDocumentModel, bodyModelFinder);
+        IModel targetBodyModel = Extensions.findModel(resultDocumentModel, bodyModelFinder);
         IModel resultBodyModel = new HtmlBodyDecorator(context).decorate(targetBodyModel,
                 Extensions.findModel(sourceDocumentModel, bodyModelFinder)
         );
         if (Extensions.asBoolean(resultBodyModel)) {
             if (Extensions.asBoolean(targetBodyModel)) {
-                Extensions.replaceModel(targetDocumentModel, Extensions.indexOf(targetDocumentModel, targetBodyModel), resultBodyModel);
+                Extensions.replaceModel(resultDocumentModel, Extensions.indexOf(resultDocumentModel, targetBodyModel), resultBodyModel);
             } else {
-                Extensions.insertModelWithWhitespace(targetDocumentModel, Extensions.findIndexOf(targetDocumentModel, event -> {
+                Extensions.insertModelWithWhitespace(resultDocumentModel, Extensions.findIndexOf(resultDocumentModel, event -> {
                     return event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName());
                 }) - 1, resultBodyModel);
             }
         }
 
-        return super.decorate(targetDocumentModel, sourceDocumentModel);
+        return super.decorate(resultDocumentModel, sourceDocumentModel);
     }
 
 }

@@ -77,11 +77,11 @@ public class XmlDocumentDecorator implements Decorator {
     public IModel decorate(IModel targetDocumentModel, IModel sourceDocumentModel) {
         IModelFactory modelFactory = context.getModelFactory();
 
-        IModel targetDocumentRootModel = rootModelFinder(targetDocumentModel);
-        IModel sourceDocumentRootModel = rootModelFinder(sourceDocumentModel);
-
         // Decorate the target document with the source one
-        IModel resultDocumentModel = new AttributeMerger(context).merge(targetDocumentRootModel, sourceDocumentRootModel);
+        IModel resultDocumentModel = new AttributeMerger(context).merge(
+                rootModelFinder(targetDocumentModel),
+                rootModelFinder(sourceDocumentModel)
+        );
 
         // Copy comments outside of the root element, keeping whitespace copied to a minimum
         final int size = targetDocumentModel.size();

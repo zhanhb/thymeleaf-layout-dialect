@@ -77,7 +77,8 @@ public class HtmlHeadDecorator implements Decorator {
 
         // Get the source and target title elements to pass to the title decorator
         IModel resultTitle = new HtmlTitleDecorator(context).decorate(titleRetriever(targetHeadModel, isTitle),
-                titleRetriever(sourceHeadModel, isTitle));
+                titleRetriever(sourceHeadModel, isTitle)
+        );
         Extensions.insertModelWithWhitespace(resultHeadModel, 1, resultTitle);
 
         // Merge the rest of the source <head> elements with the target <head>
