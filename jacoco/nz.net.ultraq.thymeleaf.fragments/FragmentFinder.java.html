@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FragmentFinder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.fragments</a> &gt; <span class="el_source">FragmentFinder.java</span></div><h1>FragmentFinder.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2015, Emanuel Rabina (http://www.ultraq.net.nz/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package nz.net.ultraq.thymeleaf.fragments;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import nz.net.ultraq.thymeleaf.internal.Extensions;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IOpenElementTag;
+import org.thymeleaf.model.IProcessableElementTag;
+import org.thymeleaf.model.ITemplateEvent;
+import org.thymeleaf.util.StringUtils;
+
+/**
+ * Searches for and returns layout dialect fragments within a given
+ * scope/element.
+ *
+ * @author zhanhb
+ * @author Emanuel Rabina
+ */
+public class FragmentFinder {
+
+    private final String dialectPrefix;
+
+    /**
+     * Constructor, create a new fragment finder to search for fragments using
+     * the given prefix as the one configured for the layout dialect.
+     *
+     * @param dialectPrefix
+     */
+<span class="fc" id="L44">    public FragmentFinder(String dialectPrefix) {</span>
+<span class="fc" id="L45">        this.dialectPrefix = dialectPrefix;</span>
+<span class="fc" id="L46">    }</span>
+
+    /**
+     * Find and return models for layout dialect fragments within the scope of
+     * the given model, without delving into {@code layout:include} or
+     * {@code layout:replace} elements, mapped by the name of each fragment.
+     *
+     * @param model Model whose events are to be searched.
+     * @return Map of fragment names and their elements.
+     */
+    public Map&lt;String, IModel&gt; findFragments(IModel model) {
+<span class="fc" id="L57">        Map&lt;String, IModel&gt; fragments = new LinkedHashMap&lt;&gt;();</span>
+
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        for (int eventIndex = 0, size = model.size(); eventIndex &lt; size;) {</span>
+<span class="fc" id="L60">            ITemplateEvent event = model.get(eventIndex);</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">            if (event instanceof IOpenElementTag) {</span>
+<span class="fc" id="L62">                String fragmentName = ((IProcessableElementTag) event).getAttributeValue(dialectPrefix, FragmentProcessor.PROCESSOR_NAME);</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">                if (!StringUtils.isEmpty(fragmentName)) {</span>
+<span class="fc" id="L64">                    IModel fragment = Extensions.getModel(model, eventIndex);</span>
+<span class="fc" id="L65">                    fragments.put(fragmentName, fragment);</span>
+<span class="fc" id="L66">                    eventIndex += fragment.size();</span>
+<span class="fc" id="L67">                    continue;</span>
+                }
+            }
+<span class="fc" id="L70">            eventIndex++;</span>
+<span class="fc" id="L71">        }</span>
+
+<span class="fc" id="L73">        return fragments;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

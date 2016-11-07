@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FragmentMap.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.fragments</a> &gt; <span class="el_source">FragmentMap.java</span></div><h1>FragmentMap.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2015, Emanuel Rabina (http://www.ultraq.net.nz/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package nz.net.ultraq.thymeleaf.fragments;
+
+import java.util.HashMap;
+import java.util.Map;
+import org.thymeleaf.context.IContext;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.processor.element.IElementModelStructureHandler;
+
+/**
+ * Holds the layout fragments encountered across layout/decorator and content
+ * templates for use later.
+ *
+ * @author zhanhb
+ * @author Emanuel Rabina
+ */
+@SuppressWarnings({&quot;serial&quot;, &quot;CloneableImplementsClone&quot;})
+<span class="fc" id="L32">public class FragmentMap extends HashMap&lt;String, IModel&gt; {</span>
+
+    private static final String FRAGMENT_COLLECTION_KEY = &quot;LayoutDialect::FragmentCollection&quot;;
+
+    /**
+     * Retrieves either the fragment map for the current context, or returns a
+     * new fragment map.
+     *
+     * @param context
+     * @return A new or existing fragment collection for the context.
+     */
+    public static FragmentMap get(IContext context) {
+<span class="fc" id="L44">        FragmentMap localVariable = (FragmentMap) context.getVariable(FRAGMENT_COLLECTION_KEY);</span>
+<span class="fc bfc" id="L45" title="All 4 branches covered.">        return localVariable != null &amp;&amp; !localVariable.isEmpty() ? localVariable : new FragmentMap();</span>
+    }
+
+    /**
+     * Set the fragment collection to contain whatever it initially had, plus
+     * the given fragments, just for the scope of the current node.
+     *
+     * @param context
+     * @param structureHandler
+     * @param fragments The new fragments to add to the map.
+     */
+    public static void setForNode(IContext context, IElementModelStructureHandler structureHandler,
+            Map&lt;String, IModel&gt; fragments) {
+<span class="fc" id="L58">        FragmentMap fragmentMap = (FragmentMap) get(context).clone();</span>
+<span class="fc" id="L59">        fragmentMap.putAll(fragments);</span>
+<span class="fc" id="L60">        structureHandler.setLocalVariable(FRAGMENT_COLLECTION_KEY, fragmentMap);</span>
+<span class="fc" id="L61">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

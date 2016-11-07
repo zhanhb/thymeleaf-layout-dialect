@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ElementMerger.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.models</a> &gt; <span class="el_source">ElementMerger.java</span></div><h1>ElementMerger.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2015, Emanuel Rabina (http://www.ultraq.net.nz/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package nz.net.ultraq.thymeleaf.models;
+
+import nz.net.ultraq.thymeleaf.internal.Extensions;
+import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.model.AttributeValueQuotes;
+import org.thymeleaf.model.IElementTag;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IModelFactory;
+import org.thymeleaf.model.IOpenElementTag;
+import org.thymeleaf.model.IProcessableElementTag;
+import org.thymeleaf.model.IStandaloneElementTag;
+import org.thymeleaf.model.ITemplateEvent;
+
+/**
+ * Merges an element and all its children into an existing element.
+ *
+ * @author zhanhb
+ * @author Emanuel Rabina
+ */
+public class ElementMerger implements ModelMerger {
+
+    private final ITemplateContext context;
+
+    /**
+     * Constructor, sets up the element merger context.
+     *
+     * @param context
+     */
+<span class="fc" id="L44">    public ElementMerger(ITemplateContext context) {</span>
+<span class="fc" id="L45">        this.context = context;</span>
+<span class="fc" id="L46">    }</span>
+
+    /**
+     * Replace the content of the target element, with the content of the source
+     * element.
+     *
+     * @param targetModel
+     * @param sourceModel
+     * @return Model that is the result of the merge.
+     */
+    @Override
+    public IModel merge(IModel targetModel, IModel sourceModel) {
+        // If one of the parameters is missing return a copy of the other, or
+        // nothing if both parameters are missing.
+<span class="fc bfc" id="L60" title="All 4 branches covered.">        if (!Extensions.asBoolean(targetModel) || !Extensions.asBoolean(sourceModel)) {</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">            IModel result = Extensions.asBoolean(targetModel) ? targetModel.cloneModel() : null;</span>
+<span class="fc bfc" id="L62" title="All 4 branches covered.">            return Extensions.asBoolean(result) ? result : Extensions.asBoolean(sourceModel) ? sourceModel.cloneModel() : null;</span>
+        }
+
+<span class="fc" id="L65">        IModelFactory modelFactory = context.getModelFactory();</span>
+
+        // The result we want is the source model, but merged into the target root element attributes
+<span class="fc" id="L68">        ITemplateEvent sourceRootEvent = Extensions.first(sourceModel);</span>
+<span class="fc" id="L69">        IModel sourceRootElement = modelFactory.createModel(sourceRootEvent);</span>
+<span class="fc" id="L70">        IProcessableElementTag targetRootEvent = (IProcessableElementTag) Extensions.first(targetModel);</span>
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">        IModel targetRootElement = modelFactory.createModel(</span>
+                sourceRootEvent instanceof IOpenElementTag
+<span class="pc bnc" id="L73" title="All 2 branches missed.">                        ? modelFactory.createOpenElementTag(((IElementTag) sourceRootEvent).getElementCompleteName(),</span>
+<span class="fc" id="L74">                                targetRootEvent.getAttributeMap(), AttributeValueQuotes.DOUBLE, false)</span>
+                        : sourceRootEvent instanceof IStandaloneElementTag
+<span class="nc" id="L76">                                ? modelFactory.createStandaloneElementTag(((IElementTag) sourceRootEvent).getElementCompleteName(),</span>
+<span class="nc" id="L77">                                        targetRootEvent.getAttributeMap(), AttributeValueQuotes.DOUBLE, false, ((IStandaloneElementTag) sourceRootEvent).isMinimized())</span>
+                                : null);
+<span class="fc" id="L79">        IModel mergedRootElement = new AttributeMerger(context).merge(targetRootElement, sourceRootElement);</span>
+<span class="fc" id="L80">        IModel mergedModel = sourceModel.cloneModel();</span>
+<span class="fc" id="L81">        mergedModel.replace(0, Extensions.first(mergedRootElement));</span>
+<span class="fc" id="L82">        return mergedModel;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

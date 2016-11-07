@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GroupingStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.decorators.strategies</a> &gt; <span class="el_source">GroupingStrategy.java</span></div><h1>GroupingStrategy.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2015, Emanuel Rabina (http://www.ultraq.net.nz/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package nz.net.ultraq.thymeleaf.decorators.strategies;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.ListIterator;
+import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
+import nz.net.ultraq.thymeleaf.internal.Extensions;
+import org.thymeleaf.model.IComment;
+import org.thymeleaf.model.IElementTag;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IOpenElementTag;
+import org.thymeleaf.model.IProcessableElementTag;
+import org.thymeleaf.model.ITemplateEvent;
+
+/**
+ * The {@code &lt;head&gt;} merging strategy which groups like elements together.
+ *
+ * @author zhanhb
+ * @author Emanuel Rabina
+ * @since 1.2.6
+ */
+<span class="fc" id="L37">public class GroupingStrategy implements SortingStrategy {</span>
+
+    /**
+     * Figure out the enum for the given model.
+     *
+     * @param model
+     * @return Matching enum to describe the model.
+     */
+    private static int findMatchingType(IModel model) {
+        final int COMMENT = 1;
+        final int META = 2;
+        final int SCRIPT = 3;
+        final int STYLE = 4;
+        final int STYLESHEET = 5;
+        final int OTHER = 6;
+
+<span class="fc" id="L53">        ITemplateEvent event = Extensions.first(model);</span>
+
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">        if (event instanceof IComment) {</span>
+<span class="nc" id="L56">            return COMMENT;</span>
+        }
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        if (event instanceof IElementTag) {</span>
+<span class="fc" id="L59">            String elementCompleteName = ((IElementTag) event).getElementCompleteName();</span>
+<span class="pc bpc" id="L60" title="1 of 4 branches missed.">            if (event instanceof IProcessableElementTag &amp;&amp; &quot;meta&quot;.equals(elementCompleteName)) {</span>
+<span class="fc" id="L61">                return META;</span>
+            }
+<span class="pc bpc" id="L63" title="1 of 4 branches missed.">            if (event instanceof IOpenElementTag &amp;&amp; &quot;script&quot;.equals(elementCompleteName)) {</span>
+<span class="fc" id="L64">                return SCRIPT;</span>
+            }
+<span class="pc bpc" id="L66" title="3 of 4 branches missed.">            if (event instanceof IOpenElementTag &amp;&amp; &quot;style&quot;.equals(elementCompleteName)) {</span>
+<span class="nc" id="L67">                return STYLE;</span>
+            }
+<span class="pc bpc" id="L69" title="2 of 4 branches missed.">            if (event instanceof IProcessableElementTag &amp;&amp; &quot;link&quot;.equals(elementCompleteName)</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">                    &amp;&amp; &quot;stylesheet&quot;.equals(((IProcessableElementTag) event).getAttributeValue(&quot;rel&quot;))) {</span>
+<span class="fc" id="L71">                return STYLESHEET;</span>
+            }
+<span class="fc" id="L73">            return OTHER;</span>
+        }
+<span class="fc" id="L75">        return 0;</span>
+    }
+
+    /**
+     * Returns the index of the last set of elements that are of the same 'type'
+     * as the content node. eg: groups scripts with scripts, stylesheets with
+     * stylesheets, and so on.
+     *
+     * @param headModel
+     * @param childModel
+     * @return Position of the end of the matching element group.
+     */
+    @Override
+    public int findPositionForModel(IModel headModel, IModel childModel) {
+        // Discard text/whitespace nodes
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        if (Extensions.isWhitespace(childModel)) {</span>
+<span class="fc" id="L91">            return -1;</span>
+        }
+
+<span class="fc" id="L94">        int type = findMatchingType(childModel);</span>
+<span class="fc" id="L95">        Iterator&lt;IModel&gt; it = Extensions.childModelIterator(headModel);</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">        if (it != null) {</span>
+<span class="fc" id="L97">            ArrayList&lt;IModel&gt; list = new ArrayList&lt;&gt;(20);</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">            while (it.hasNext()) {</span>
+<span class="fc" id="L99">                list.add(it.next());</span>
+            }
+<span class="fc" id="L101">            ListIterator&lt;IModel&gt; listIterator = list.listIterator(list.size());</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">            while (listIterator.hasPrevious()) {</span>
+<span class="fc" id="L103">                IModel headSubModel = listIterator.previous();</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">                if (type == findMatchingType(headSubModel)) {</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">                    if (Extensions.asBoolean(headModel)) {</span>
+<span class="fc" id="L106">                        return Extensions.indexOf(headModel, headSubModel) + headSubModel.size();</span>
+                    }
+                    break;
+                }
+<span class="fc" id="L110">            }</span>
+        }
+<span class="fc" id="L112">        return 1;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

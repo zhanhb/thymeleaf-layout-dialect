@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HtmlTitleDecorator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.decorators.html</a> &gt; <span class="el_source">HtmlTitleDecorator.java</span></div><h1>HtmlTitleDecorator.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2016, Emanuel Rabina (http://www.ultraq.net.nz/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package nz.net.ultraq.thymeleaf.decorators.html;
+
+import java.util.Collections;
+import nz.net.ultraq.thymeleaf.LayoutDialect;
+import nz.net.ultraq.thymeleaf.decorators.Decorator;
+import nz.net.ultraq.thymeleaf.decorators.Title;
+import nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor;
+import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.internal.ModelBuilder;
+import nz.net.ultraq.thymeleaf.models.ElementMerger;
+import org.thymeleaf.context.IEngineContext;
+import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.model.IAttribute;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IProcessableElementTag;
+import org.thymeleaf.model.ITemplateEvent;
+import org.thymeleaf.model.IText;
+import org.thymeleaf.standard.StandardDialect;
+import org.thymeleaf.standard.processor.StandardTextTagProcessor;
+import org.thymeleaf.standard.processor.StandardUtextTagProcessor;
+import org.thymeleaf.util.StringUtils;
+import org.unbescape.html.HtmlEscape;
+
+/**
+ * Decorator for the {@code &lt;title&gt;} part of the template to handle the special
+ * processing required for the {@code layout:title-pattern} processor.
+ *
+ * @author zhanhb
+ * @author Emanuel Rabina
+ */
+public class HtmlTitleDecorator implements Decorator {
+
+    // Get the title pattern to use
+    private static IAttribute titlePatternProcessorRetriever(IModel titleModel, String layoutDialectPrefix) {
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        if (Extensions.asBoolean(titleModel)) {</span>
+<span class="fc" id="L51">            ITemplateEvent event = Extensions.first(titleModel);</span>
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">            if (event != null) {</span>
+<span class="fc" id="L53">                return ((IProcessableElementTag) event).getAttribute(layoutDialectPrefix, TitlePatternProcessor.PROCESSOR_NAME);</span>
+            }
+        }
+<span class="fc" id="L56">        return null;</span>
+    }
+
+    private static void extractTitle(IModel titleModel, String contextKey, ITemplateContext context, String standardDialectPrefix) {
+<span class="fc bfc" id="L60" title="All 2 branches covered.">        IProcessableElementTag titleTag = Extensions.asBoolean(titleModel) ? (IProcessableElementTag) Extensions.first(titleModel) : null;</span>
+<span class="fc" id="L61">        Title title = (Title) context.getVariable(contextKey);</span>
+<span class="fc" id="L62">        String escapeTitle = null;</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        if (title != null) {</span>
+<span class="fc" id="L64">            escapeTitle = title.getTitle();</span>
+        }
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        if (StringUtils.isEmpty(escapeTitle)) {</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">            if (titleTag != null) {</span>
+<span class="fc" id="L68">                escapeTitle = titleTag.getAttributeValue(standardDialectPrefix, StandardTextTagProcessor.ATTR_NAME);</span>
+            }
+        }
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        if (!StringUtils.isEmpty(escapeTitle)) {</span>
+<span class="fc" id="L72">            ((IEngineContext) context).setVariable(contextKey, new Title(escapeTitle, true));</span>
+        } else {
+<span class="fc" id="L74">            String unescapeTitle = null;</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">            if (titleTag != null) {</span>
+<span class="fc" id="L76">                unescapeTitle = titleTag.getAttributeValue(standardDialectPrefix, StandardUtextTagProcessor.ATTR_NAME);</span>
+            }
+<span class="fc bfc" id="L78" title="All 2 branches covered.">            if (StringUtils.isEmpty(unescapeTitle)) {</span>
+<span class="fc bfc" id="L79" title="All 4 branches covered.">                unescapeTitle = titleModel != null &amp;&amp; titleModel.size() &gt; 2 ? &quot;'&quot;</span>
+<span class="fc" id="L80">                        + HtmlEscape.escapeHtml5Xml(((IText) titleModel.get(1)).getText())</span>
+                        + &quot;'&quot; : null;
+            }
+<span class="fc bfc" id="L83" title="All 2 branches covered.">            if (!StringUtils.isEmpty(unescapeTitle)) {</span>
+<span class="fc" id="L84">                ((IEngineContext) context).setVariable(contextKey, new Title(unescapeTitle));</span>
+            }
+        }
+<span class="fc" id="L87">    }</span>
+
+    private final ITemplateContext context;
+
+    /**
+     * Constructor, sets up the decorator context.
+     *
+     * @param context
+     */
+<span class="fc" id="L96">    public HtmlTitleDecorator(ITemplateContext context) {</span>
+<span class="fc" id="L97">        this.context = context;</span>
+<span class="fc" id="L98">    }</span>
+
+    /**
+     * Special decorator for the {@code &lt;title&gt;} part, accumulates the important
+     * processing parts for the {@code layout:title-pattern} processor.
+     *
+     * @param targetTitleModel
+     * @param sourceTitleModel
+     * @return A new {@code &lt;title&gt;} model that is the result of decorating the
+     * {@code &lt;title&gt;}.
+     */
+    @Override
+    @SuppressWarnings(&quot;SpaceAroundOperator&quot;)
+    public IModel decorate(IModel targetTitleModel, IModel sourceTitleModel) {
+<span class="fc" id="L112">        String layoutDialectPrefix = Extensions.getPrefixForDialect(context, LayoutDialect.class);</span>
+<span class="fc" id="L113">        String standardDialectPrefix = Extensions.getPrefixForDialect(context, StandardDialect.class);</span>
+
+<span class="fc" id="L115">        IAttribute titlePatternProcessor = titlePatternProcessorRetriever(sourceTitleModel, layoutDialectPrefix);</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">        if (titlePatternProcessor == null) {</span>
+<span class="fc" id="L117">            titlePatternProcessor = titlePatternProcessorRetriever(targetTitleModel, layoutDialectPrefix);</span>
+        }
+
+        IModel resultTitle;
+
+        // Set the title pattern to use on a new model, as well as the important
+        // title result parts that we want to use on the pattern.
+<span class="fc bfc" id="L124" title="All 2 branches covered.">        if (titlePatternProcessor != null) {</span>
+<span class="fc" id="L125">            extractTitle(sourceTitleModel, TitlePatternProcessor.CONTENT_TITLE_KEY, context, standardDialectPrefix);</span>
+<span class="fc" id="L126">            extractTitle(targetTitleModel, TitlePatternProcessor.LAYOUT_TITLE_KEY, context, standardDialectPrefix);</span>
+
+<span class="fc" id="L128">            resultTitle = new ModelBuilder(context).createNode(&quot;title&quot;,</span>
+<span class="fc" id="L129">                    Collections.singletonMap(titlePatternProcessor.getAttributeCompleteName(), titlePatternProcessor.getValue()));</span>
+        } else {
+<span class="fc" id="L131">            resultTitle = new ElementMerger(context).merge(targetTitleModel, sourceTitleModel);</span>
+        }
+<span class="fc" id="L133">        return resultTitle;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

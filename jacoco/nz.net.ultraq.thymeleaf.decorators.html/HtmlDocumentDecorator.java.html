@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HtmlDocumentDecorator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.decorators.html</a> &gt; <span class="el_source">HtmlDocumentDecorator.java</span></div><h1>HtmlDocumentDecorator.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2013, Emanuel Rabina (http://www.ultraq.net.nz/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package nz.net.ultraq.thymeleaf.decorators.html;
+
+import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
+import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
+import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
+import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.model.ICloseElementTag;
+import org.thymeleaf.model.IElementTag;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IOpenElementTag;
+
+/**
+ * A decorator made to work over an HTML document. Decoration for a document
+ * involves 2 sub-decorators: a special one for the {@code &lt;head&gt;} element, and
+ * a standard one for the {@code &lt;body&gt;} element.
+ *
+ * @author zhanhb
+ * @author Emanuel Rabina
+ */
+public class HtmlDocumentDecorator extends XmlDocumentDecorator {
+
+    private final SortingStrategy sortingStrategy;
+
+    /**
+     * Constructor, apply the given sorting strategy to the decorator.
+     *
+     * @param context
+     * @param sortingStrategy
+     */
+    public HtmlDocumentDecorator(ITemplateContext context, SortingStrategy sortingStrategy) {
+<span class="fc" id="L47">        super(context);</span>
+<span class="fc" id="L48">        this.sortingStrategy = sortingStrategy;</span>
+<span class="fc" id="L49">    }</span>
+
+    /**
+     * Decorate an entire HTML page.
+     *
+     * @param targetDocumentModel
+     * @param sourceDocumentModel
+     * @return Result of the decoration.
+     */
+    @Override
+    public IModel decorate(IModel targetDocumentModel, IModel sourceDocumentModel) {
+<span class="fc" id="L60">        IModel resultDocumentModel = targetDocumentModel.cloneModel();</span>
+        // Head decoration
+<span class="fc" id="L62">        ITemplateEventPredicate headModelFinder = event -&gt; {</span>
+<span class="fc bfc" id="L63" title="All 4 branches covered.">            return event instanceof IOpenElementTag &amp;&amp; &quot;head&quot;.equals(((IElementTag) event).getElementCompleteName());</span>
+        };
+<span class="fc" id="L65">        IModel targetHeadModel = Extensions.findModel(resultDocumentModel, headModelFinder);</span>
+<span class="fc" id="L66">        IModel resultHeadModel = new HtmlHeadDecorator(context, sortingStrategy).decorate(targetHeadModel,</span>
+<span class="fc" id="L67">                Extensions.findModel(sourceDocumentModel, headModelFinder)</span>
+        );
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        if (Extensions.asBoolean(resultHeadModel)) {</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">            if (Extensions.asBoolean(targetHeadModel)) {</span>
+<span class="fc" id="L71">                Extensions.replaceModel(resultDocumentModel, Extensions.indexOf(resultDocumentModel, targetHeadModel), resultHeadModel);</span>
+            } else {
+<span class="fc" id="L73">                Extensions.insertModelWithWhitespace(resultDocumentModel, Extensions.findIndexOf(resultDocumentModel, event -&gt; {</span>
+<span class="fc bfc" id="L74" title="All 6 branches covered.">                    return (event instanceof IOpenElementTag &amp;&amp; &quot;body&quot;.equals(((IElementTag) event).getElementCompleteName()))</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">                            || (event instanceof ICloseElementTag &amp;&amp; &quot;html&quot;.equals(((IElementTag) event).getElementCompleteName()));</span>
+                }) - 1, resultHeadModel);
+            }
+        }
+
+        // Body decoration
+<span class="fc" id="L81">        ITemplateEventPredicate bodyModelFinder = event -&gt; {</span>
+<span class="fc bfc" id="L82" title="All 4 branches covered.">            return event instanceof IOpenElementTag &amp;&amp; &quot;body&quot;.equals(((IElementTag) event).getElementCompleteName());</span>
+        };
+<span class="fc" id="L84">        IModel targetBodyModel = Extensions.findModel(resultDocumentModel, bodyModelFinder);</span>
+<span class="fc" id="L85">        IModel resultBodyModel = new HtmlBodyDecorator(context).decorate(targetBodyModel,</span>
+<span class="fc" id="L86">                Extensions.findModel(sourceDocumentModel, bodyModelFinder)</span>
+        );
+<span class="fc bfc" id="L88" title="All 2 branches covered.">        if (Extensions.asBoolean(resultBodyModel)) {</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">            if (Extensions.asBoolean(targetBodyModel)) {</span>
+<span class="fc" id="L90">                Extensions.replaceModel(resultDocumentModel, Extensions.indexOf(resultDocumentModel, targetBodyModel), resultBodyModel);</span>
+            } else {
+<span class="fc" id="L92">                Extensions.insertModelWithWhitespace(resultDocumentModel, Extensions.findIndexOf(resultDocumentModel, event -&gt; {</span>
+<span class="fc bfc" id="L93" title="All 4 branches covered.">                    return event instanceof ICloseElementTag &amp;&amp; &quot;html&quot;.equals(((IElementTag) event).getElementCompleteName());</span>
+                }) - 1, resultBodyModel);
+            }
+        }
+
+<span class="fc" id="L98">        return super.decorate(resultDocumentModel, sourceDocumentModel);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

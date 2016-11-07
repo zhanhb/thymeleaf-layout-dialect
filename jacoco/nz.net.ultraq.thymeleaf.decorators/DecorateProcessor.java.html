@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DecorateProcessor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.decorators</a> &gt; <span class="el_source">DecorateProcessor.java</span></div><h1>DecorateProcessor.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2012, Emanuel Rabina (http://www.ultraq.net.nz/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package nz.net.ultraq.thymeleaf.decorators;
+
+import java.util.Map;
+import nz.net.ultraq.thymeleaf.decorators.html.HtmlDocumentDecorator;
+import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
+import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
+import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
+import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
+import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
+import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.engine.AttributeName;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IOpenElementTag;
+import org.thymeleaf.model.IProcessableElementTag;
+import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
+import org.thymeleaf.processor.element.IElementModelStructureHandler;
+import org.thymeleaf.standard.expression.FragmentExpression;
+import org.thymeleaf.templatemode.TemplateMode;
+
+/**
+ * Specifies the name of the template to decorate using the current template.
+ *
+ * @author zhanhb
+ * @author Emanuel Rabina
+ */
+public class DecorateProcessor extends AbstractAttributeModelProcessor {
+
+    public static final String PROCESSOR_NAME = &quot;decorate&quot;;
+    public static final int PROCESSOR_PRECEDENCE = 0;
+
+    private final SortingStrategy sortingStrategy;
+
+    /**
+     * Constructor, configure this processor to work on the 'decorate' attribute
+     * and to use the given sorting strategy.
+     *
+     * @param templateMode
+     * @param dialectPrefix
+     * @param sortingStrategy
+     */
+    public DecorateProcessor(TemplateMode templateMode, String dialectPrefix, SortingStrategy sortingStrategy) {
+<span class="fc" id="L58">        this(templateMode, dialectPrefix, sortingStrategy, PROCESSOR_NAME);</span>
+<span class="fc" id="L59">    }</span>
+
+    /**
+     * Constructor, configurable processor name so that I could support the
+     * deprecated {@code layout:decorator} alias.
+     *
+     * @param templateMode
+     * @param dialectPrefix
+     * @param sortingStrategy
+     * @param attributeName
+     */
+    protected DecorateProcessor(TemplateMode templateMode, String dialectPrefix, SortingStrategy sortingStrategy,
+            String attributeName) {
+<span class="fc" id="L72">        super(templateMode, dialectPrefix, null, false, attributeName, true, PROCESSOR_PRECEDENCE, false);</span>
+<span class="fc" id="L73">        this.sortingStrategy = sortingStrategy;</span>
+<span class="fc" id="L74">    }</span>
+
+    /**
+     * Locates the template to decorate and, once decorated, inserts it into the
+     * processing chain.
+     *
+     * @param context
+     * @param model
+     * @param attributeName
+     * @param attributeValue
+     * @param structureHandler
+     */
+    @Override
+    protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
+            String attributeValue, IElementModelStructureHandler structureHandler) {
+
+        // Ensure that every element to this point contained a decorate processor
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        for (IProcessableElementTag element : context.getElementStack()) {</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">            if (element.getAttribute(attributeName) == null) {</span>
+<span class="fc" id="L93">                throw new IllegalArgumentException(&quot;layout:decorate/data-layout-decorate must appear in the root element of your template&quot;);</span>
+            }
+<span class="fc" id="L95">        }</span>
+
+<span class="fc" id="L97">        TemplateModelFinder templateModelFinder = new TemplateModelFinder(context);</span>
+
+        // Remove the decorate processor from the root element
+<span class="fc" id="L100">        IProcessableElementTag rootElement = (IProcessableElementTag) Extensions.first(model);</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">        if (rootElement.hasAttribute(attributeName)) {</span>
+<span class="fc" id="L102">            rootElement = context.getModelFactory().removeAttribute(rootElement, attributeName);</span>
+<span class="fc" id="L103">            model.replace(0, rootElement);</span>
+        }
+
+        // Load the entirety of this template so we can access items outside of the root element
+        // TODO: Can probably find a way of preventing this double-loading for #102
+<span class="fc" id="L108">        String contentTemplateName = context.getTemplateData().getTemplate();</span>
+<span class="fc" id="L109">        IModel contentTemplate = templateModelFinder.findTemplate(contentTemplateName).cloneModel();</span>
+<span class="fc" id="L110">        Extensions.replaceModel(contentTemplate, Extensions.findIndexOf(contentTemplate, event -&gt; event instanceof IOpenElementTag), model);</span>
+
+        // Locate the template to decorate
+<span class="fc" id="L113">        FragmentExpression decorateTemplateExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);</span>
+<span class="fc" id="L114">        IModel decorateTemplate = templateModelFinder.findTemplate(decorateTemplateExpression).cloneModel();</span>
+
+        // Gather all fragment parts from this page to apply to the new document
+        // after decoration has taken place
+<span class="fc" id="L118">        Map&lt;String, IModel&gt; pageFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);</span>
+
+        // Choose the decorator to use based on template mode, then apply it
+<span class="fc" id="L121">        TemplateMode templateMode = getTemplateMode();</span>
+<span class="pc bpc" id="L122" title="1 of 4 branches missed.">        XmlDocumentDecorator decorator</span>
+                = templateMode == TemplateMode.HTML ? new HtmlDocumentDecorator(context, sortingStrategy)
+                        : templateMode == TemplateMode.XML ? new XmlDocumentDecorator(context)
+                                : null;
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">        if (decorator == null) {</span>
+<span class="nc" id="L127">            throw new IllegalArgumentException(</span>
+                    &quot;Layout dialect cannot be applied to the &quot; + templateMode + &quot; template mode, only HTML and XML template modes are currently supported&quot;
+            );
+        }
+<span class="fc" id="L131">        IModel resultTemplate = decorator.decorate(decorateTemplate, contentTemplate);</span>
+<span class="fc" id="L132">        Extensions.replaceModel(model, 0, resultTemplate);</span>
+
+        // Save layout fragments for use later by layout:fragment processors
+<span class="fc" id="L135">        FragmentMap.setForNode(context, structureHandler, pageFragments);</span>
+<span class="fc" id="L136">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

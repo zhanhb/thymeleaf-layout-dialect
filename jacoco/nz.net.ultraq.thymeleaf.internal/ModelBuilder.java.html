@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ModelBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.internal</a> &gt; <span class="el_source">ModelBuilder.java</span></div><h1>ModelBuilder.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2016, Emanuel Rabina (http://www.ultraq.net.nz/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package nz.net.ultraq.thymeleaf.internal;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.engine.ElementDefinitions;
+import org.thymeleaf.engine.HTMLElementDefinition;
+import org.thymeleaf.engine.HTMLElementType;
+import org.thymeleaf.model.AttributeValueQuotes;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IModelFactory;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.util.StringUtils;
+
+/**
+ * Create Thymeleaf 3 models using the Groovy builder syntax.
+ *
+ * @author zhanhb
+ * @author Emanuel Rabina
+ */
+public class ModelBuilder {
+
+<span class="fc" id="L43">    private static final Logger logger = LoggerFactory.getLogger(ModelBuilder.class);</span>
+
+<span class="fc" id="L45">    private static final Set&lt;String&gt; encounteredVoidTags = Collections.newSetFromMap(new ConcurrentHashMap&lt;&gt;());</span>
+
+    private final ElementDefinitions elementDefinitions;
+    private final IModelFactory modelFactory;
+    private final TemplateMode templateMode;
+
+    /**
+     * Constructor, create a new model builder.
+     *
+     * @param context
+     */
+    public ModelBuilder(ITemplateContext context) {
+<span class="fc" id="L57">        this(context.getModelFactory(), context.getConfiguration().getElementDefinitions(), context.getTemplateMode());</span>
+<span class="fc" id="L58">    }</span>
+
+    /**
+     * Constructor, create a new model builder.
+     *
+     * @param modelFactory
+     * @param elementDefinitions
+     * @param templateMode
+     */
+<span class="fc" id="L67">    public ModelBuilder(IModelFactory modelFactory, ElementDefinitions elementDefinitions, TemplateMode templateMode) {</span>
+<span class="fc" id="L68">        this.modelFactory = modelFactory;</span>
+<span class="fc" id="L69">        this.elementDefinitions = elementDefinitions;</span>
+<span class="fc" id="L70">        this.templateMode = templateMode;</span>
+<span class="fc" id="L71">    }</span>
+
+    /**
+     * Create a model for the given element.
+     *
+     * @param name Element name.
+     * @return New model representing an element with the given name.
+     */
+    public IModel createNode(String name) {
+<span class="fc" id="L80">        return createNode(name, null, null);</span>
+    }
+
+    /**
+     * Create a model for the given element and inner text content.
+     *
+     * @param name Element name.
+     * @param value Text content.
+     * @return New model representing an element with the given name and
+     * content.
+     */
+    public IModel createNode(String name, String value) {
+<span class="fc" id="L92">        return createNode(name, null, value);</span>
+    }
+
+    /**
+     * Create a model for the given element and attributes.
+     *
+     * @param name Element name.
+     * @param attributes Element attributes.
+     * @return New model representing an element with the given name and
+     * attributes.
+     */
+    public IModel createNode(String name, Map&lt;String, String&gt; attributes) {
+<span class="fc" id="L104">        return createNode(name, attributes, null);</span>
+    }
+
+    /**
+     * Create a model for the given element, attributes, and inner text content.
+     *
+     * @param name Element name.
+     * @param attributes Element attributes.
+     * @param value Text content.
+     * @return New model representing an element with the given name,
+     * attributes, and content.
+     */
+    public IModel createNode(String name, Map&lt;String, String&gt; attributes, String value) {
+<span class="fc" id="L117">        Objects.requireNonNull(name);</span>
+
+<span class="fc" id="L119">        IModel model = modelFactory.createModel();</span>
+<span class="fc" id="L120">        HTMLElementDefinition elementDefinition = (HTMLElementDefinition) elementDefinitions.forName(templateMode, name);</span>
+
+        // Standalone element
+<span class="fc bfc" id="L123" title="All 2 branches covered.">        if (elementDefinition.getType() == HTMLElementType.VOID) {</span>
+<span class="pc bpc" id="L124" title="1 of 4 branches missed.">            if (attributes != null &amp;&amp; attributes.containsKey(&quot;standalone&quot;)) {</span>
+<span class="fc" id="L125">                attributes.remove(&quot;standalone&quot;);</span>
+<span class="fc" id="L126">                model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, true));</span>
+<span class="pc bpc" id="L127" title="1 of 4 branches missed.">            } else if (attributes != null &amp;&amp; attributes.containsKey(&quot;void&quot;)) {</span>
+<span class="fc" id="L128">                attributes.remove(&quot;void&quot;);</span>
+<span class="fc" id="L129">                model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, false));</span>
+            } else {
+<span class="fc bfc" id="L131" title="All 2 branches covered.">                if (encounteredVoidTags.add(name)) {</span>
+<span class="fc" id="L132">                    logger.warn(</span>
+                            &quot;Instructed to write a closing tag {} for an HTML void element.  &quot;
+                            + &quot;This might cause processing errors further down the track.  &quot;
+                            + &quot;To avoid this, either self close the opening element, remove the closing tag, or process this template using the XML processing mode.  &quot;
+                            + &quot;See https://html.spec.whatwg.org/multipage/syntax.html#void-elements for more information on HTML void elements.&quot;,
+                            name);
+                }
+
+<span class="fc" id="L140">                model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, false));</span>
+<span class="fc" id="L141">                model.add(modelFactory.createCloseElementTag(name));</span>
+            }
+<span class="fc bfc" id="L143" title="All 4 branches covered.">        } else if (attributes != null &amp;&amp; attributes.containsKey(&quot;standalone&quot;)) { // Other standalone element</span>
+<span class="fc" id="L144">            attributes.remove(&quot;standalone&quot;);</span>
+<span class="fc" id="L145">            model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, true));</span>
+        } else { // Open/close element and potential text content
+<span class="fc" id="L147">            model.add(modelFactory.createOpenElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false));</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">            if (!StringUtils.isEmpty(value)) {</span>
+<span class="fc" id="L149">                model.add(modelFactory.createText(value));</span>
+            }
+<span class="fc" id="L151">            model.add(modelFactory.createCloseElementTag(name));</span>
+        }
+
+<span class="fc" id="L154">        return model;</span>
+    }
+
+    /**
+     * Link a parent and child node. A child node is appended to a parent by
+     * being the last sub-model before the parent close tag.
+     *
+     * @param parent
+     * @param child
+     */
+    public void nodeCompleted(IModel parent, IModel child) {
+<span class="fc bfc" id="L165" title="All 2 branches covered.">        if (Extensions.asBoolean(parent)) {</span>
+<span class="fc" id="L166">            parent.insertModel(parent.size() - 1, child);</span>
+        }
+<span class="fc" id="L168">    }</span>
+
+    /**
+     * Does nothing. Because models only copy events when added to one another,
+     * we can't just add child events at this point - we need to wait until that
+     * child has had it's children added, and so on. So the parent/child link is
+     * made in the {@link ModelBuilder#nodeCompleted} method instead.
+     *
+     * @param parent
+     * @param child
+     */
+    public void setParent(IModel parent, IModel child) {
+<span class="fc" id="L180">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

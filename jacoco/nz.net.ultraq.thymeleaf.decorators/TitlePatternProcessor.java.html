@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TitlePatternProcessor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.decorators</a> &gt; <span class="el_source">TitlePatternProcessor.java</span></div><h1>TitlePatternProcessor.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2012, Emanuel Rabina (http://www.ultraq.net.nz/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package nz.net.ultraq.thymeleaf.decorators;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+import nz.net.ultraq.thymeleaf.context.LayoutContext;
+import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.engine.AttributeName;
+import org.thymeleaf.model.IProcessableElementTag;
+import org.thymeleaf.processor.element.AbstractAttributeTagProcessor;
+import org.thymeleaf.processor.element.IElementTagStructureHandler;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.util.StringUtils;
+import org.unbescape.html.HtmlEscape;
+
+/**
+ * Allows for greater control of the resulting {@code &lt;title&gt;} element by
+ * specifying a pattern with some special tokens. This can be used to extend the
+ * layout's title with the content's one, instead of simply overriding it.
+ *
+ * @author zhanhb
+ * @author Emanuel Rabina
+ */
+public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
+
+<span class="fc" id="L42">    private static final Logger logger = LoggerFactory.getLogger(TitlePatternProcessor.class);</span>
+
+    @Deprecated
+    private static final String PARAM_TITLE_DECORATOR = &quot;$DECORATOR_TITLE&quot;;
+    private static final String PARAM_TITLE_CONTENT = &quot;$CONTENT_TITLE&quot;;
+    private static final String PARAM_TITLE_LAYOUT = &quot;$LAYOUT_TITLE&quot;;
+
+<span class="fc" id="L49">    private static final AtomicBoolean warned = new AtomicBoolean();</span>
+
+    public static final String PROCESSOR_NAME = &quot;title-pattern&quot;;
+    public static final int PROCESSOR_PRECEDENCE = 1;
+
+    public static final String CONTEXT_CONTENT_TITLE = &quot;contentTitle&quot;;
+    public static final String CONTEXT_LAYOUT_TITLE = &quot;layoutTitle&quot;;
+    public static final String CONTEXT_RESULTING_TITLE = &quot;resultingTitle&quot;;
+
+    public static final String CONTENT_TITLE_KEY = &quot;LayoutDialect::ContentTitle&quot;;
+    public static final String LAYOUT_TITLE_KEY = &quot;LayoutDialect::LayoutTitle&quot;;
+
+    private static String titleProcessor(String contextKey, ITemplateContext context, ExpressionProcessor expressionProcessor) {
+<span class="fc" id="L62">        Title titleObject = (Title) context.getVariable(contextKey);</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        if (titleObject != null) {</span>
+<span class="fc" id="L64">            String titleValue = HtmlEscape.unescapeHtml(expressionProcessor.processAsString(titleObject.getTitle()));</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">            return titleObject.isEscape() ? HtmlEscape.escapeHtml5Xml(titleValue) : titleValue;</span>
+        }
+<span class="fc" id="L67">        return null;</span>
+    }
+
+    /**
+     * Constructor, sets this processor to work on the 'title-pattern'
+     * attribute.
+     *
+     * @param templateMode
+     * @param dialectPrefix
+     */
+    public TitlePatternProcessor(TemplateMode templateMode, String dialectPrefix) {
+<span class="fc" id="L78">        super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);</span>
+<span class="fc" id="L79">    }</span>
+
+    /**
+     * Process the {@code layout:title-pattern} directive, replaces the title
+     * text with the titles from the content and layout pages.
+     *
+     * @param context
+     * @param tag
+     * @param attributeName
+     * @param attributeValue
+     * @param structureHandler
+     */
+    @Override
+    protected void doProcess(ITemplateContext context, IProcessableElementTag tag,
+            AttributeName attributeName, String attributeValue, IElementTagStructureHandler structureHandler) {
+        // Ensure this attribute is only on the &lt;title&gt; element
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (!&quot;title&quot;.equals(tag.getElementCompleteName())) {</span>
+<span class="nc" id="L96">            throw new IllegalArgumentException(attributeName + &quot; processor should only appear in a &lt;title&gt; element&quot;);</span>
+        }
+
+<span class="fc" id="L99">        String titlePattern = attributeValue;</span>
+<span class="fc" id="L100">        ExpressionProcessor expressionProcessor = new ExpressionProcessor(context);</span>
+
+<span class="fc" id="L102">        String contentTitle = titleProcessor(CONTENT_TITLE_KEY, context, expressionProcessor);</span>
+<span class="fc" id="L103">        String layoutTitle = titleProcessor(LAYOUT_TITLE_KEY, context, expressionProcessor);</span>
+
+<span class="pc bpc" id="L105" title="2 of 6 branches missed.">        if (warned.compareAndSet(false, true) &amp;&amp; !StringUtils.isEmpty(titlePattern) &amp;&amp; titlePattern.contains(PARAM_TITLE_DECORATOR)) {</span>
+<span class="nc" id="L106">            logger.warn(</span>
+                    &quot;The $DECORATOR_TITLE token is deprecated and will be removed in the next major version of the layout dialect.  &quot;
+                    + &quot;Please use the $LAYOUT_TITLE token instead to future-proof your code.  &quot;
+                    + &quot;See https://github.com/ultraq/thymeleaf-layout-dialect/issues/95 for more information.&quot;
+            );
+        }
+
+        String title;
+<span class="pc bpc" id="L114" title="1 of 6 branches missed.">        if (!StringUtils.isEmpty(titlePattern) &amp;&amp; !StringUtils.isEmpty(layoutTitle) &amp;&amp; !StringUtils.isEmpty(contentTitle)) {</span>
+<span class="fc" id="L115">            title = titlePattern</span>
+<span class="fc" id="L116">                    .replace(PARAM_TITLE_LAYOUT, layoutTitle)</span>
+<span class="fc" id="L117">                    .replace(PARAM_TITLE_DECORATOR, layoutTitle)</span>
+<span class="fc" id="L118">                    .replace(PARAM_TITLE_CONTENT, contentTitle);</span>
+        } else {
+<span class="pc bpc" id="L120" title="1 of 4 branches missed.">            title = !StringUtils.isEmpty(contentTitle) ? contentTitle : !StringUtils.isEmpty(layoutTitle) ? layoutTitle : &quot;&quot;;</span>
+        }
+
+<span class="fc" id="L123">        structureHandler.setBody(title, false);</span>
+
+        // Save the title to the layout context
+<span class="fc" id="L126">        LayoutContext layoutContext = LayoutContext.forContext(context);</span>
+<span class="fc" id="L127">        layoutContext.put(CONTEXT_CONTENT_TITLE, contentTitle);</span>
+<span class="fc" id="L128">        layoutContext.put(CONTEXT_LAYOUT_TITLE, layoutTitle);</span>
+<span class="fc" id="L129">        layoutContext.put(CONTEXT_RESULTING_TITLE, title);</span>
+<span class="fc" id="L130">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

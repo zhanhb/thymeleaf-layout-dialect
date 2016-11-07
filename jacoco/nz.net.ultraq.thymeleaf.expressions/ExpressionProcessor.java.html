@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExpressionProcessor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.expressions</a> &gt; <span class="el_source">ExpressionProcessor.java</span></div><h1>ExpressionProcessor.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2016, Emanuel Rabina (http://www.ultraq.net.nz/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package nz.net.ultraq.thymeleaf.expressions;
+
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.thymeleaf.context.IExpressionContext;
+import org.thymeleaf.standard.expression.FragmentExpression;
+import org.thymeleaf.standard.expression.IStandardExpression;
+import org.thymeleaf.standard.expression.StandardExpressions;
+
+/**
+ * A simplified API for working with Thymeleaf expressions.
+ *
+ * @author zhanhb
+ * @author Emanuel Rabina
+ */
+public class ExpressionProcessor {
+
+<span class="fc" id="L37">    private static final Logger logger = LoggerFactory.getLogger(ExpressionProcessor.class);</span>
+<span class="fc" id="L38">    private static final Pattern THYMELEAF_3_FRAGMENT_EXPRESSION = Pattern.compile(&quot;(?s)^~\\{.+\\}$&quot;);</span>
+<span class="fc" id="L39">    private static final Set&lt;String&gt; oldFragmentExpressions = Collections.newSetFromMap(new ConcurrentHashMap&lt;&gt;());</span>
+
+    private final IExpressionContext context;
+
+    /**
+     * Constructor, sets the execution context.
+     *
+     * @param context
+     */
+<span class="fc" id="L48">    public ExpressionProcessor(IExpressionContext context) {</span>
+<span class="fc" id="L49">        this.context = context;</span>
+<span class="fc" id="L50">    }</span>
+
+    /**
+     * Parses an expression, returning the matching expression type.
+     *
+     * @param expression
+     * @return Matching expression type.
+     */
+    public IStandardExpression parse(String expression) {
+<span class="fc" id="L59">        return StandardExpressions.getExpressionParser(context.getConfiguration())</span>
+<span class="fc" id="L60">                .parseExpression(context, expression);</span>
+    }
+
+    /**
+     * Parses an expression under the assumption it is a fragment expression.
+     * This method will wrap fragment expressions written in Thymeleaf 2 syntax
+     * as a temporary backwards compatibility measure for those migrating their
+     * web apps to Thymeleaf 3.
+     *
+     * @param expression
+     * @return A fragment expression.
+     */
+    public FragmentExpression parseFragmentExpression(String expression) {
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        if (!THYMELEAF_3_FRAGMENT_EXPRESSION.matcher(expression).matches()) {</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">            if (oldFragmentExpressions.add(expression)) {</span>
+<span class="fc" id="L75">                logger.warn(</span>
+                        &quot;Fragment expression \&quot;{}\&quot; is being wrapped as a Thymeleaf 3 fragment expression (~{...}) for backwards compatibility purposes.  &quot;
+                        + &quot;This wrapping will be dropped in the next major version of the expression processor, so please rewrite as a Thymeleaf 3 fragment expression to future-proof your code.  &quot;
+                        + &quot;See https://github.com/thymeleaf/thymeleaf/issues/451 for more information.&quot;,
+                        expression);
+            }
+<span class="fc" id="L81">            return (FragmentExpression) parse(&quot;~{&quot; + expression + &quot;}&quot;);</span>
+        }
+
+<span class="fc" id="L84">        return (FragmentExpression) parse(expression);</span>
+    }
+
+    /**
+     * Parses and executes an expression, returning the result of the expression
+     * having been parsed and executed.
+     *
+     * @param expression
+     * @return The result of the expression being executed.
+     */
+    public Object process(String expression) {
+<span class="fc" id="L95">        return parse(expression).execute(context);</span>
+    }
+
+    /**
+     * Parse and execute an expression, returning the result as a string. Useful
+     * for expressions that expect a simple result.
+     *
+     * @param expression
+     * @return The expression as a string.
+     */
+    public String processAsString(String expression) {
+<span class="fc" id="L106">        return String.valueOf(process(expression));</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>
