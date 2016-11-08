@@ -25,11 +25,11 @@ import org.thymeleaf.model.IText;
  * @author zhanhb
  */
 class ITemplateEventExtensions {
-	static void apply() {
+    static void apply() {
         ITemplateEvent.metaClass {
             isWhitespace << {
                 Z.isWhitespace(delegate)
             }
         }
-	}
+    }
 }

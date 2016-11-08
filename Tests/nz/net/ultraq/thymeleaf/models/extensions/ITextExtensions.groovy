@@ -8,7 +8,7 @@ import org.thymeleaf.model.IText;
  * @author zhanhb
  */
 class ITextExtensions {
-	static void apply() {
+    static void apply() {
         IText.metaClass {
             equals << { Object other ->
                 Z.equals(delegate, other)
@@ -17,5 +17,5 @@ class ITextExtensions {
                 Z.isWhitespace(delegate)
             }
         }
-	}
+    }
 }

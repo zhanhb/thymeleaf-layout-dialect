@@ -107,7 +107,6 @@ public class HtmlTitleDecorator implements Decorator {
      * {@code <title>}.
      */
     @Override
-    @SuppressWarnings("SpaceAroundOperator")
     public IModel decorate(IModel targetTitleModel, IModel sourceTitleModel) {
         String layoutDialectPrefix = Extensions.getPrefixForDialect(context, LayoutDialect.class);
         String standardDialectPrefix = Extensions.getPrefixForDialect(context, StandardDialect.class);

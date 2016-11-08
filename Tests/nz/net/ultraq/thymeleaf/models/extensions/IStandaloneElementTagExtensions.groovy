@@ -8,11 +8,11 @@ import org.thymeleaf.model.IStandaloneElementTag
  * @author zhanhb
  */
 class IStandaloneElementTagExtensions {
-	static void apply() {
+    static void apply() {
         IStandaloneElementTag.metaClass {
             equals << { Object other ->
                 Z.equals(delegate, other)
             }
         }
-	}
+    }
 }

@@ -24,11 +24,11 @@ import org.thymeleaf.engine.TemplateModel;
  * @author zhanhb
  */
 class TemplateModelExtensions {
-	static void apply() {
+    static void apply() {
         TemplateModel.metaClass {
             getTemplate << {
                 Z.getTemplate(delegate)
             }
         }
-	}
+    }
 }

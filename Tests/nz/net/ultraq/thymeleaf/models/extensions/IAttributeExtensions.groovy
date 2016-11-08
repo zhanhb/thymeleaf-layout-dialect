@@ -8,7 +8,7 @@ import org.thymeleaf.model.IAttribute;
  * @author zhanhb
  */
 class IAttributeExtensions {
-	static void apply() {
+    static void apply() {
         IAttribute.metaClass {
             equalsName << { String prefix, String name ->
                 Z.equalsName(delegate, prefix, name)
@@ -17,5 +17,5 @@ class IAttributeExtensions {
                 Z.getAttributeName(delegate)
             }
         }
-	}
+    }
 }

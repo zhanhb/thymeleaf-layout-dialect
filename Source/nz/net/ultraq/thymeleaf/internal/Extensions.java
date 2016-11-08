@@ -26,8 +26,6 @@ import org.thymeleaf.DialectConfiguration;
 import org.thymeleaf.context.IExpressionContext;
 import org.thymeleaf.dialect.IProcessorDialect;
 import org.thymeleaf.engine.AttributeName;
-import org.thymeleaf.engine.HTMLElementDefinition;
-import org.thymeleaf.engine.HTMLElementType;
 import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.model.IAttribute;
 import org.thymeleaf.model.ICloseElementTag;
@@ -39,7 +37,6 @@ import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.model.IStandaloneElementTag;
 import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.model.IText;
-import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.util.StringUtils;
 
 /**
@@ -625,8 +622,7 @@ public class Extensions {
         throw new AssertionError();
     }
 
-    @SuppressWarnings({"UtilityClassWithoutPrivateConstructor",
-        "NestedAssignment", "CollectionWithoutInitialCapacity"})
+    @SuppressWarnings({"UtilityClassWithoutPrivateConstructor", "NestedAssignment"})
     private static class DialectPrefixCacheHolder {
 
         private static final ConcurrentWeakIdentityHashMap<IExpressionContext, ConcurrentMap<Class<?>, String>> CACHE

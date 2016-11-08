@@ -8,11 +8,11 @@ import org.thymeleaf.model.IOpenElementTag
  * @author zhanhb
  */
 class IOpenElementTagExtensions {
-	static void apply() {
+    static void apply() {
         IOpenElementTag.metaClass {
             equals << { Object other ->
                 Z.equals(delegate, other)
             }
         }
-	}
+    }
 }
