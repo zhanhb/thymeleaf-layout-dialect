@@ -1,0 +1,4 @@
+# Auto detect text files and perform LF normalization
+# disable auto normalization of platform line ending.
+# * text=auto
+* text eol=lf
