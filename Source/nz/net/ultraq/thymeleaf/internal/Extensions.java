@@ -605,14 +605,9 @@ public class Extensions {
                     level++;
                 } else if (event instanceof ICloseElementTag) {
                     ICloseElementTag tag = (ICloseElementTag) event;
-                    if (tag.getTemplateMode() == TemplateMode.HTML && ((HTMLElementDefinition) tag.getElementDefinition()).getType() == HTMLElementType.VOID) {
-                        // Do nothing.  This is to capture closing tags for HTML void
-                        // elements which shouldn't be specified according to the HTML spec.
-                        // https://html.spec.whatwg.org/multipage/syntax.html#void-elementselse
-                    } else if (tag.isSynthetic()) {
-                        // Do nothing.  This is to capture what attoparser calls 'synthetic'
-                        // closing tags, which it inserts in the model to balance them out
-                        // to normalize some of the tags in HTML.
+                    if (tag.isUnmatched()) {
+                        // Do nothing.  Unmatched closing tags do not correspond to any
+                        // opening element, and so should not affect the model level.
                     } else if (level == 0) {
                         break;
                     } else {

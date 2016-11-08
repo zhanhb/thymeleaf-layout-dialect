@@ -136,9 +136,8 @@ public class ModelBuilder {
                             + "See https://html.spec.whatwg.org/multipage/syntax.html#void-elements for more information on HTML void elements.",
                             name);
                 }
-
                 model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, false));
-                model.add(modelFactory.createCloseElementTag(name));
+                model.add(modelFactory.createCloseElementTag(name, false, true));
             }
         } else if (attributes != null && attributes.containsKey("standalone")) { // Other standalone element
             attributes.remove("standalone");
