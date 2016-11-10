@@ -46,7 +46,7 @@ class ConcurrentWeakIdentityHashMap&lt;K, V&gt; {
     private void purgeKeys() {
         Reference&lt;? extends K&gt; reference;
 <span class="fc" id="L48">        ReferenceQueue&lt;K&gt; q = this.queue;</span>
-<span class="fc" id="L49">        ConcurrentMap&lt;Object, V&gt; m = this.map;</span>
+<span class="fc" id="L49">        ConcurrentMap&lt;?, V&gt; m = this.map;</span>
 <span class="fc bfc" id="L50" title="All 2 branches covered.">        while ((reference = q.poll()) != null) {</span>
 <span class="fc" id="L51">            m.remove(reference);</span>
         }

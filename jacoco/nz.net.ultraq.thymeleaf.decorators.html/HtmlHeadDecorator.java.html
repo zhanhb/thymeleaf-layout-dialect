@@ -83,7 +83,7 @@ public class HtmlHeadDecorator implements Decorator {
 
         // Merge the rest of the source &lt;head&gt; elements with the target &lt;head&gt;
         // elements using the current merging strategy
-<span class="fc bfc" id="L86" title="All 2 branches covered.">        if (Extensions.asBoolean(sourceHeadModel)) {</span>
+<span class="fc bfc" id="L86" title="All 4 branches covered.">        if (Extensions.asBoolean(sourceHeadModel) &amp;&amp; Extensions.asBoolean(targetHeadModel)) {</span>
 <span class="fc" id="L87">            Iterator&lt;IModel&gt; it = Extensions.childModelIterator(sourceHeadModel);</span>
 <span class="pc bpc" id="L88" title="1 of 2 branches missed.">            if (it != null) {</span>
 <span class="fc bfc" id="L89" title="All 2 branches covered.">                while (it.hasNext()) {</span>

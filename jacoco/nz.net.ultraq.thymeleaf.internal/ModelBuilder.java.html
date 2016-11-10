@@ -136,22 +136,21 @@ public class ModelBuilder {
                             + &quot;See https://html.spec.whatwg.org/multipage/syntax.html#void-elements for more information on HTML void elements.&quot;,
                             name);
                 }
-
-<span class="fc" id="L140">                model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, false));</span>
-<span class="fc" id="L141">                model.add(modelFactory.createCloseElementTag(name));</span>
+<span class="fc" id="L139">                model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, false));</span>
+<span class="fc" id="L140">                model.add(modelFactory.createCloseElementTag(name, false, true));</span>
             }
-<span class="fc bfc" id="L143" title="All 4 branches covered.">        } else if (attributes != null &amp;&amp; attributes.containsKey(&quot;standalone&quot;)) { // Other standalone element</span>
-<span class="fc" id="L144">            attributes.remove(&quot;standalone&quot;);</span>
-<span class="fc" id="L145">            model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, true));</span>
+<span class="fc bfc" id="L142" title="All 4 branches covered.">        } else if (attributes != null &amp;&amp; attributes.containsKey(&quot;standalone&quot;)) { // Other standalone element</span>
+<span class="fc" id="L143">            attributes.remove(&quot;standalone&quot;);</span>
+<span class="fc" id="L144">            model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, true));</span>
         } else { // Open/close element and potential text content
-<span class="fc" id="L147">            model.add(modelFactory.createOpenElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false));</span>
-<span class="fc bfc" id="L148" title="All 2 branches covered.">            if (!StringUtils.isEmpty(value)) {</span>
-<span class="fc" id="L149">                model.add(modelFactory.createText(value));</span>
+<span class="fc" id="L146">            model.add(modelFactory.createOpenElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false));</span>
+<span class="fc bfc" id="L147" title="All 2 branches covered.">            if (!StringUtils.isEmpty(value)) {</span>
+<span class="fc" id="L148">                model.add(modelFactory.createText(value));</span>
             }
-<span class="fc" id="L151">            model.add(modelFactory.createCloseElementTag(name));</span>
+<span class="fc" id="L150">            model.add(modelFactory.createCloseElementTag(name));</span>
         }
 
-<span class="fc" id="L154">        return model;</span>
+<span class="fc" id="L153">        return model;</span>
     }
 
     /**
@@ -162,10 +161,10 @@ public class ModelBuilder {
      * @param child
      */
     public void nodeCompleted(IModel parent, IModel child) {
-<span class="fc bfc" id="L165" title="All 2 branches covered.">        if (Extensions.asBoolean(parent)) {</span>
-<span class="fc" id="L166">            parent.insertModel(parent.size() - 1, child);</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">        if (Extensions.asBoolean(parent)) {</span>
+<span class="fc" id="L165">            parent.insertModel(parent.size() - 1, child);</span>
         }
-<span class="fc" id="L168">    }</span>
+<span class="fc" id="L167">    }</span>
 
     /**
      * Does nothing. Because models only copy events when added to one another,
@@ -177,7 +176,7 @@ public class ModelBuilder {
      * @param child
      */
     public void setParent(IModel parent, IModel child) {
-<span class="fc" id="L180">    }</span>
+<span class="fc" id="L179">    }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

@@ -107,30 +107,29 @@ public class HtmlTitleDecorator implements Decorator {
      * {@code &lt;title&gt;}.
      */
     @Override
-    @SuppressWarnings(&quot;SpaceAroundOperator&quot;)
     public IModel decorate(IModel targetTitleModel, IModel sourceTitleModel) {
-<span class="fc" id="L112">        String layoutDialectPrefix = Extensions.getPrefixForDialect(context, LayoutDialect.class);</span>
-<span class="fc" id="L113">        String standardDialectPrefix = Extensions.getPrefixForDialect(context, StandardDialect.class);</span>
+<span class="fc" id="L111">        String layoutDialectPrefix = Extensions.getPrefixForDialect(context, LayoutDialect.class);</span>
+<span class="fc" id="L112">        String standardDialectPrefix = Extensions.getPrefixForDialect(context, StandardDialect.class);</span>
 
-<span class="fc" id="L115">        IAttribute titlePatternProcessor = titlePatternProcessorRetriever(sourceTitleModel, layoutDialectPrefix);</span>
-<span class="fc bfc" id="L116" title="All 2 branches covered.">        if (titlePatternProcessor == null) {</span>
-<span class="fc" id="L117">            titlePatternProcessor = titlePatternProcessorRetriever(targetTitleModel, layoutDialectPrefix);</span>
+<span class="fc" id="L114">        IAttribute titlePatternProcessor = titlePatternProcessorRetriever(sourceTitleModel, layoutDialectPrefix);</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">        if (titlePatternProcessor == null) {</span>
+<span class="fc" id="L116">            titlePatternProcessor = titlePatternProcessorRetriever(targetTitleModel, layoutDialectPrefix);</span>
         }
 
         IModel resultTitle;
 
         // Set the title pattern to use on a new model, as well as the important
         // title result parts that we want to use on the pattern.
-<span class="fc bfc" id="L124" title="All 2 branches covered.">        if (titlePatternProcessor != null) {</span>
-<span class="fc" id="L125">            extractTitle(sourceTitleModel, TitlePatternProcessor.CONTENT_TITLE_KEY, context, standardDialectPrefix);</span>
-<span class="fc" id="L126">            extractTitle(targetTitleModel, TitlePatternProcessor.LAYOUT_TITLE_KEY, context, standardDialectPrefix);</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">        if (titlePatternProcessor != null) {</span>
+<span class="fc" id="L124">            extractTitle(sourceTitleModel, TitlePatternProcessor.CONTENT_TITLE_KEY, context, standardDialectPrefix);</span>
+<span class="fc" id="L125">            extractTitle(targetTitleModel, TitlePatternProcessor.LAYOUT_TITLE_KEY, context, standardDialectPrefix);</span>
 
-<span class="fc" id="L128">            resultTitle = new ModelBuilder(context).createNode(&quot;title&quot;,</span>
-<span class="fc" id="L129">                    Collections.singletonMap(titlePatternProcessor.getAttributeCompleteName(), titlePatternProcessor.getValue()));</span>
+<span class="fc" id="L127">            resultTitle = new ModelBuilder(context).createNode(&quot;title&quot;,</span>
+<span class="fc" id="L128">                    Collections.singletonMap(titlePatternProcessor.getAttributeCompleteName(), titlePatternProcessor.getValue()));</span>
         } else {
-<span class="fc" id="L131">            resultTitle = new ElementMerger(context).merge(targetTitleModel, sourceTitleModel);</span>
+<span class="fc" id="L130">            resultTitle = new ElementMerger(context).merge(targetTitleModel, sourceTitleModel);</span>
         }
-<span class="fc" id="L133">        return resultTitle;</span>
+<span class="fc" id="L132">        return resultTitle;</span>
     }
 
 }
