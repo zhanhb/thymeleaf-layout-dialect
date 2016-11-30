@@ -24,6 +24,7 @@ import nz.net.ultraq.thymeleaf.models.AttributeMerger;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IElementTag;
 import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.model.IOpenElementTag;
 
 /**
@@ -66,6 +67,7 @@ public class HtmlHeadDecorator implements Decorator {
             return null;
         }
 
+        IModelFactory modelFactory = context.getModelFactory();
         ITemplateEventPredicate isTitle = event -> event instanceof IOpenElementTag && "title".equals(((IElementTag) event).getElementCompleteName());
 
         // New head model based off the target being decorated
@@ -79,7 +81,7 @@ public class HtmlHeadDecorator implements Decorator {
         IModel resultTitle = new HtmlTitleDecorator(context).decorate(titleRetriever(targetHeadModel, isTitle),
                 titleRetriever(sourceHeadModel, isTitle)
         );
-        Extensions.insertModelWithWhitespace(resultHeadModel, 1, resultTitle);
+        Extensions.insertModelWithWhitespace(resultHeadModel, 1, resultTitle, modelFactory);
 
         // Merge the rest of the source <head> elements with the target <head>
         // elements using the current merging strategy
@@ -93,7 +95,7 @@ public class HtmlHeadDecorator implements Decorator {
                     }
                     int position = sortingStrategy.findPositionForModel(resultHeadModel, model);
                     if (position != -1) {
-                        Extensions.insertModelWithWhitespace(resultHeadModel, position, model);
+                        Extensions.insertModelWithWhitespace(resultHeadModel, position, model, modelFactory);
                     }
                 }
             }

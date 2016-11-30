@@ -289,14 +289,21 @@ public class Extensions {
      * @param delegate
      * @param pos
      * @param model
+     * @param modelFactory
      */
-    public static void insertModelWithWhitespace(@Nonnull IModel delegate, int pos, IModel model) {
-        IModel whitespace = getModel(delegate, pos); // Assumes that whitespace exists at the insertion point
+    public static void insertModelWithWhitespace(@Nonnull IModel delegate, int pos, IModel model, IModelFactory modelFactory) {
+        // Use existing whitespace at the insertion point
+        IModel whitespace = getModel(delegate, pos);
         if (isWhitespace(whitespace)) {
             delegate.insertModel(pos, model);
             delegate.insertModel(pos, whitespace);
         } else {
+            // Generate whitespace, usually inserting into a tag that is immediately
+            // closed so whitespace should be added to either side
+            whitespace = modelFactory.createModel(modelFactory.createText("\n\t"));
+            delegate.insertModel(pos, whitespace);
             delegate.insertModel(pos, model);
+            delegate.insertModel(pos, whitespace);
         }
     }
 

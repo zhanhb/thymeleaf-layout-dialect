@@ -23,6 +23,7 @@ import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.ICloseElementTag;
 import org.thymeleaf.model.IElementTag;
 import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.model.IOpenElementTag;
 
 /**
@@ -57,6 +58,7 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
      */
     @Override
     public IModel decorate(IModel targetDocumentModel, IModel sourceDocumentModel) {
+        IModelFactory modelFactory = context.getModelFactory();
         IModel resultDocumentModel = targetDocumentModel.cloneModel();
         // Head decoration
         ITemplateEventPredicate headModelFinder = event -> {
@@ -73,7 +75,7 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
                 Extensions.insertModelWithWhitespace(resultDocumentModel, Extensions.findIndexOf(resultDocumentModel, event -> {
                     return (event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName()))
                             || (event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName()));
-                }) - 1, resultHeadModel);
+                }) - 1, resultHeadModel, modelFactory);
             }
         }
 
@@ -91,7 +93,7 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
             } else {
                 Extensions.insertModelWithWhitespace(resultDocumentModel, Extensions.findIndexOf(resultDocumentModel, event -> {
                     return event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName());
-                }) - 1, resultBodyModel);
+                }) - 1, resultBodyModel, modelFactory);
             }
         }
 
