@@ -86,17 +86,14 @@ public class HtmlHeadDecorator implements Decorator {
         // Merge the rest of the source <head> elements with the target <head>
         // elements using the current merging strategy
         if (Extensions.asBoolean(sourceHeadModel) && Extensions.asBoolean(targetHeadModel)) {
-            Iterator<IModel> it = Extensions.childModelIterator(sourceHeadModel);
-            if (it != null) {
-                while (it.hasNext()) {
-                    IModel model = it.next();
-                    if (isTitle.test(Extensions.first(model))) {
-                        continue;
-                    }
-                    int position = sortingStrategy.findPositionForModel(resultHeadModel, model);
-                    if (position != -1) {
-                        Extensions.insertModelWithWhitespace(resultHeadModel, position, model, modelFactory);
-                    }
+            for (Iterator<IModel> it = Extensions.childModelIterator(sourceHeadModel); it.hasNext();) {
+                IModel model = it.next();
+                if (isTitle.test(Extensions.first(model))) {
+                    continue;
+                }
+                int position = sortingStrategy.findPositionForModel(resultHeadModel, model);
+                if (position != -1) {
+                    Extensions.insertModelWithWhitespace(resultHeadModel, position, model, modelFactory);
                 }
             }
         }

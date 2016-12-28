@@ -15,6 +15,7 @@
  */
 package nz.net.ultraq.thymeleaf.internal;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -73,9 +74,9 @@ public class Extensions {
      * @param delegate
      * @return New model iterator.
      */
-    @Nullable
+    @Nonnull
     public static Iterator<IModel> childModelIterator(@Nonnull IModel delegate) {
-        return isElement(delegate) ? new ChildModelIterator(delegate) : null;
+        return isElement(delegate) ? new ChildModelIterator(delegate) : Collections.emptyIterator();
     }
 
     /**
@@ -233,8 +234,7 @@ public class Extensions {
      * Returns the first event on the model.
      *
      * @param delegate
-     * @return The model's first event, or {@code null} if the model has no
-     * events.
+     * @return The model's first event.
      */
     public static ITemplateEvent first(@Nonnull IModel delegate) {
         return delegate.get(0);
@@ -362,8 +362,7 @@ public class Extensions {
      * Returns the last event on the model.
      *
      * @param delegate
-     * @return The model's lats event, or {@code null} if the model has no
-     * events.
+     * @return The model's last event.
      */
     public static ITemplateEvent last(@Nonnull IModel delegate) {
         return delegate.get(delegate.size() - 1);

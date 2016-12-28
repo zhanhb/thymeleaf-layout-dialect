@@ -17,6 +17,7 @@
 package nz.net.ultraq.thymeleaf.context.extensions
 
 import org.thymeleaf.context.IContext
+import org.thymeleaf.dialect.IProcessorDialect
 
 /**
  * Meta-programming extensions to the {@link IContext} class.
@@ -42,6 +43,18 @@ class IContextExtensions {
 			 */
 			getAt << { String name ->
 				return delegate.getVariable(name)
+			}
+
+			/**
+			 * Returns the configured prefix for the given dialect.  If the dialect
+			 * prefix has not been configured, then the dialect prefix is returned.
+			 * 
+			 * @param dialectClass
+			 * @return The configured prefix for the dialect, or {@code null} if the
+			 *         dialect being queried hasn't been configured.
+			 */
+			getPrefixForDialect << { Class<IProcessorDialect> dialectClass ->
+                Extensions.getPrefixForDialect(this, dialectClass)
 			}
 
 			/**

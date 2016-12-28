@@ -109,12 +109,9 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
         // from the model so that we can use the child event iterator.
         Extensions.trim(fragmentForInclusionUse);
 
-        Iterator<IModel> it = Extensions.childModelIterator(fragmentForInclusionUse);
-        if (it != null) {
-            while (it.hasNext()) {
-                IModel fragmentChildModel = it.next();
-                model.insertModel(model.size() - 1, fragmentChildModel);
-            }
+        for (Iterator<IModel> it = Extensions.childModelIterator(fragmentForInclusionUse); it.hasNext();) {
+            IModel fragmentChildModel = it.next();
+            model.insertModel(model.size() - 1, fragmentChildModel);
         }
 
         // When fragment parameters aren't named, derive the name from the fragment definition

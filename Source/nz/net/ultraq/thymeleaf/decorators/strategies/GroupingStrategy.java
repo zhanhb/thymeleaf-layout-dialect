@@ -92,23 +92,23 @@ public class GroupingStrategy implements SortingStrategy {
         }
 
         int type = findMatchingType(childModel);
-        Iterator<IModel> it = Extensions.childModelIterator(headModel);
-        if (it != null) {
-            ArrayList<IModel> list = new ArrayList<>(20);
-            while (it.hasNext()) {
-                list.add(it.next());
-            }
-            ListIterator<IModel> listIterator = list.listIterator(list.size());
-            while (listIterator.hasPrevious()) {
-                IModel headSubModel = listIterator.previous();
-                if (type == findMatchingType(headSubModel)) {
-                    if (Extensions.asBoolean(headModel)) {
-                        return Extensions.indexOf(headModel, headSubModel) + headSubModel.size();
-                    }
-                    break;
+        ArrayList<IModel> list = new ArrayList<>(20);
+
+        for (Iterator<IModel> it = Extensions.childModelIterator(headModel); it.hasNext();) {
+            list.add(it.next());
+        }
+
+        ListIterator<IModel> listIterator = list.listIterator(list.size());
+        while (listIterator.hasPrevious()) {
+            IModel headSubModel = listIterator.previous();
+            if (type == findMatchingType(headSubModel)) {
+                if (Extensions.asBoolean(headModel)) {
+                    return Extensions.indexOf(headModel, headSubModel) + headSubModel.size();
                 }
+                break;
             }
         }
+
         return 1;
     }
 
