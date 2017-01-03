@@ -127,7 +127,7 @@ public class Extensions {
         return false;
     }
 
-    private static boolean equals(@Nullable ITemplateEvent event, Object other) {
+    private static boolean equals(@Nullable ITemplateEvent event, @Nullable Object other) {
         if (event instanceof IOpenElementTag) {
             return equals(((IOpenElementTag) event), other);
         } else if (event instanceof ICloseElementTag) {
@@ -149,7 +149,7 @@ public class Extensions {
      * @return {@code true} if this model is the same (barring whitespace) as
      * the other one.
      */
-    public static boolean equalsIgnoreWhitespace(IModel delegate, IModel other) {
+    public static boolean equalsIgnoreWhitespace(@Nonnull IModel delegate, @Nonnull IModel other) {
         int thisEventIndex = 0;
         int otherEventIndex = 0;
 
@@ -183,7 +183,7 @@ public class Extensions {
      * @param closure
      * @return {@code true} if every event satisfies the closure.
      */
-    public static boolean everyWithIndex(IModel delegate, @Nonnull ITemplateEventIntPredicate closure) {
+    public static boolean everyWithIndex(@Nonnull IModel delegate, @Nonnull ITemplateEventIntPredicate closure) {
         for (int i = 0, size = delegate.size(); i < size; i++) {
             if (!closure.test(delegate.get(i), i)) {
                 return false;
@@ -201,7 +201,7 @@ public class Extensions {
      * @return The index of the first event to match the closure criteria, or
      * {@code -1} if nothing matched.
      */
-    public static int findIndexOf(IModel delegate, ITemplateEventPredicate closure) {
+    public static int findIndexOf(@Nonnull IModel delegate, @Nonnull ITemplateEventPredicate closure) {
         for (int i = 0, size = delegate.size(); i < size; i++) {
             ITemplateEvent event = delegate.get(i);
             boolean result = closure.test(event);
@@ -277,7 +277,7 @@ public class Extensions {
      * @param model
      * @return Index of an extracted submodel within this model.
      */
-    public static int indexOf(IModel delegate, IModel model) {
+    public static int indexOf(@Nonnull IModel delegate, @Nonnull IModel model) {
         ITemplateEvent modelEvent = first(model);
         return findIndexOf(delegate, event -> event == modelEvent);
     }
@@ -291,7 +291,7 @@ public class Extensions {
      * @param model
      * @param modelFactory
      */
-    public static void insertModelWithWhitespace(@Nonnull IModel delegate, int pos, IModel model, IModelFactory modelFactory) {
+    public static void insertModelWithWhitespace(@Nonnull IModel delegate, int pos, @Nonnull IModel model, @Nonnull IModelFactory modelFactory) {
         // Use existing whitespace at the insertion point
         IModel whitespace = getModel(delegate, pos);
         if (isWhitespace(whitespace)) {
@@ -316,7 +316,7 @@ public class Extensions {
      * @param event
      * @param modelFactory
      */
-    public static void insertWithWhitespace(IModel delegate, int pos, ITemplateEvent event, IModelFactory modelFactory) {
+    public static void insertWithWhitespace(@Nonnull IModel delegate, int pos, @Nonnull ITemplateEvent event, @Nonnull IModelFactory modelFactory) {
         // TODO: Because I can't check the parent for whitespace hints, I should
         //       make this smarter and find whitespace within the model to copy.
         IModel whitespace = getModel(delegate, pos); // Assumes that whitespace exists at the insertion point
@@ -425,7 +425,7 @@ public class Extensions {
      * @param pos
      * @param model
      */
-    public static void replaceModel(@Nonnull IModel delegate, int pos, IModel model) {
+    public static void replaceModel(@Nonnull IModel delegate, int pos, @Nonnull IModel model) {
         removeModel(delegate, pos);
         delegate.insertModel(pos, model);
     }
@@ -436,7 +436,7 @@ public class Extensions {
      *
      * @param delegate
      */
-    public static void trim(IModel delegate) {
+    public static void trim(@Nonnull IModel delegate) {
         while (isWhitespace(first(delegate))) {
             removeFirst(delegate);
         }
@@ -518,7 +518,7 @@ public class Extensions {
      * @return {@code true} if this attribute is an attribute processor of the
      * matching name.
      */
-    public static boolean equalsName(@Nonnull IAttribute delegate, String prefix, String name) {
+    public static boolean equalsName(@Nonnull IAttribute delegate, @Nonnull String prefix, @Nonnull String name) {
         String attributeName = delegate.getAttributeCompleteName();
         return (prefix + ":" + name).equals(attributeName) || ("data-" + prefix + "-" + name).equals(attributeName);
     }
@@ -563,7 +563,7 @@ public class Extensions {
      * @return The configured prefix for the dialect, or {@code null} if the
      * dialect being queried hasn't been configured.
      */
-    public static String getPrefixForDialect(IExpressionContext delegate, Class<? extends IProcessorDialect> dialectClass) {
+    public static String getPrefixForDialect(@Nonnull IExpressionContext delegate, Class<? extends IProcessorDialect> dialectClass) {
         ConcurrentMap<Class<?>, String> dialectPrefixCache = DialectPrefixCacheHolder.getDialectPrefixCache(delegate);
 
         String dialectPrefix = dialectPrefixCache.get(dialectClass);

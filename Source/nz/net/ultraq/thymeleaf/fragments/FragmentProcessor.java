@@ -69,9 +69,9 @@ public class FragmentProcessor extends AbstractAttributeTagProcessor {
     protected void doProcess(ITemplateContext context, IProcessableElementTag tag,
             AttributeName attributeName, String attributeValue, IElementTagStructureHandler structureHandler) {
         // Emit a warning if found in the <head> section
-        if (warned.compareAndSet(false, true) && getTemplateMode() == TemplateMode.HTML) {
+        if (getTemplateMode() == TemplateMode.HTML) {
             for (IProcessableElementTag element : context.getElementStack()) {
-                if ("head".equals(element.getElementCompleteName())) {
+                if ("head".equals(element.getElementCompleteName()) && warned.compareAndSet(false, true)) {
                     logger.warn("You don't need to put the layout:fragment/data-layout-fragment attribute into the <head> section - "
                             + "the decoration process will automatically copy the <head> section of your content templates into your layout page.");
                     break;
