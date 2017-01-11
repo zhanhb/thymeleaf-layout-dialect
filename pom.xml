@@ -94,7 +94,7 @@
     <properties>
         <argLine>-Dfile.encoding=${file.encoding} -ea</argLine>
         <arguments>-Prelease-profile</arguments>
-        <attoparser.version>2.0.1.RELEASE</attoparser.version>
+        <attoparser.version>2.0.2.RELEASE</attoparser.version>
         <byte-buddy.version>1.5.7</byte-buddy.version>
         <commons-lang3.version>3.5</commons-lang3.version>
         <findbugs-jsr305.version>3.0.1</findbugs-jsr305.version>
