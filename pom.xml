@@ -98,7 +98,7 @@
         <byte-buddy.version>1.5.7</byte-buddy.version>
         <commons-lang3.version>3.5</commons-lang3.version>
         <findbugs-jsr305.version>3.0.1</findbugs-jsr305.version>
-        <groovy.version>2.4.7</groovy.version>
+        <groovy.version>2.4.8</groovy.version>
         <guava.version>20.0</guava.version>
         <hamcrest.version>1.3</hamcrest.version>
         <java.version>1.8</java.version>
