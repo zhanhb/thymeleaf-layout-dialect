@@ -99,7 +99,8 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
         // Check that the root element is the same as the one currently being processed
         ITemplateEvent contentRootEvent = Extensions.find(contentTemplate, event -> event instanceof IOpenElementTag);
         IProcessableElementTag rootElement = (IProcessableElementTag) Extensions.first(model);
-        if (contentRootEvent != rootElement) {
+        // TODO content equals
+        if (!Extensions.equals(contentRootEvent, rootElement)) {
             throw new IllegalArgumentException("layout:decorate/data-layout-decorate must appear in the root element of your template");
         }
 

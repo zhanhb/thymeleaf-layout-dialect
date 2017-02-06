@@ -127,7 +127,7 @@ public class Extensions {
         return false;
     }
 
-    private static boolean equals(@Nullable ITemplateEvent event, @Nullable Object other) {
+    public static boolean equals(@Nullable ITemplateEvent event, @Nullable Object other) {
         if (event instanceof IOpenElementTag) {
             return equals(((IOpenElementTag) event), other);
         } else if (event instanceof ICloseElementTag) {
