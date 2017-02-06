@@ -25,9 +25,12 @@ import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
+import org.thymeleaf.engine.TemplateData;
+import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IOpenElementTag;
 import org.thymeleaf.model.IProcessableElementTag;
+import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import org.thymeleaf.standard.expression.FragmentExpression;
@@ -87,31 +90,31 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
     protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
             String attributeValue, IElementModelStructureHandler structureHandler) {
 
-        // Ensure that every element to this point contained a decorate processor
-        for (IProcessableElementTag element : context.getElementStack()) {
-            if (element.getAttribute(attributeName) == null) {
-                throw new IllegalArgumentException("layout:decorate/data-layout-decorate must appear in the root element of your template");
-            }
-        }
-
         TemplateModelFinder templateModelFinder = new TemplateModelFinder(context);
 
-        // Remove the decorate processor from the root element
+        // Load the entirety of this template so we can access items outside of the root element
+        String contentTemplateName = context.getTemplateData().getTemplate();
+        IModel contentTemplate = templateModelFinder.findTemplate(contentTemplateName).cloneModel();
+
+        // Check that the root element is the same as the one currently being processed
+        ITemplateEvent contentRootEvent = Extensions.find(contentTemplate, event -> event instanceof IOpenElementTag);
         IProcessableElementTag rootElement = (IProcessableElementTag) Extensions.first(model);
+        if (contentRootEvent != rootElement) {
+            throw new IllegalArgumentException("layout:decorate/data-layout-decorate must appear in the root element of your template");
+        }
+
+        // Remove the decorate processor from the root element
         if (rootElement.hasAttribute(attributeName)) {
             rootElement = context.getModelFactory().removeAttribute(rootElement, attributeName);
             model.replace(0, rootElement);
         }
-
-        // Load the entirety of this template so we can access items outside of the root element
-        // TODO: Can probably find a way of preventing this double-loading for #102
-        String contentTemplateName = context.getTemplateData().getTemplate();
-        IModel contentTemplate = templateModelFinder.findTemplate(contentTemplateName).cloneModel();
         Extensions.replaceModel(contentTemplate, Extensions.findIndexOf(contentTemplate, event -> event instanceof IOpenElementTag), model);
 
         // Locate the template to decorate
         FragmentExpression decorateTemplateExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);
-        IModel decorateTemplate = templateModelFinder.findTemplate(decorateTemplateExpression).cloneModel();
+        TemplateModel decorateTemplate = templateModelFinder.findTemplate(decorateTemplateExpression);
+        TemplateData decorateTemplateData = decorateTemplate.getTemplateData();
+        IModel clone = decorateTemplate.cloneModel();
 
         // Gather all fragment parts from this page to apply to the new document
         // after decoration has taken place
@@ -128,8 +131,9 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
                     "Layout dialect cannot be applied to the " + templateMode + " template mode, only HTML and XML template modes are currently supported"
             );
         }
-        IModel resultTemplate = decorator.decorate(decorateTemplate, contentTemplate);
+        IModel resultTemplate = decorator.decorate(clone, contentTemplate);
         Extensions.replaceModel(model, 0, resultTemplate);
+        structureHandler.setTemplateData(decorateTemplateData);
 
         // Save layout fragments for use later by layout:fragment processors
         FragmentMap.setForNode(context, structureHandler, pageFragments);

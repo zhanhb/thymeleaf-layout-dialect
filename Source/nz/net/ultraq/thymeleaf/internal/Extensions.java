@@ -193,6 +193,26 @@ public class Extensions {
     }
 
     /**
+     * Returns the first event in the model that meets the criteria of the given
+     * closure.
+     *
+     * @param delegate
+     * @param closure
+     * @return The first event to match the closure criteria, or {@code null} if
+     * nothing matched.
+     */
+    public static ITemplateEvent find(@Nonnull IModel delegate, @Nonnull ITemplateEventPredicate closure) {
+        for (int i = 0; i < delegate.size(); i++) {
+            ITemplateEvent event = delegate.get(i);
+            boolean result = closure.test(event);
+            if (result) {
+                return event;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Returns the index of the first event in the model that meets the criteria
      * of the given closure.
      *
