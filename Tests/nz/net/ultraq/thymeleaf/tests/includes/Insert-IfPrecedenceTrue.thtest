@@ -1,7 +1,6 @@
 
-# Checks the interaction of the layout:replace processor with the th:if
-# processor.  Note that the replacement removes the th:if, meaning the fragment
-# is added regardless.
+# Checks the interaction of the layout:include processor with the th:if
+# processor.
 
 %TEMPLATE_MODE HTML
 
@@ -11,7 +10,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <body>
-	<div th:if="${false}" layout:replace="Page :: text"></div>
+	<div th:if="${true}" layout:insert="Page :: text"></div>
 </body>
 </html>
 
@@ -32,7 +31,9 @@
 <html>
 <body>
 	<div>
-		<p>Included text</p>
+		<div>
+			<p>Included text</p>
+		</div>
 	</div>
 </body>
 </html>
