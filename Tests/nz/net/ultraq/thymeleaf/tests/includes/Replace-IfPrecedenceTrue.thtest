@@ -10,7 +10,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <body>
-	<div th:if="${true}" layout:replace="Page :: text"></div>
+	<div th:if="${true}" layout:replace="~{Page :: text}"></div>
 </body>
 </html>
 
