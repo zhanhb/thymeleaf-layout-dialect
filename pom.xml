@@ -61,6 +61,10 @@
         </contributor>
     </contributors>
 
+    <prerequisites>
+        <maven>3.2</maven>
+    </prerequisites>
+
     <scm>
         <connection>scm:git:git@github.com:zhanhb/thymeleaf-layout-dialect.git</connection>
         <developerConnection>scm:git:git@github.com:zhanhb/thymeleaf-layout-dialect.git</developerConnection>
