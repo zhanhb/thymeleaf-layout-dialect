@@ -86,22 +86,19 @@ public class HtmlHeadDecorator implements Decorator {
         // Merge the rest of the source &lt;head&gt; elements with the target &lt;head&gt;
         // elements using the current merging strategy
 <span class="fc bfc" id="L88" title="All 4 branches covered.">        if (Extensions.asBoolean(sourceHeadModel) &amp;&amp; Extensions.asBoolean(targetHeadModel)) {</span>
-<span class="fc" id="L89">            Iterator&lt;IModel&gt; it = Extensions.childModelIterator(sourceHeadModel);</span>
-<span class="pc bpc" id="L90" title="1 of 2 branches missed.">            if (it != null) {</span>
-<span class="fc bfc" id="L91" title="All 2 branches covered.">                while (it.hasNext()) {</span>
-<span class="fc" id="L92">                    IModel model = it.next();</span>
-<span class="fc bfc" id="L93" title="All 2 branches covered.">                    if (isTitle.test(Extensions.first(model))) {</span>
-<span class="fc" id="L94">                        continue;</span>
-                    }
-<span class="fc" id="L96">                    int position = sortingStrategy.findPositionForModel(resultHeadModel, model);</span>
-<span class="fc bfc" id="L97" title="All 2 branches covered.">                    if (position != -1) {</span>
-<span class="fc" id="L98">                        Extensions.insertModelWithWhitespace(resultHeadModel, position, model, modelFactory);</span>
-                    }
-<span class="fc" id="L100">                }</span>
-            }
+<span class="fc bfc" id="L89" title="All 2 branches covered.">            for (Iterator&lt;IModel&gt; it = Extensions.childModelIterator(sourceHeadModel); it.hasNext();) {</span>
+<span class="fc" id="L90">                IModel model = it.next();</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">                if (isTitle.test(Extensions.first(model))) {</span>
+<span class="fc" id="L92">                    continue;</span>
+                }
+<span class="fc" id="L94">                int position = sortingStrategy.findPositionForModel(resultHeadModel, model);</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">                if (position != -1) {</span>
+<span class="fc" id="L96">                    Extensions.insertModelWithWhitespace(resultHeadModel, position, model, modelFactory);</span>
+                }
+<span class="fc" id="L98">            }</span>
         }
-<span class="fc" id="L103">        return resultHeadModel;</span>
+<span class="fc" id="L100">        return resultHeadModel;</span>
     }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.8.201612092310</span></div></body></html>

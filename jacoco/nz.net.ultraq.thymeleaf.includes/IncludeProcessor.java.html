@@ -109,37 +109,34 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
         // from the model so that we can use the child event iterator.
 <span class="fc" id="L110">        Extensions.trim(fragmentForInclusionUse);</span>
 
-<span class="fc" id="L112">        Iterator&lt;IModel&gt; it = Extensions.childModelIterator(fragmentForInclusionUse);</span>
-<span class="pc bpc" id="L113" title="1 of 2 branches missed.">        if (it != null) {</span>
-<span class="fc bfc" id="L114" title="All 2 branches covered.">            while (it.hasNext()) {</span>
-<span class="fc" id="L115">                IModel fragmentChildModel = it.next();</span>
-<span class="fc" id="L116">                model.insertModel(model.size() - 1, fragmentChildModel);</span>
-<span class="fc" id="L117">            }</span>
-        }
+<span class="fc bfc" id="L112" title="All 2 branches covered.">        for (Iterator&lt;IModel&gt; it = Extensions.childModelIterator(fragmentForInclusionUse); it.hasNext();) {</span>
+<span class="fc" id="L113">            IModel fragmentChildModel = it.next();</span>
+<span class="fc" id="L114">            model.insertModel(model.size() - 1, fragmentChildModel);</span>
+<span class="fc" id="L115">        }</span>
 
         // When fragment parameters aren't named, derive the name from the fragment definition
         // TODO: Common code across all the inclusion processors
-<span class="pc bpc" id="L122" title="1 of 2 branches missed.">        if (fragmentExpression.hasSyntheticParameters()) {</span>
-<span class="nc" id="L123">            String fragmentDefinition = ((IProcessableElementTag) Extensions.first(fragmentForInclusionUse)).getAttributeValue(getDialectPrefix(), FragmentProcessor.PROCESSOR_NAME);</span>
-<span class="nc" id="L124">            List&lt;String&gt; parameterNames = new FragmentParameterNamesExtractor().extract(fragmentDefinition);</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">        if (fragmentExpression.hasSyntheticParameters()) {</span>
+<span class="nc" id="L120">            String fragmentDefinition = ((IProcessableElementTag) Extensions.first(fragmentForInclusionUse)).getAttributeValue(getDialectPrefix(), FragmentProcessor.PROCESSOR_NAME);</span>
+<span class="nc" id="L121">            List&lt;String&gt; parameterNames = new FragmentParameterNamesExtractor().extract(fragmentDefinition);</span>
 
-<span class="nc" id="L126">            AssignationSequence parameters = fragmentExpression.getParameters();</span>
-<span class="nc bnc" id="L127" title="All 2 branches missed.">            if (parameters != null) {</span>
-<span class="nc" id="L128">                int index = 0;</span>
-<span class="nc bnc" id="L129" title="All 2 branches missed.">                for (Assignation parameter : parameters) {</span>
-<span class="nc" id="L130">                    structureHandler.setLocalVariable(parameterNames.get(index), parameter.getRight().execute(context));</span>
-<span class="nc" id="L131">                    ++index;</span>
-<span class="nc" id="L132">                }</span>
+<span class="nc" id="L123">            AssignationSequence parameters = fragmentExpression.getParameters();</span>
+<span class="nc bnc" id="L124" title="All 2 branches missed.">            if (parameters != null) {</span>
+<span class="nc" id="L125">                int index = 0;</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">                for (Assignation parameter : parameters) {</span>
+<span class="nc" id="L127">                    structureHandler.setLocalVariable(parameterNames.get(index), parameter.getRight().execute(context));</span>
+<span class="nc" id="L128">                    ++index;</span>
+<span class="nc" id="L129">                }</span>
             }
-<span class="nc" id="L134">        } else { // Otherwise, apply values as is</span>
-<span class="fc" id="L135">            AssignationSequence parameters = fragmentExpression.getParameters();</span>
-<span class="fc bfc" id="L136" title="All 2 branches covered.">            if (parameters != null) {</span>
-<span class="fc bfc" id="L137" title="All 2 branches covered.">                for (Assignation parameter : parameters) {</span>
-<span class="fc" id="L138">                    structureHandler.setLocalVariable((String) parameter.getLeft().execute(context), parameter.getRight().execute(context));</span>
-<span class="fc" id="L139">                }</span>
+<span class="nc" id="L131">        } else { // Otherwise, apply values as is</span>
+<span class="fc" id="L132">            AssignationSequence parameters = fragmentExpression.getParameters();</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">            if (parameters != null) {</span>
+<span class="fc bfc" id="L134" title="All 2 branches covered.">                for (Assignation parameter : parameters) {</span>
+<span class="fc" id="L135">                    structureHandler.setLocalVariable((String) parameter.getLeft().execute(context), parameter.getRight().execute(context));</span>
+<span class="fc" id="L136">                }</span>
             }
         }
-<span class="fc" id="L142">    }</span>
+<span class="fc" id="L139">    }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.8.201612092310</span></div></body></html>

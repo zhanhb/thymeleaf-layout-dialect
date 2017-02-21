@@ -69,9 +69,9 @@ public class FragmentProcessor extends AbstractAttributeTagProcessor {
     protected void doProcess(ITemplateContext context, IProcessableElementTag tag,
             AttributeName attributeName, String attributeValue, IElementTagStructureHandler structureHandler) {
         // Emit a warning if found in the &lt;head&gt; section
-<span class="pc bpc" id="L72" title="1 of 4 branches missed.">        if (warned.compareAndSet(false, true) &amp;&amp; getTemplateMode() == TemplateMode.HTML) {</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        if (getTemplateMode() == TemplateMode.HTML) {</span>
 <span class="fc bfc" id="L73" title="All 2 branches covered.">            for (IProcessableElementTag element : context.getElementStack()) {</span>
-<span class="pc bpc" id="L74" title="1 of 2 branches missed.">                if (&quot;head&quot;.equals(element.getElementCompleteName())) {</span>
+<span class="pc bpc" id="L74" title="3 of 4 branches missed.">                if (&quot;head&quot;.equals(element.getElementCompleteName()) &amp;&amp; warned.compareAndSet(false, true)) {</span>
 <span class="nc" id="L75">                    logger.warn(&quot;You don't need to put the layout:fragment/data-layout-fragment attribute into the &lt;head&gt; section - &quot;</span>
                             + &quot;the decoration process will automatically copy the &lt;head&gt; section of your content templates into your layout page.&quot;);
 <span class="nc" id="L77">                    break;</span>
@@ -96,4 +96,4 @@ public class FragmentProcessor extends AbstractAttributeTagProcessor {
 <span class="fc" id="L96">    }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.8.201612092310</span></div></body></html>

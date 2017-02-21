@@ -16,18 +16,20 @@
 package nz.net.ultraq.thymeleaf.decorators;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import nz.net.ultraq.thymeleaf.context.LayoutContext;
-import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import nz.net.ultraq.thymeleaf.internal.Extensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.processor.element.AbstractAttributeTagProcessor;
 import org.thymeleaf.processor.element.IElementTagStructureHandler;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.util.StringUtils;
-import org.unbescape.html.HtmlEscape;
 
 /**
  * Allows for greater control of the resulting {@code &lt;title&gt;} element by
@@ -39,33 +41,21 @@ import org.unbescape.html.HtmlEscape;
  */
 public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
 
-<span class="fc" id="L42">    private static final Logger logger = LoggerFactory.getLogger(TitlePatternProcessor.class);</span>
+<span class="fc" id="L44">    private static final Logger logger = LoggerFactory.getLogger(TitlePatternProcessor.class);</span>
 
     @Deprecated
-    private static final String PARAM_TITLE_DECORATOR = &quot;$DECORATOR_TITLE&quot;;
-    private static final String PARAM_TITLE_CONTENT = &quot;$CONTENT_TITLE&quot;;
-    private static final String PARAM_TITLE_LAYOUT = &quot;$LAYOUT_TITLE&quot;;
+    private static final String TOKEN_DECORATOR_TITLE = &quot;$DECORATOR_TITLE&quot;;
+    // private static final String TOKEN_CONTENT_TITLE   = &quot;$CONTENT_TITLE&quot;;
+    private static final String TOKEN_LAYOUT_TITLE = &quot;$LAYOUT_TITLE&quot;;
+<span class="fc" id="L50">    private static final Pattern TOKEN_PATTERN = Pattern.compile(&quot;(\\$(LAYOUT|DECORATOR|CONTENT)_TITLE)&quot;);</span>
 
-<span class="fc" id="L49">    private static final AtomicBoolean warned = new AtomicBoolean();</span>
+<span class="fc" id="L52">    private static final AtomicBoolean warned = new AtomicBoolean();</span>
 
     public static final String PROCESSOR_NAME = &quot;title-pattern&quot;;
     public static final int PROCESSOR_PRECEDENCE = 1;
 
-    public static final String CONTEXT_CONTENT_TITLE = &quot;contentTitle&quot;;
-    public static final String CONTEXT_LAYOUT_TITLE = &quot;layoutTitle&quot;;
-    public static final String CONTEXT_RESULTING_TITLE = &quot;resultingTitle&quot;;
-
     public static final String CONTENT_TITLE_KEY = &quot;LayoutDialect::ContentTitle&quot;;
     public static final String LAYOUT_TITLE_KEY = &quot;LayoutDialect::LayoutTitle&quot;;
-
-    private static String titleProcessor(String contextKey, ITemplateContext context, ExpressionProcessor expressionProcessor) {
-<span class="fc" id="L62">        Title titleObject = (Title) context.getVariable(contextKey);</span>
-<span class="fc bfc" id="L63" title="All 2 branches covered.">        if (titleObject != null) {</span>
-<span class="fc" id="L64">            String titleValue = HtmlEscape.unescapeHtml(expressionProcessor.processAsString(titleObject.getTitle()));</span>
-<span class="fc bfc" id="L65" title="All 2 branches covered.">            return titleObject.isEscape() ? HtmlEscape.escapeHtml5Xml(titleValue) : titleValue;</span>
-        }
-<span class="fc" id="L67">        return null;</span>
-    }
 
     /**
      * Constructor, sets this processor to work on the 'title-pattern'
@@ -75,8 +65,8 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
      * @param dialectPrefix
      */
     public TitlePatternProcessor(TemplateMode templateMode, String dialectPrefix) {
-<span class="fc" id="L78">        super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);</span>
-<span class="fc" id="L79">    }</span>
+<span class="fc" id="L68">        super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);</span>
+<span class="fc" id="L69">    }</span>
 
     /**
      * Process the {@code layout:title-pattern} directive, replaces the title
@@ -92,42 +82,51 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
     protected void doProcess(ITemplateContext context, IProcessableElementTag tag,
             AttributeName attributeName, String attributeValue, IElementTagStructureHandler structureHandler) {
         // Ensure this attribute is only on the &lt;title&gt; element
-<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (!&quot;title&quot;.equals(tag.getElementCompleteName())) {</span>
-<span class="nc" id="L96">            throw new IllegalArgumentException(attributeName + &quot; processor should only appear in a &lt;title&gt; element&quot;);</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">        if (!&quot;title&quot;.equals(tag.getElementCompleteName())) {</span>
+<span class="nc" id="L86">            throw new IllegalArgumentException(attributeName + &quot; processor should only appear in a &lt;title&gt; element&quot;);</span>
         }
 
-<span class="fc" id="L99">        String titlePattern = attributeValue;</span>
-<span class="fc" id="L100">        ExpressionProcessor expressionProcessor = new ExpressionProcessor(context);</span>
+<span class="fc" id="L89">        String titlePattern = attributeValue;</span>
+<span class="fc" id="L90">        IModelFactory modelFactory = context.getModelFactory();</span>
 
-<span class="fc" id="L102">        String contentTitle = titleProcessor(CONTENT_TITLE_KEY, context, expressionProcessor);</span>
-<span class="fc" id="L103">        String layoutTitle = titleProcessor(LAYOUT_TITLE_KEY, context, expressionProcessor);</span>
+<span class="fc" id="L92">        IModel contentTitle = (IModel) context.getVariable(CONTENT_TITLE_KEY);</span>
+<span class="fc" id="L93">        IModel layoutTitle = (IModel) context.getVariable(LAYOUT_TITLE_KEY);</span>
 
-<span class="pc bpc" id="L105" title="2 of 6 branches missed.">        if (warned.compareAndSet(false, true) &amp;&amp; !StringUtils.isEmpty(titlePattern) &amp;&amp; titlePattern.contains(PARAM_TITLE_DECORATOR)) {</span>
-<span class="nc" id="L106">            logger.warn(</span>
-                    &quot;The $DECORATOR_TITLE token is deprecated and will be removed in the next major version of the layout dialect.  &quot;
-                    + &quot;Please use the $LAYOUT_TITLE token instead to future-proof your code.  &quot;
-                    + &quot;See https://github.com/ultraq/thymeleaf-layout-dialect/issues/95 for more information.&quot;
-            );
+<span class="pc bpc" id="L95" title="2 of 4 branches missed.">        if (!StringUtils.isEmpty(titlePattern) &amp;&amp; titlePattern.contains(TOKEN_DECORATOR_TITLE)) {</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">            if (!warned.compareAndSet(false, true)) {</span>
+<span class="nc" id="L97">                logger.warn(</span>
+                        &quot;The $DECORATOR_TITLE token is deprecated and will be removed in the next major version of the layout dialect.  &quot;
+                        + &quot;Please use the $LAYOUT_TITLE token instead to future-proof your code.  &quot;
+                        + &quot;See https://github.com/ultraq/thymeleaf-layout-dialect/issues/95 for more information.&quot;
+                );
+            }
         }
 
-        String title;
-<span class="pc bpc" id="L114" title="1 of 6 branches missed.">        if (!StringUtils.isEmpty(titlePattern) &amp;&amp; !StringUtils.isEmpty(layoutTitle) &amp;&amp; !StringUtils.isEmpty(contentTitle)) {</span>
-<span class="fc" id="L115">            title = titlePattern</span>
-<span class="fc" id="L116">                    .replace(PARAM_TITLE_LAYOUT, layoutTitle)</span>
-<span class="fc" id="L117">                    .replace(PARAM_TITLE_DECORATOR, layoutTitle)</span>
-<span class="fc" id="L118">                    .replace(PARAM_TITLE_CONTENT, contentTitle);</span>
-        } else {
-<span class="pc bpc" id="L120" title="1 of 4 branches missed.">            title = !StringUtils.isEmpty(contentTitle) ? contentTitle : !StringUtils.isEmpty(layoutTitle) ? layoutTitle : &quot;&quot;;</span>
+        // Break the title pattern up into tokens to map to their respective models
+<span class="fc" id="L106">        IModel titleModel = modelFactory.createModel();</span>
+<span class="fc bfc" id="L107" title="All 4 branches covered.">        if (Extensions.asBoolean(layoutTitle) &amp;&amp; Extensions.asBoolean(contentTitle)) {</span>
+<span class="fc" id="L108">            Matcher matcher = TOKEN_PATTERN.matcher(titlePattern);</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">            while (matcher.find()) {</span>
+<span class="fc" id="L110">                String text = titlePattern.substring(matcher.regionStart(), matcher.start());</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">                if (!StringUtils.isEmpty(text)) {</span>
+<span class="fc" id="L112">                    titleModel.add(modelFactory.createText(text));</span>
+                }
+<span class="fc" id="L114">                String token = matcher.group(1);</span>
+<span class="pc bpc" id="L115" title="1 of 4 branches missed.">                titleModel.addModel(TOKEN_LAYOUT_TITLE.equals(token) || TOKEN_DECORATOR_TITLE.equals(token) ? layoutTitle : contentTitle);</span>
+<span class="fc" id="L116">                matcher.region(matcher.regionStart() + text.length() + token.length(), titlePattern.length());</span>
+<span class="fc" id="L117">            }</span>
+<span class="fc" id="L118">            String remainingText = titlePattern.substring(matcher.regionStart());</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">            if (!StringUtils.isEmpty(remainingText)) {</span>
+<span class="nc" id="L120">                titleModel.add(modelFactory.createText(remainingText));</span>
+            }
+<span class="fc bfc" id="L122" title="All 2 branches covered.">        } else if (Extensions.asBoolean(contentTitle)) {</span>
+<span class="fc" id="L123">            titleModel.addModel(contentTitle);</span>
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">        } else if (Extensions.asBoolean(layoutTitle)) {</span>
+<span class="fc" id="L125">            titleModel.addModel(layoutTitle);</span>
         }
 
-<span class="fc" id="L123">        structureHandler.setBody(title, false);</span>
-
-        // Save the title to the layout context
-<span class="fc" id="L126">        LayoutContext layoutContext = LayoutContext.forContext(context);</span>
-<span class="fc" id="L127">        layoutContext.put(CONTEXT_CONTENT_TITLE, contentTitle);</span>
-<span class="fc" id="L128">        layoutContext.put(CONTEXT_LAYOUT_TITLE, layoutTitle);</span>
-<span class="fc" id="L129">        layoutContext.put(CONTEXT_RESULTING_TITLE, title);</span>
-<span class="fc" id="L130">    }</span>
+<span class="fc" id="L128">        structureHandler.setBody(titleModel, true);</span>
+<span class="fc" id="L129">    }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.8.201612092310</span></div></body></html>
