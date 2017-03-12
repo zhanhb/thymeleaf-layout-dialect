@@ -30,7 +30,6 @@ import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IOpenElementTag;
 import org.thymeleaf.model.IProcessableElementTag;
-import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import org.thymeleaf.standard.expression.FragmentExpression;
@@ -97,10 +96,10 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
         IModel contentTemplate = templateModelFinder.findTemplate(contentTemplateName).cloneModel();
 
         // Check that the root element is the same as the one currently being processed
-        ITemplateEvent contentRootEvent = Extensions.find(contentTemplate, event -> event instanceof IOpenElementTag);
+        IOpenElementTag contentRootEvent = (IOpenElementTag) Extensions.find(contentTemplate, event -> event instanceof IOpenElementTag);
         IProcessableElementTag rootElement = (IProcessableElementTag) Extensions.first(model);
         // TODO content equals
-        if (!Extensions.equals(contentRootEvent, rootElement)) {
+        if (!Extensions.equalsIgnoreXmlNamespaces(contentRootEvent, rootElement)) {
             throw new IllegalArgumentException("layout:decorate/data-layout-decorate must appear in the root element of your template");
         }
 

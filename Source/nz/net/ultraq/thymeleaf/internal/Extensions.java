@@ -17,6 +17,8 @@ package nz.net.ultraq.thymeleaf.internal;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -499,6 +501,36 @@ public class Extensions {
         return other instanceof IOpenElementTag
                 && Objects.equals(delegate.getElementCompleteName(), ((IElementTag) other).getElementCompleteName())
                 && Objects.equals(delegate.getAttributeMap(), ((IProcessableElementTag) other).getAttributeMap());
+    }
+
+    /**
+     * For use in comparing one tag with another by the decorator processor when
+     * checking if root elements are the same.
+     *
+     * @param delegate
+     * @param other
+     * @return {@code true} if this element shares the same name and all
+     * attributes that aren't XML namespace attributes as the other element.
+     */
+    public static boolean equalsIgnoreXmlNamespaces(IOpenElementTag delegate, @Nullable Object other) {
+        if (other instanceof IOpenElementTag) {
+            IOpenElementTag element = (IOpenElementTag) other;
+            if (Objects.equals(delegate.getElementDefinition(), element.getElementDefinition())) {
+                // since getAttributeMap returns a copy
+                Map<String, String> difference = new LinkedHashMap<>(delegate.getAttributeMap());
+                difference.keySet().removeAll(element.getAttributeMap().keySet());
+                if (difference.isEmpty()) {
+                    return true;
+                }
+                for (String prefix : difference.keySet()) {
+                    if (!prefix.startsWith("xmlns:")) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
