@@ -72,6 +72,11 @@
         <url>https://github.com/zhanhb/thymeleaf-layout-dialect</url>
     </scm>
 
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/zhanhb/thymeleaf-layout-dialect/issues</url>
+    </issueManagement>
+
     <ciManagement>
         <system>Travis CI</system>
         <url>https://travis-ci.org/zhanhb/thymeleaf-layout-dialect</url>
