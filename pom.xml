@@ -103,7 +103,7 @@
     <properties>
         <argLine>-Dfile.encoding=${file.encoding} -ea</argLine>
         <arguments>-Prelease-profile</arguments>
-        <attoparser.version>2.0.2.RELEASE</attoparser.version>
+        <attoparser.version>2.0.3.RELEASE</attoparser.version>
         <byte-buddy.version>1.6.0</byte-buddy.version>
         <commons-lang3.version>3.5</commons-lang3.version>
         <findbugs-jsr305.version>3.0.1</findbugs-jsr305.version>
@@ -117,12 +117,12 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <mockito.version>2.6.5</mockito.version>
         <objenesis.version>2.5.1</objenesis.version>
-        <ognl3.version>3.1.10</ognl3.version>
+        <ognl3.version>3.1.12</ognl3.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <reflections.version>0.9.10</reflections.version>
         <slf4j.version>1.7.22</slf4j.version>
-        <thymeleaf-testing.version>3.0.2.RELEASE</thymeleaf-testing.version>
-        <thymeleaf.version>3.0.3.RELEASE</thymeleaf.version>
+        <thymeleaf-testing.version>3.0.3.RELEASE</thymeleaf-testing.version>
+        <thymeleaf.version>3.0.5.RELEASE</thymeleaf.version>
         <unbescape.version>1.1.4.RELEASE</unbescape.version>
     </properties>
 
