@@ -99,7 +99,7 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
         IOpenElementTag contentRootEvent = (IOpenElementTag) Extensions.find(contentTemplate, event -> event instanceof IOpenElementTag);
         IProcessableElementTag rootElement = (IProcessableElementTag) Extensions.first(model);
         // TODO content equals
-        if (!Extensions.equalsIgnoreXmlNamespaces(contentRootEvent, rootElement)) {
+        if (!Extensions.equalsIgnoreXmlnsAndThWith(contentRootEvent, context, rootElement)) {
             throw new IllegalArgumentException("layout:decorate/data-layout-decorate must appear in the root element of your template");
         }
 

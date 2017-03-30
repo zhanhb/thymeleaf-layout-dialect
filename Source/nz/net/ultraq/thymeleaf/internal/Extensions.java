@@ -27,6 +27,7 @@ import javax.annotation.Nullable;
 import nz.net.ultraq.thymeleaf.models.extensions.ChildModelIterator;
 import org.thymeleaf.DialectConfiguration;
 import org.thymeleaf.context.IExpressionContext;
+import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.dialect.IProcessorDialect;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.engine.TemplateModel;
@@ -40,6 +41,7 @@ import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.model.IStandaloneElementTag;
 import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.model.IText;
+import org.thymeleaf.standard.StandardDialect;
 import org.thymeleaf.util.StringUtils;
 
 /**
@@ -50,7 +52,7 @@ import org.thymeleaf.util.StringUtils;
  * @see IModel
  * @see TemplateModel
  * @see ITemplateEvent
- * @see IOpenElementTag
+ * @see IProcessableElementTag
  * @see ICloseElementTag
  * @see IStandaloneElementTag
  * @see IAttribute
@@ -130,8 +132,8 @@ public class Extensions {
     }
 
     public static boolean equals(@Nullable ITemplateEvent event, @Nullable Object other) {
-        if (event instanceof IOpenElementTag) {
-            return equals(((IOpenElementTag) event), other);
+        if (event instanceof IProcessableElementTag) {
+            return equals(((IProcessableElementTag) event), other);
         } else if (event instanceof ICloseElementTag) {
             return equals(((ICloseElementTag) event), other);
         } else if (event instanceof IStandaloneElementTag) {
@@ -497,8 +499,8 @@ public class Extensions {
      * @return {@code true} if this tag has the same name and attributes as the
      * other element.
      */
-    public static boolean equals(IOpenElementTag delegate, @Nullable Object other) {
-        return other instanceof IOpenElementTag
+    public static boolean equals(IProcessableElementTag delegate, @Nullable Object other) {
+        return other instanceof IProcessableElementTag
                 && Objects.equals(delegate.getElementCompleteName(), ((IElementTag) other).getElementCompleteName())
                 && Objects.equals(delegate.getAttributeMap(), ((IProcessableElementTag) other).getAttributeMap());
     }
@@ -508,13 +510,14 @@ public class Extensions {
      * checking if root elements are the same.
      *
      * @param delegate
+     * @param context
      * @param other
      * @return {@code true} if this element shares the same name and all
      * attributes that aren't XML namespace attributes as the other element.
      */
-    public static boolean equalsIgnoreXmlNamespaces(IOpenElementTag delegate, @Nullable Object other) {
-        if (other instanceof IOpenElementTag) {
-            IOpenElementTag element = (IOpenElementTag) other;
+    public static boolean equalsIgnoreXmlnsAndThWith(IProcessableElementTag delegate, ITemplateContext context, @Nullable Object other) {
+        if (other instanceof IProcessableElementTag) {
+            IProcessableElementTag element = (IProcessableElementTag) other;
             if (Objects.equals(delegate.getElementDefinition(), element.getElementDefinition())) {
                 // since getAttributeMap returns a copy
                 Map<String, String> difference = new LinkedHashMap<>(delegate.getAttributeMap());
@@ -522,8 +525,9 @@ public class Extensions {
                 if (difference.isEmpty()) {
                     return true;
                 }
+                String p = getPrefixForDialect(context, StandardDialect.class) + ":with";
                 for (String prefix : difference.keySet()) {
-                    if (!prefix.startsWith("xmlns:")) {
+                    if (!prefix.startsWith("xmlns:") && !prefix.startsWith(p)) {
                         return false;
                     }
                 }

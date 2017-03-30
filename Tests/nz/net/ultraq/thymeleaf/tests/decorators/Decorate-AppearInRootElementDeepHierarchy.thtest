@@ -1,0 +1,35 @@
+
+# Test the root element requirement when working with a deep layout hierarchy
+# and the special merging of the th:with attribute processor.  Made to recreate
+# the situation mentioned here:
+# https://github.com/ultraq/thymeleaf-layout-dialect/issues/127#issuecomment-287559862
+
+%TEMPLATE_MODE HTML
+
+
+%INPUT
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{Parent}"
+	th:with="page1='child'">
+</html>
+
+
+%INPUT[Parent]
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{Grandparent}"
+	th:with="page2='parent'">
+</html>
+
+
+%INPUT[Grandparent]
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+</html>
+
+
+%OUTPUT
+<!DOCTYPE html>
+<html>
+</html>
