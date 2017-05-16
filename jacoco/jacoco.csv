@@ -14,7 +14,7 @@ Thymeleaf Layout Dialect,nz.net.ultraq.thymeleaf.fragments,FragmentParameterName
 Thymeleaf Layout Dialect,nz.net.ultraq.thymeleaf.fragments,FragmentMap,0,32,0,4,0,7,0,5,0,3
 Thymeleaf Layout Dialect,nz.net.ultraq.thymeleaf.fragments,FragmentProcessor,9,78,3,7,2,16,2,6,0,3
 Thymeleaf Layout Dialect,nz.net.ultraq.thymeleaf.fragments,FragmentFinder,0,54,0,6,0,16,0,5,0,2
-Thymeleaf Layout Dialect,nz.net.ultraq.thymeleaf.internal,Extensions,68,696,38,108,18,164,39,74,3,37
+Thymeleaf Layout Dialect,nz.net.ultraq.thymeleaf.internal,Extensions,97,682,44,104,22,161,42,72,4,36
 Thymeleaf Layout Dialect,nz.net.ultraq.thymeleaf.internal,Extensions.DialectPrefixCacheHolder,3,30,1,3,1,3,2,3,1,2
 Thymeleaf Layout Dialect,nz.net.ultraq.thymeleaf.internal,ConcurrentWeakIdentityHashMap,0,61,0,2,0,15,0,6,0,5
 Thymeleaf Layout Dialect,nz.net.ultraq.thymeleaf.internal,ConcurrentWeakIdentityHashMap.Key,1,28,3,3,0,5,3,3,0,3
@@ -32,7 +32,7 @@ Thymeleaf Layout Dialect,nz.net.ultraq.thymeleaf.includes,InsertProcessor,44,81,
 Thymeleaf Layout Dialect,nz.net.ultraq.thymeleaf.includes,ReplaceProcessor,0,123,1,9,0,26,1,6,0,2
 Thymeleaf Layout Dialect,nz.net.ultraq.thymeleaf.includes,IncludeProcessor,44,113,5,9,10,25,3,7,0,3
 Thymeleaf Layout Dialect,nz.net.ultraq.thymeleaf.decorators,DecoratorProcessor,16,15,2,0,4,4,2,2,1,2
-Thymeleaf Layout Dialect,nz.net.ultraq.thymeleaf.decorators,DecorateProcessor,15,145,3,7,1,29,3,7,0,5
+Thymeleaf Layout Dialect,nz.net.ultraq.thymeleaf.decorators,DecorateProcessor,15,146,3,7,1,29,3,7,0,5
 Thymeleaf Layout Dialect,nz.net.ultraq.thymeleaf.decorators,TitlePatternProcessor,25,138,8,18,4,30,7,9,0,3
 Thymeleaf Layout Dialect,nz.net.ultraq.thymeleaf.decorators,DecorateProcessor..Lambda.new ITemplateEventPredicate() {...},0,13,0,0,0,0,0,4,0,4
 Thymeleaf Layout Dialect,nz.net.ultraq.thymeleaf.decorators,DecorateProcessor..Lambda.new ITemplateEventPredicate() {...},0,13,0,0,0,0,0,4,0,4

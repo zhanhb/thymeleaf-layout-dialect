@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Extensions.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.internal</a> &gt; <span class="el_source">Extensions.java</span></div><h1>Extensions.java</h1><pre class="source lang-java linenums">/*
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Extensions.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.internal</a> &gt; <span class="el_source">Extensions.java</span></div><h1>Extensions.java</h1><pre class="source lang-java linenums">/*
  * Copyright 2016, Emanuel Rabina (http://www.ultraq.net.nz/)
  *
  * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
@@ -27,6 +27,7 @@ import javax.annotation.Nullable;
 import nz.net.ultraq.thymeleaf.models.extensions.ChildModelIterator;
 import org.thymeleaf.DialectConfiguration;
 import org.thymeleaf.context.IExpressionContext;
+import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.dialect.IProcessorDialect;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.engine.TemplateModel;
@@ -40,6 +41,7 @@ import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.model.IStandaloneElementTag;
 import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.model.IText;
+import org.thymeleaf.standard.StandardDialect;
 import org.thymeleaf.util.StringUtils;
 
 /**
@@ -50,7 +52,7 @@ import org.thymeleaf.util.StringUtils;
  * @see IModel
  * @see TemplateModel
  * @see ITemplateEvent
- * @see IOpenElementTag
+ * @see IProcessableElementTag
  * @see ICloseElementTag
  * @see IStandaloneElementTag
  * @see IAttribute
@@ -66,7 +68,7 @@ public class Extensions {
      * @return {@code true} if this model has events.
      */
     public static boolean asBoolean(@Nullable IModel delegate) {
-<span class="fc bfc" id="L69" title="All 4 branches covered.">        return delegate != null &amp;&amp; delegate.size() &gt; 0;</span>
+<span class="fc bfc" id="L71" title="All 4 branches covered.">        return delegate != null &amp;&amp; delegate.size() &gt; 0;</span>
     }
 
     /**
@@ -78,7 +80,7 @@ public class Extensions {
      */
     @Nonnull
     public static Iterator&lt;IModel&gt; childModelIterator(@Nonnull IModel delegate) {
-<span class="pc bpc" id="L81" title="1 of 2 branches missed.">        return isElement(delegate) ? new ChildModelIterator(delegate) : Collections.emptyIterator();</span>
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">        return isElement(delegate) ? new ChildModelIterator(delegate) : Collections.emptyIterator();</span>
     }
 
     /**
@@ -88,12 +90,12 @@ public class Extensions {
      * @param delegate
      */
     public static void clearChildren(@Nonnull IModel delegate) {
-<span class="pc bpc" id="L91" title="1 of 2 branches missed.">        if (isElement(delegate)) {</span>
-<span class="fc bfc" id="L92" title="All 2 branches covered.">            while (delegate.size() &gt; 2) {</span>
-<span class="fc" id="L93">                delegate.remove(1);</span>
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">        if (isElement(delegate)) {</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">            while (delegate.size() &gt; 2) {</span>
+<span class="fc" id="L95">                delegate.remove(1);</span>
             }
         }
-<span class="fc" id="L96">    }</span>
+<span class="fc" id="L98">    }</span>
 
     /**
      * Iterate through each event in the model.
@@ -102,12 +104,12 @@ public class Extensions {
      * @param closure
      */
     public static void each(@Nullable IModel delegate, @Nonnull ITemplateEventConsumer closure) {
-<span class="nc bnc" id="L105" title="All 2 branches missed.">        if (delegate != null) {</span>
-<span class="nc bnc" id="L106" title="All 2 branches missed.">            for (int i = 0, size = delegate.size(); i &lt; size; i++) {</span>
-<span class="nc" id="L107">                closure.accept(delegate.get(i));</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">        if (delegate != null) {</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">            for (int i = 0, size = delegate.size(); i &lt; size; i++) {</span>
+<span class="nc" id="L109">                closure.accept(delegate.get(i));</span>
             }
         }
-<span class="nc" id="L110">    }</span>
+<span class="nc" id="L112">    }</span>
 
     /**
      * Compare 2 models, returning {@code true} if all of the model's events are
@@ -118,28 +120,28 @@ public class Extensions {
      * @return {@code true} if this model is the same as the other one.
      */
     public static boolean equals(IModel delegate, @Nullable Object other) {
-<span class="pc bpc" id="L121" title="1 of 2 branches missed.">        if (other instanceof IModel) {</span>
-<span class="fc" id="L122">            IModel iModel = (IModel) other;</span>
-<span class="pc bpc" id="L123" title="1 of 2 branches missed.">            if (delegate.size() == iModel.size()) {</span>
-<span class="fc" id="L124">                return everyWithIndex(delegate, (event, index) -&gt; {</span>
-<span class="fc" id="L125">                    return equals(event, iModel.get(index));</span>
+<span class="pc bpc" id="L123" title="1 of 2 branches missed.">        if (other instanceof IModel) {</span>
+<span class="fc" id="L124">            IModel iModel = (IModel) other;</span>
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">            if (delegate.size() == iModel.size()) {</span>
+<span class="fc" id="L126">                return everyWithIndex(delegate, (event, index) -&gt; {</span>
+<span class="fc" id="L127">                    return equals(event, iModel.get(index));</span>
                 });
             }
         }
-<span class="nc" id="L129">        return false;</span>
+<span class="nc" id="L131">        return false;</span>
     }
 
     public static boolean equals(@Nullable ITemplateEvent event, @Nullable Object other) {
-<span class="fc bfc" id="L133" title="All 2 branches covered.">        if (event instanceof IOpenElementTag) {</span>
-<span class="fc" id="L134">            return equals(((IOpenElementTag) event), other);</span>
-<span class="fc bfc" id="L135" title="All 2 branches covered.">        } else if (event instanceof ICloseElementTag) {</span>
-<span class="fc" id="L136">            return equals(((ICloseElementTag) event), other);</span>
-<span class="fc bfc" id="L137" title="All 2 branches covered.">        } else if (event instanceof IStandaloneElementTag) {</span>
-<span class="fc" id="L138">            return equals(((IStandaloneElementTag) event), other);</span>
-<span class="pc bpc" id="L139" title="1 of 2 branches missed.">        } else if (event instanceof IText) {</span>
-<span class="fc" id="L140">            return equals(((IText) event), other);</span>
+<span class="fc bfc" id="L135" title="All 2 branches covered.">        if (event instanceof IProcessableElementTag) {</span>
+<span class="fc" id="L136">            return equals(((IProcessableElementTag) event), other);</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">        } else if (event instanceof ICloseElementTag) {</span>
+<span class="fc" id="L138">            return equals(((ICloseElementTag) event), other);</span>
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">        } else if (event instanceof IStandaloneElementTag) {</span>
+<span class="nc" id="L140">            return equals(((IStandaloneElementTag) event), other);</span>
+<span class="pc bpc" id="L141" title="1 of 2 branches missed.">        } else if (event instanceof IText) {</span>
+<span class="fc" id="L142">            return equals(((IText) event), other);</span>
         }
-<span class="nc" id="L142">        return Objects.equals(event, other);</span>
+<span class="nc" id="L144">        return Objects.equals(event, other);</span>
     }
 
     /**
@@ -152,28 +154,28 @@ public class Extensions {
      * the other one.
      */
     public static boolean equalsIgnoreWhitespace(@Nonnull IModel delegate, @Nonnull IModel other) {
-<span class="fc" id="L155">        int thisEventIndex = 0;</span>
-<span class="fc" id="L156">        int otherEventIndex = 0;</span>
+<span class="fc" id="L157">        int thisEventIndex = 0;</span>
+<span class="fc" id="L158">        int otherEventIndex = 0;</span>
 
-<span class="fc" id="L158">        final int size1 = delegate.size(), size2 = other.size();</span>
-<span class="pc bpc" id="L159" title="1 of 4 branches missed.">        for (; thisEventIndex &lt; size1 || otherEventIndex &lt; size2;) {</span>
-<span class="fc" id="L160">            ITemplateEvent thisEvent = delegate.get(thisEventIndex);</span>
-<span class="fc" id="L161">            ITemplateEvent otherEvent = other.get(otherEventIndex);</span>
-<span class="pc bpc" id="L162" title="1 of 2 branches missed.">            if (isWhitespace(thisEvent)) {</span>
-<span class="nc" id="L163">                thisEventIndex++;</span>
-<span class="nc" id="L164">                continue;</span>
-<span class="fc bfc" id="L165" title="All 2 branches covered.">            } else if (isWhitespace(otherEvent)) {</span>
-<span class="fc" id="L166">                otherEventIndex++;</span>
-<span class="fc" id="L167">                continue;</span>
+<span class="fc" id="L160">        final int size1 = delegate.size(), size2 = other.size();</span>
+<span class="pc bpc" id="L161" title="1 of 4 branches missed.">        for (; thisEventIndex &lt; size1 || otherEventIndex &lt; size2;) {</span>
+<span class="fc" id="L162">            ITemplateEvent thisEvent = delegate.get(thisEventIndex);</span>
+<span class="fc" id="L163">            ITemplateEvent otherEvent = other.get(otherEventIndex);</span>
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">            if (isWhitespace(thisEvent)) {</span>
+<span class="nc" id="L165">                thisEventIndex++;</span>
+<span class="nc" id="L166">                continue;</span>
+<span class="fc bfc" id="L167" title="All 2 branches covered.">            } else if (isWhitespace(otherEvent)) {</span>
+<span class="fc" id="L168">                otherEventIndex++;</span>
+<span class="fc" id="L169">                continue;</span>
             }
-<span class="pc bpc" id="L169" title="1 of 2 branches missed.">            if (!equals(thisEvent, otherEvent)) {</span>
-<span class="nc" id="L170">                return false;</span>
+<span class="pc bpc" id="L171" title="1 of 2 branches missed.">            if (!equals(thisEvent, otherEvent)) {</span>
+<span class="nc" id="L172">                return false;</span>
             }
-<span class="fc" id="L172">            thisEventIndex++;</span>
-<span class="fc" id="L173">            otherEventIndex++;</span>
-<span class="fc" id="L174">        }</span>
+<span class="fc" id="L174">            thisEventIndex++;</span>
+<span class="fc" id="L175">            otherEventIndex++;</span>
+<span class="fc" id="L176">        }</span>
 
-<span class="pc bpc" id="L176" title="2 of 4 branches missed.">        return thisEventIndex == size1 &amp;&amp; otherEventIndex == size2;</span>
+<span class="pc bpc" id="L178" title="2 of 4 branches missed.">        return thisEventIndex == size1 &amp;&amp; otherEventIndex == size2;</span>
 
     }
 
@@ -186,12 +188,12 @@ public class Extensions {
      * @return {@code true} if every event satisfies the closure.
      */
     public static boolean everyWithIndex(@Nonnull IModel delegate, @Nonnull ITemplateEventIntPredicate closure) {
-<span class="fc bfc" id="L189" title="All 2 branches covered.">        for (int i = 0, size = delegate.size(); i &lt; size; i++) {</span>
-<span class="pc bpc" id="L190" title="1 of 2 branches missed.">            if (!closure.test(delegate.get(i), i)) {</span>
-<span class="nc" id="L191">                return false;</span>
+<span class="fc bfc" id="L191" title="All 2 branches covered.">        for (int i = 0, size = delegate.size(); i &lt; size; i++) {</span>
+<span class="pc bpc" id="L192" title="1 of 2 branches missed.">            if (!closure.test(delegate.get(i), i)) {</span>
+<span class="nc" id="L193">                return false;</span>
             }
         }
-<span class="fc" id="L194">        return true;</span>
+<span class="fc" id="L196">        return true;</span>
     }
 
     /**
@@ -204,14 +206,14 @@ public class Extensions {
      * nothing matched.
      */
     public static ITemplateEvent find(@Nonnull IModel delegate, @Nonnull ITemplateEventPredicate closure) {
-<span class="pc bpc" id="L207" title="1 of 2 branches missed.">        for (int i = 0; i &lt; delegate.size(); i++) {</span>
-<span class="fc" id="L208">            ITemplateEvent event = delegate.get(i);</span>
-<span class="fc" id="L209">            boolean result = closure.test(event);</span>
-<span class="fc bfc" id="L210" title="All 2 branches covered.">            if (result) {</span>
-<span class="fc" id="L211">                return event;</span>
+<span class="pc bpc" id="L209" title="1 of 2 branches missed.">        for (int i = 0; i &lt; delegate.size(); i++) {</span>
+<span class="fc" id="L210">            ITemplateEvent event = delegate.get(i);</span>
+<span class="fc" id="L211">            boolean result = closure.test(event);</span>
+<span class="fc bfc" id="L212" title="All 2 branches covered.">            if (result) {</span>
+<span class="fc" id="L213">                return event;</span>
             }
         }
-<span class="nc" id="L214">        return null;</span>
+<span class="nc" id="L216">        return null;</span>
     }
 
     /**
@@ -224,14 +226,14 @@ public class Extensions {
      * {@code -1} if nothing matched.
      */
     public static int findIndexOf(@Nonnull IModel delegate, @Nonnull ITemplateEventPredicate closure) {
-<span class="fc bfc" id="L227" title="All 2 branches covered.">        for (int i = 0, size = delegate.size(); i &lt; size; i++) {</span>
-<span class="fc" id="L228">            ITemplateEvent event = delegate.get(i);</span>
-<span class="fc" id="L229">            boolean result = closure.test(event);</span>
-<span class="fc bfc" id="L230" title="All 2 branches covered.">            if (result) {</span>
-<span class="fc" id="L231">                return i;</span>
+<span class="fc bfc" id="L229" title="All 2 branches covered.">        for (int i = 0, size = delegate.size(); i &lt; size; i++) {</span>
+<span class="fc" id="L230">            ITemplateEvent event = delegate.get(i);</span>
+<span class="fc" id="L231">            boolean result = closure.test(event);</span>
+<span class="fc bfc" id="L232" title="All 2 branches covered.">            if (result) {</span>
+<span class="fc" id="L233">                return i;</span>
             }
         }
-<span class="fc" id="L234">        return -1;</span>
+<span class="fc" id="L236">        return -1;</span>
     }
 
     /**
@@ -245,11 +247,11 @@ public class Extensions {
      */
     @Nullable
     public static IModel findModel(@Nonnull IModel delegate, @Nonnull ITemplateEventPredicate closure) {
-<span class="fc" id="L248">        int eventIndex = findIndexOf(delegate, closure);</span>
-<span class="fc bfc" id="L249" title="All 2 branches covered.">        if (eventIndex != -1) {</span>
-<span class="fc" id="L250">            return getModel(delegate, eventIndex);</span>
+<span class="fc" id="L250">        int eventIndex = findIndexOf(delegate, closure);</span>
+<span class="fc bfc" id="L251" title="All 2 branches covered.">        if (eventIndex != -1) {</span>
+<span class="fc" id="L252">            return getModel(delegate, eventIndex);</span>
         }
-<span class="fc" id="L252">        return null;</span>
+<span class="fc" id="L254">        return null;</span>
     }
 
     /**
@@ -259,7 +261,7 @@ public class Extensions {
      * @return The model's first event.
      */
     public static ITemplateEvent first(@Nonnull IModel delegate) {
-<span class="fc" id="L262">        return delegate.get(0);</span>
+<span class="fc" id="L264">        return delegate.get(0);</span>
     }
 
     /**
@@ -274,17 +276,17 @@ public class Extensions {
     @Nonnull
     @SuppressWarnings(&quot;ValueOfIncrementOrDecrementUsed&quot;)
     public static IModel getModel(@Nonnull IModel delegate, int pos) {
-<span class="fc" id="L277">        int modelSize = calculateModelSize(delegate, pos);</span>
-<span class="fc" id="L278">        IModel subModel = delegate.cloneModel();</span>
-<span class="pc bpc" id="L279" title="1 of 2 branches missed.">        int removeBefore = delegate instanceof TemplateModel ? pos - 1 : pos;</span>
-<span class="fc" id="L280">        int removeAfter = subModel.size() - (removeBefore + modelSize);</span>
-<span class="fc bfc" id="L281" title="All 2 branches covered.">        while (removeBefore-- &gt; 0) {</span>
-<span class="fc" id="L282">            removeFirst(subModel);</span>
+<span class="fc" id="L279">        int modelSize = calculateModelSize(delegate, pos);</span>
+<span class="fc" id="L280">        IModel subModel = delegate.cloneModel();</span>
+<span class="pc bpc" id="L281" title="1 of 2 branches missed.">        int removeBefore = delegate instanceof TemplateModel ? pos - 1 : pos;</span>
+<span class="fc" id="L282">        int removeAfter = subModel.size() - (removeBefore + modelSize);</span>
+<span class="fc bfc" id="L283" title="All 2 branches covered.">        while (removeBefore-- &gt; 0) {</span>
+<span class="fc" id="L284">            removeFirst(subModel);</span>
         }
-<span class="fc bfc" id="L284" title="All 2 branches covered.">        while (removeAfter-- &gt; 0) {</span>
-<span class="fc" id="L285">            removeLast(subModel);</span>
+<span class="fc bfc" id="L286" title="All 2 branches covered.">        while (removeAfter-- &gt; 0) {</span>
+<span class="fc" id="L287">            removeLast(subModel);</span>
         }
-<span class="fc" id="L287">        return subModel;</span>
+<span class="fc" id="L289">        return subModel;</span>
     }
 
     /**
@@ -300,8 +302,8 @@ public class Extensions {
      * @return Index of an extracted submodel within this model.
      */
     public static int indexOf(@Nonnull IModel delegate, @Nonnull IModel model) {
-<span class="fc" id="L303">        ITemplateEvent modelEvent = first(model);</span>
-<span class="fc bfc" id="L304" title="All 2 branches covered.">        return findIndexOf(delegate, event -&gt; event == modelEvent);</span>
+<span class="fc" id="L305">        ITemplateEvent modelEvent = first(model);</span>
+<span class="fc bfc" id="L306" title="All 2 branches covered.">        return findIndexOf(delegate, event -&gt; event == modelEvent);</span>
     }
 
     /**
@@ -315,19 +317,19 @@ public class Extensions {
      */
     public static void insertModelWithWhitespace(@Nonnull IModel delegate, int pos, @Nonnull IModel model, @Nonnull IModelFactory modelFactory) {
         // Use existing whitespace at the insertion point
-<span class="fc" id="L318">        IModel whitespace = getModel(delegate, pos);</span>
-<span class="fc bfc" id="L319" title="All 2 branches covered.">        if (isWhitespace(whitespace)) {</span>
-<span class="fc" id="L320">            delegate.insertModel(pos, model);</span>
-<span class="fc" id="L321">            delegate.insertModel(pos, whitespace);</span>
+<span class="fc" id="L320">        IModel whitespace = getModel(delegate, pos);</span>
+<span class="fc bfc" id="L321" title="All 2 branches covered.">        if (isWhitespace(whitespace)) {</span>
+<span class="fc" id="L322">            delegate.insertModel(pos, model);</span>
+<span class="fc" id="L323">            delegate.insertModel(pos, whitespace);</span>
         } else {
             // Generate whitespace, usually inserting into a tag that is immediately
             // closed so whitespace should be added to either side
-<span class="fc" id="L325">            whitespace = modelFactory.createModel(modelFactory.createText(&quot;\n\t&quot;));</span>
-<span class="fc" id="L326">            delegate.insertModel(pos, whitespace);</span>
-<span class="fc" id="L327">            delegate.insertModel(pos, model);</span>
+<span class="fc" id="L327">            whitespace = modelFactory.createModel(modelFactory.createText(&quot;\n\t&quot;));</span>
 <span class="fc" id="L328">            delegate.insertModel(pos, whitespace);</span>
+<span class="fc" id="L329">            delegate.insertModel(pos, model);</span>
+<span class="fc" id="L330">            delegate.insertModel(pos, whitespace);</span>
         }
-<span class="fc" id="L330">    }</span>
+<span class="fc" id="L332">    }</span>
 
     /**
      * Inserts an event, creating a whitespace event before it so that it
@@ -341,22 +343,22 @@ public class Extensions {
     public static void insertWithWhitespace(@Nonnull IModel delegate, int pos, @Nonnull ITemplateEvent event, @Nonnull IModelFactory modelFactory) {
         // TODO: Because I can't check the parent for whitespace hints, I should
         //       make this smarter and find whitespace within the model to copy.
-<span class="fc" id="L344">        IModel whitespace = getModel(delegate, pos); // Assumes that whitespace exists at the insertion point</span>
-<span class="pc bpc" id="L345" title="1 of 2 branches missed.">        if (isWhitespace(whitespace)) {</span>
-<span class="nc" id="L346">            delegate.insert(pos, event);</span>
-<span class="nc" id="L347">            delegate.insertModel(pos, whitespace);</span>
+<span class="fc" id="L346">        IModel whitespace = getModel(delegate, pos); // Assumes that whitespace exists at the insertion point</span>
+<span class="pc bpc" id="L347" title="1 of 2 branches missed.">        if (isWhitespace(whitespace)) {</span>
+<span class="nc" id="L348">            delegate.insert(pos, event);</span>
+<span class="nc" id="L349">            delegate.insertModel(pos, whitespace);</span>
         } else {
-<span class="fc" id="L349">            IText newLine = modelFactory.createText(&quot;\n&quot;);</span>
-<span class="fc bfc" id="L350" title="All 2 branches covered.">            if (pos == 0) {</span>
-<span class="fc" id="L351">                delegate.insert(pos, newLine);</span>
-<span class="fc" id="L352">                delegate.insert(pos, event);</span>
-<span class="pc bpc" id="L353" title="1 of 2 branches missed.">            } else if (pos == delegate.size()) {</span>
-<span class="fc" id="L354">                delegate.insert(pos, newLine);</span>
-<span class="fc" id="L355">                delegate.insert(pos, event);</span>
+<span class="fc" id="L351">            IText newLine = modelFactory.createText(&quot;\n&quot;);</span>
+<span class="fc bfc" id="L352" title="All 2 branches covered.">            if (pos == 0) {</span>
+<span class="fc" id="L353">                delegate.insert(pos, newLine);</span>
+<span class="fc" id="L354">                delegate.insert(pos, event);</span>
+<span class="pc bpc" id="L355" title="1 of 2 branches missed.">            } else if (pos == delegate.size()) {</span>
 <span class="fc" id="L356">                delegate.insert(pos, newLine);</span>
+<span class="fc" id="L357">                delegate.insert(pos, event);</span>
+<span class="fc" id="L358">                delegate.insert(pos, newLine);</span>
             }
         }
-<span class="fc" id="L359">    }</span>
+<span class="fc" id="L361">    }</span>
 
     /**
      * Returns whether or not this model represents an element with potential
@@ -367,7 +369,7 @@ public class Extensions {
      * and the last event is the matching closing tag.
      */
     public static boolean isElement(@Nonnull IModel delegate) {
-<span class="pc bpc" id="L370" title="2 of 4 branches missed.">        return first(delegate) instanceof IOpenElementTag &amp;&amp; last(delegate) instanceof ICloseElementTag;</span>
+<span class="pc bpc" id="L372" title="2 of 4 branches missed.">        return first(delegate) instanceof IOpenElementTag &amp;&amp; last(delegate) instanceof ICloseElementTag;</span>
     }
 
     /**
@@ -377,7 +379,7 @@ public class Extensions {
      * @return {@code true} if this is a collapsible text model.
      */
     public static boolean isWhitespace(@Nonnull IModel delegate) {
-<span class="fc bfc" id="L380" title="All 4 branches covered.">        return delegate.size() == 1 &amp;&amp; isWhitespace(first(delegate));</span>
+<span class="fc bfc" id="L382" title="All 4 branches covered.">        return delegate.size() == 1 &amp;&amp; isWhitespace(first(delegate));</span>
     }
 
     /**
@@ -387,7 +389,7 @@ public class Extensions {
      * @return The model's last event.
      */
     public static ITemplateEvent last(@Nonnull IModel delegate) {
-<span class="fc" id="L390">        return delegate.get(delegate.size() - 1);</span>
+<span class="fc" id="L392">        return delegate.get(delegate.size() - 1);</span>
     }
 
     /**
@@ -396,8 +398,8 @@ public class Extensions {
      * @param delegate
      */
     public static void removeFirst(@Nonnull IModel delegate) {
-<span class="fc" id="L399">        delegate.remove(0);</span>
-<span class="fc" id="L400">    }</span>
+<span class="fc" id="L401">        delegate.remove(0);</span>
+<span class="fc" id="L402">    }</span>
 
     /**
      * Removes the last event on the model.
@@ -405,8 +407,8 @@ public class Extensions {
      * @param delegate
      */
     public static void removeLast(@Nonnull IModel delegate) {
-<span class="fc" id="L408">        delegate.remove(delegate.size() - 1);</span>
-<span class="fc" id="L409">    }</span>
+<span class="fc" id="L410">        delegate.remove(delegate.size() - 1);</span>
+<span class="fc" id="L411">    }</span>
 
     /**
      * Removes a models-worth of events from the specified position. What this
@@ -418,12 +420,12 @@ public class Extensions {
      * @param pos
      */
     public static void removeModel(@Nonnull IModel delegate, int pos) {
-<span class="fc" id="L421">        int modelSize = calculateModelSize(delegate, pos);</span>
-<span class="fc bfc" id="L422" title="All 2 branches covered.">        while (modelSize &gt; 0) {</span>
-<span class="fc" id="L423">            delegate.remove(pos);</span>
-<span class="fc" id="L424">            modelSize--;</span>
+<span class="fc" id="L423">        int modelSize = calculateModelSize(delegate, pos);</span>
+<span class="fc bfc" id="L424" title="All 2 branches covered.">        while (modelSize &gt; 0) {</span>
+<span class="fc" id="L425">            delegate.remove(pos);</span>
+<span class="fc" id="L426">            modelSize--;</span>
         }
-<span class="fc" id="L426">    }</span>
+<span class="fc" id="L428">    }</span>
 
     /**
      * Removes a models-worth of events from the specified position, plus the
@@ -433,12 +435,12 @@ public class Extensions {
      * @param pos
      */
     public static void removeModelWithWhitespace(@Nonnull IModel delegate, int pos) {
-<span class="fc" id="L436">        removeModel(delegate, pos);</span>
-<span class="fc" id="L437">        ITemplateEvent priorEvent = delegate.get(pos - 1);</span>
-<span class="fc bfc" id="L438" title="All 2 branches covered.">        if (isWhitespace(priorEvent)) {</span>
-<span class="fc" id="L439">            delegate.remove(pos - 1);</span>
+<span class="fc" id="L438">        removeModel(delegate, pos);</span>
+<span class="fc" id="L439">        ITemplateEvent priorEvent = delegate.get(pos - 1);</span>
+<span class="fc bfc" id="L440" title="All 2 branches covered.">        if (isWhitespace(priorEvent)) {</span>
+<span class="fc" id="L441">            delegate.remove(pos - 1);</span>
         }
-<span class="fc" id="L441">    }</span>
+<span class="fc" id="L443">    }</span>
 
     /**
      * Replaces the model at the specified index with the given model.
@@ -448,9 +450,9 @@ public class Extensions {
      * @param model
      */
     public static void replaceModel(@Nonnull IModel delegate, int pos, @Nonnull IModel model) {
-<span class="fc" id="L451">        removeModel(delegate, pos);</span>
-<span class="fc" id="L452">        delegate.insertModel(pos, model);</span>
-<span class="fc" id="L453">    }</span>
+<span class="fc" id="L453">        removeModel(delegate, pos);</span>
+<span class="fc" id="L454">        delegate.insertModel(pos, model);</span>
+<span class="fc" id="L455">    }</span>
 
     /**
      * Removes whitespace events from the head and tail of the model's
@@ -459,13 +461,13 @@ public class Extensions {
      * @param delegate
      */
     public static void trim(@Nonnull IModel delegate) {
-<span class="pc bpc" id="L462" title="1 of 2 branches missed.">        while (isWhitespace(first(delegate))) {</span>
-<span class="nc" id="L463">            removeFirst(delegate);</span>
+<span class="pc bpc" id="L464" title="1 of 2 branches missed.">        while (isWhitespace(first(delegate))) {</span>
+<span class="nc" id="L465">            removeFirst(delegate);</span>
         }
-<span class="fc bfc" id="L465" title="All 2 branches covered.">        while (isWhitespace(last(delegate))) {</span>
-<span class="fc" id="L466">            removeLast(delegate);</span>
+<span class="fc bfc" id="L467" title="All 2 branches covered.">        while (isWhitespace(last(delegate))) {</span>
+<span class="fc" id="L468">            removeLast(delegate);</span>
         }
-<span class="fc" id="L468">    }</span>
+<span class="fc" id="L470">    }</span>
 
     /**
      * Shortcut to the template name found on the template data object. Only
@@ -476,7 +478,7 @@ public class Extensions {
      * @return Template name.
      */
     public static String getTemplate(@Nonnull TemplateModel delegate) {
-<span class="nc" id="L479">        return delegate.getTemplateData().getTemplate();</span>
+<span class="nc" id="L481">        return delegate.getTemplateData().getTemplate();</span>
     }
 
     /**
@@ -486,7 +488,7 @@ public class Extensions {
      * @return {@code true} if this is a collapsible text node.
      */
     public static boolean isWhitespace(@Nonnull ITemplateEvent delegate) {
-<span class="fc bfc" id="L489" title="All 4 branches covered.">        return delegate instanceof IText &amp;&amp; isWhitespace((IText) delegate);</span>
+<span class="fc bfc" id="L491" title="All 4 branches covered.">        return delegate instanceof IText &amp;&amp; isWhitespace((IText) delegate);</span>
     }
 
     /**
@@ -497,10 +499,10 @@ public class Extensions {
      * @return {@code true} if this tag has the same name and attributes as the
      * other element.
      */
-    public static boolean equals(IOpenElementTag delegate, @Nullable Object other) {
-<span class="pc bpc" id="L501" title="1 of 2 branches missed.">        return other instanceof IOpenElementTag</span>
-<span class="pc bpc" id="L502" title="1 of 2 branches missed.">                &amp;&amp; Objects.equals(delegate.getElementCompleteName(), ((IElementTag) other).getElementCompleteName())</span>
-<span class="pc bpc" id="L503" title="1 of 2 branches missed.">                &amp;&amp; Objects.equals(delegate.getAttributeMap(), ((IProcessableElementTag) other).getAttributeMap());</span>
+    public static boolean equals(IProcessableElementTag delegate, @Nullable Object other) {
+<span class="pc bpc" id="L503" title="1 of 2 branches missed.">        return other instanceof IProcessableElementTag</span>
+<span class="pc bpc" id="L504" title="1 of 2 branches missed.">                &amp;&amp; Objects.equals(delegate.getElementCompleteName(), ((IElementTag) other).getElementCompleteName())</span>
+<span class="pc bpc" id="L505" title="1 of 2 branches missed.">                &amp;&amp; Objects.equals(delegate.getAttributeMap(), ((IProcessableElementTag) other).getAttributeMap());</span>
     }
 
     /**
@@ -508,29 +510,31 @@ public class Extensions {
      * checking if root elements are the same.
      *
      * @param delegate
+     * @param context
      * @param other
      * @return {@code true} if this element shares the same name and all
      * attributes that aren't XML namespace attributes as the other element.
      */
-    public static boolean equalsIgnoreXmlNamespaces(IOpenElementTag delegate, @Nullable Object other) {
-<span class="pc bpc" id="L516" title="1 of 2 branches missed.">        if (other instanceof IOpenElementTag) {</span>
-<span class="fc" id="L517">            IOpenElementTag element = (IOpenElementTag) other;</span>
-<span class="fc bfc" id="L518" title="All 2 branches covered.">            if (Objects.equals(delegate.getElementDefinition(), element.getElementDefinition())) {</span>
+    public static boolean equalsIgnoreXmlnsAndThWith(IProcessableElementTag delegate, ITemplateContext context, @Nullable Object other) {
+<span class="pc bpc" id="L519" title="1 of 2 branches missed.">        if (other instanceof IProcessableElementTag) {</span>
+<span class="fc" id="L520">            IProcessableElementTag element = (IProcessableElementTag) other;</span>
+<span class="fc bfc" id="L521" title="All 2 branches covered.">            if (Objects.equals(delegate.getElementDefinition(), element.getElementDefinition())) {</span>
                 // since getAttributeMap returns a copy
-<span class="fc" id="L520">                Map&lt;String, String&gt; difference = new LinkedHashMap&lt;&gt;(delegate.getAttributeMap());</span>
-<span class="fc" id="L521">                difference.keySet().removeAll(element.getAttributeMap().keySet());</span>
-<span class="fc bfc" id="L522" title="All 2 branches covered.">                if (difference.isEmpty()) {</span>
-<span class="fc" id="L523">                    return true;</span>
+<span class="fc" id="L523">                Map&lt;String, String&gt; difference = new LinkedHashMap&lt;&gt;(delegate.getAttributeMap());</span>
+<span class="fc" id="L524">                difference.keySet().removeAll(element.getAttributeMap().keySet());</span>
+<span class="fc bfc" id="L525" title="All 2 branches covered.">                if (difference.isEmpty()) {</span>
+<span class="fc" id="L526">                    return true;</span>
                 }
-<span class="fc bfc" id="L525" title="All 2 branches covered.">                for (String prefix : difference.keySet()) {</span>
-<span class="pc bpc" id="L526" title="1 of 2 branches missed.">                    if (!prefix.startsWith(&quot;xmlns:&quot;)) {</span>
-<span class="nc" id="L527">                        return false;</span>
+<span class="fc" id="L528">                String p = getPrefixForDialect(context, StandardDialect.class) + &quot;:with&quot;;</span>
+<span class="fc bfc" id="L529" title="All 2 branches covered.">                for (String prefix : difference.keySet()) {</span>
+<span class="pc bpc" id="L530" title="3 of 4 branches missed.">                    if (!prefix.startsWith(&quot;xmlns:&quot;) &amp;&amp; !prefix.startsWith(p)) {</span>
+<span class="nc" id="L531">                        return false;</span>
                     }
-<span class="fc" id="L529">                }</span>
-<span class="fc" id="L530">                return true;</span>
+<span class="fc" id="L533">                }</span>
+<span class="fc" id="L534">                return true;</span>
             }
         }
-<span class="fc" id="L533">        return false;</span>
+<span class="fc" id="L537">        return false;</span>
     }
 
     /**
@@ -541,8 +545,8 @@ public class Extensions {
      * @return {@code true} if this tag has the same name as the other element.
      */
     public static boolean equals(ICloseElementTag delegate, @Nullable Object other) {
-<span class="pc bpc" id="L544" title="1 of 2 branches missed.">        return other instanceof ICloseElementTag</span>
-<span class="pc bpc" id="L545" title="1 of 2 branches missed.">                &amp;&amp; Objects.equals(delegate.getElementCompleteName(), ((IElementTag) other).getElementCompleteName());</span>
+<span class="pc bpc" id="L548" title="1 of 2 branches missed.">        return other instanceof ICloseElementTag</span>
+<span class="pc bpc" id="L549" title="1 of 2 branches missed.">                &amp;&amp; Objects.equals(delegate.getElementCompleteName(), ((IElementTag) other).getElementCompleteName());</span>
     }
 
     /**
@@ -554,9 +558,9 @@ public class Extensions {
      * other element.
      */
     public static boolean equals(IStandaloneElementTag delegate, @Nullable Object other) {
-<span class="pc bpc" id="L557" title="1 of 2 branches missed.">        return other instanceof IStandaloneElementTag</span>
-<span class="pc bpc" id="L558" title="1 of 2 branches missed.">                &amp;&amp; Objects.equals(delegate.getElementCompleteName(), ((IElementTag) other).getElementCompleteName())</span>
-<span class="pc bpc" id="L559" title="1 of 2 branches missed.">                &amp;&amp; Objects.equals(delegate.getAttributeMap(), ((IProcessableElementTag) other).getAttributeMap());</span>
+<span class="nc bnc" id="L561" title="All 2 branches missed.">        return other instanceof IStandaloneElementTag</span>
+<span class="nc bnc" id="L562" title="All 2 branches missed.">                &amp;&amp; Objects.equals(delegate.getElementCompleteName(), ((IElementTag) other).getElementCompleteName())</span>
+<span class="nc bnc" id="L563" title="All 2 branches missed.">                &amp;&amp; Objects.equals(delegate.getAttributeMap(), ((IProcessableElementTag) other).getAttributeMap());</span>
     }
 
     /**
@@ -571,8 +575,8 @@ public class Extensions {
      * matching name.
      */
     public static boolean equalsName(@Nonnull IAttribute delegate, @Nonnull String prefix, @Nonnull String name) {
-<span class="fc" id="L574">        String attributeName = delegate.getAttributeCompleteName();</span>
-<span class="pc bpc" id="L575" title="1 of 4 branches missed.">        return (prefix + &quot;:&quot; + name).equals(attributeName) || (&quot;data-&quot; + prefix + &quot;-&quot; + name).equals(attributeName);</span>
+<span class="fc" id="L578">        String attributeName = delegate.getAttributeCompleteName();</span>
+<span class="pc bpc" id="L579" title="1 of 4 branches missed.">        return (prefix + &quot;:&quot; + name).equals(attributeName) || (&quot;data-&quot; + prefix + &quot;-&quot; + name).equals(attributeName);</span>
     }
 
     /**
@@ -582,7 +586,7 @@ public class Extensions {
      * @return Attribute name object.
      */
     public static AttributeName getAttributeName(@Nonnull IAttribute delegate) {
-<span class="fc" id="L585">        return delegate.getAttributeDefinition().getAttributeName();</span>
+<span class="fc" id="L589">        return delegate.getAttributeDefinition().getAttributeName();</span>
     }
 
     /**
@@ -593,7 +597,7 @@ public class Extensions {
      * @return {@code true} if the text content matches.
      */
     public static boolean equals(IText delegate, @Nullable Object other) {
-<span class="pc bpc" id="L596" title="2 of 4 branches missed.">        return other instanceof IText &amp;&amp; Objects.equals(delegate.getText(), ((IText) other).getText());</span>
+<span class="pc bpc" id="L600" title="2 of 4 branches missed.">        return other instanceof IText &amp;&amp; Objects.equals(delegate.getText(), ((IText) other).getText());</span>
     }
 
     /**
@@ -603,7 +607,7 @@ public class Extensions {
      * @return {@code true} if, when trimmed, the text content is empty.
      */
     public static boolean isWhitespace(@Nonnull IText delegate) {
-<span class="fc" id="L606">        return delegate.getText().trim().isEmpty();</span>
+<span class="fc" id="L610">        return delegate.getText().trim().isEmpty();</span>
     }
 
     /**
@@ -616,25 +620,25 @@ public class Extensions {
      * dialect being queried hasn't been configured.
      */
     public static String getPrefixForDialect(@Nonnull IExpressionContext delegate, Class&lt;? extends IProcessorDialect&gt; dialectClass) {
-<span class="fc" id="L619">        ConcurrentMap&lt;Class&lt;?&gt;, String&gt; dialectPrefixCache = DialectPrefixCacheHolder.getDialectPrefixCache(delegate);</span>
+<span class="fc" id="L623">        ConcurrentMap&lt;Class&lt;?&gt;, String&gt; dialectPrefixCache = DialectPrefixCacheHolder.getDialectPrefixCache(delegate);</span>
 
-<span class="fc" id="L621">        String dialectPrefix = dialectPrefixCache.get(dialectClass);</span>
-<span class="fc bfc" id="L622" title="All 2 branches covered.">        if (StringUtils.isEmpty(dialectPrefix)) {</span>
-<span class="fc" id="L623">            DialectConfiguration dialectConfiguration = null;</span>
-<span class="pc bpc" id="L624" title="1 of 2 branches missed.">            for (DialectConfiguration dialectConfig : delegate.getConfiguration().getDialectConfigurations()) {</span>
-<span class="fc bfc" id="L625" title="All 2 branches covered.">                if (dialectClass.isInstance(dialectConfig.getDialect())) {</span>
-<span class="fc" id="L626">                    dialectConfiguration = dialectConfig;</span>
-<span class="fc" id="L627">                    break;</span>
+<span class="fc" id="L625">        String dialectPrefix = dialectPrefixCache.get(dialectClass);</span>
+<span class="fc bfc" id="L626" title="All 2 branches covered.">        if (StringUtils.isEmpty(dialectPrefix)) {</span>
+<span class="fc" id="L627">            DialectConfiguration dialectConfiguration = null;</span>
+<span class="pc bpc" id="L628" title="1 of 2 branches missed.">            for (DialectConfiguration dialectConfig : delegate.getConfiguration().getDialectConfigurations()) {</span>
+<span class="fc bfc" id="L629" title="All 2 branches covered.">                if (dialectClass.isInstance(dialectConfig.getDialect())) {</span>
+<span class="fc" id="L630">                    dialectConfiguration = dialectConfig;</span>
+<span class="fc" id="L631">                    break;</span>
                 }
-<span class="fc" id="L629">            }</span>
-<span class="pc bpc" id="L630" title="1 of 2 branches missed.">            dialectPrefix = dialectConfiguration != null</span>
-<span class="pc bfc" id="L631" title="All 2 branches covered.">                    ? dialectConfiguration.isPrefixSpecified() ? dialectConfiguration.getPrefix() : ((IProcessorDialect) dialectConfiguration.getDialect()).getPrefix()</span>
+<span class="fc" id="L633">            }</span>
+<span class="pc bpc" id="L634" title="1 of 2 branches missed.">            dialectPrefix = dialectConfiguration != null</span>
+<span class="pc bfc" id="L635" title="All 2 branches covered.">                    ? dialectConfiguration.isPrefixSpecified() ? dialectConfiguration.getPrefix() : ((IProcessorDialect) dialectConfiguration.getDialect()).getPrefix()</span>
                     : null;
-<span class="pc bpc" id="L633" title="1 of 2 branches missed.">            if (dialectPrefix != null) {</span>
-<span class="fc" id="L634">                dialectPrefixCache.putIfAbsent(dialectClass, dialectPrefix);</span>
+<span class="pc bpc" id="L637" title="1 of 2 branches missed.">            if (dialectPrefix != null) {</span>
+<span class="fc" id="L638">                dialectPrefixCache.putIfAbsent(dialectClass, dialectPrefix);</span>
             }
         }
-<span class="fc" id="L637">        return dialectPrefix;</span>
+<span class="fc" id="L641">        return dialectPrefix;</span>
     }
 
     /**
@@ -649,47 +653,47 @@ public class Extensions {
      */
     @SuppressWarnings(&quot;ValueOfIncrementOrDecrementUsed&quot;)
     private static int calculateModelSize(@Nonnull IModel model, int index) {
-<span class="fc" id="L652">        int eventIndex = index;</span>
-<span class="fc" id="L653">        ITemplateEvent event = model.get(eventIndex++);</span>
+<span class="fc" id="L656">        int eventIndex = index;</span>
+<span class="fc" id="L657">        ITemplateEvent event = model.get(eventIndex++);</span>
 
-<span class="fc bfc" id="L655" title="All 2 branches covered.">        if (event instanceof IOpenElementTag) {</span>
-<span class="fc" id="L656">            int level = 0;</span>
+<span class="fc bfc" id="L659" title="All 2 branches covered.">        if (event instanceof IOpenElementTag) {</span>
+<span class="fc" id="L660">            int level = 0;</span>
             while (true) {
-<span class="fc" id="L658">                event = model.get(eventIndex++);</span>
-<span class="fc bfc" id="L659" title="All 2 branches covered.">                if (event instanceof IOpenElementTag) {</span>
-<span class="fc" id="L660">                    level++;</span>
-<span class="fc bfc" id="L661" title="All 2 branches covered.">                } else if (event instanceof ICloseElementTag) {</span>
-<span class="fc" id="L662">                    ICloseElementTag tag = (ICloseElementTag) event;</span>
-<span class="fc bfc" id="L663" title="All 2 branches covered.">                    if (tag.isUnmatched()) {</span>
+<span class="fc" id="L662">                event = model.get(eventIndex++);</span>
+<span class="fc bfc" id="L663" title="All 2 branches covered.">                if (event instanceof IOpenElementTag) {</span>
+<span class="fc" id="L664">                    level++;</span>
+<span class="fc bfc" id="L665" title="All 2 branches covered.">                } else if (event instanceof ICloseElementTag) {</span>
+<span class="fc" id="L666">                    ICloseElementTag tag = (ICloseElementTag) event;</span>
+<span class="fc bfc" id="L667" title="All 2 branches covered.">                    if (tag.isUnmatched()) {</span>
                         // Do nothing.  Unmatched closing tags do not correspond to any
                         // opening element, and so should not affect the model level.
-<span class="fc bfc" id="L666" title="All 2 branches covered.">                    } else if (level == 0) {</span>
-<span class="fc" id="L667">                        break;</span>
+<span class="fc bfc" id="L670" title="All 2 branches covered.">                    } else if (level == 0) {</span>
+<span class="fc" id="L671">                        break;</span>
                     } else {
-<span class="fc" id="L669">                        level--;</span>
+<span class="fc" id="L673">                        level--;</span>
                     }
-<span class="fc" id="L671">                }</span>
+<span class="fc" id="L675">                }</span>
             }
-<span class="fc" id="L673">            return eventIndex - index;</span>
+<span class="fc" id="L677">            return eventIndex - index;</span>
         }
 
-<span class="fc" id="L676">        return 1;</span>
+<span class="fc" id="L680">        return 1;</span>
     }
 
-<span class="nc" id="L679">    private Extensions() {</span>
-<span class="nc" id="L680">        throw new AssertionError();</span>
+<span class="nc" id="L683">    private Extensions() {</span>
+<span class="nc" id="L684">        throw new AssertionError();</span>
     }
 
     @SuppressWarnings({&quot;UtilityClassWithoutPrivateConstructor&quot;, &quot;NestedAssignment&quot;})
-<span class="nc" id="L684">    private static class DialectPrefixCacheHolder {</span>
+<span class="nc" id="L688">    private static class DialectPrefixCacheHolder {</span>
 
-<span class="fc" id="L686">        private static final ConcurrentWeakIdentityHashMap&lt;IExpressionContext, ConcurrentMap&lt;Class&lt;?&gt;, String&gt;&gt; CACHE</span>
+<span class="fc" id="L690">        private static final ConcurrentWeakIdentityHashMap&lt;IExpressionContext, ConcurrentMap&lt;Class&lt;?&gt;, String&gt;&gt; CACHE</span>
                 = new ConcurrentWeakIdentityHashMap&lt;&gt;(20);
 
         static ConcurrentMap&lt;Class&lt;?&gt;, String&gt; getDialectPrefixCache(IExpressionContext delegate) {
             ConcurrentMap&lt;Class&lt;?&gt;, String&gt; dialectPrefixCache, newCache;
-<span class="fc bfc" id="L691" title="All 2 branches covered.">            return (dialectPrefixCache = CACHE.get(delegate)) == null</span>
-<span class="pc bpc" id="L692" title="1 of 2 branches missed.">                    &amp;&amp; (dialectPrefixCache = CACHE.putIfAbsent(delegate,</span>
+<span class="fc bfc" id="L695" title="All 2 branches covered.">            return (dialectPrefixCache = CACHE.get(delegate)) == null</span>
+<span class="pc bpc" id="L696" title="1 of 2 branches missed.">                    &amp;&amp; (dialectPrefixCache = CACHE.putIfAbsent(delegate,</span>
                             newCache = new ConcurrentHashMap&lt;&gt;(4))) == null
                             ? newCache : dialectPrefixCache;
         }
@@ -697,4 +701,4 @@ public class Extensions {
     }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.8.201612092310</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
