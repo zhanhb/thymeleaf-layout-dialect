@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExpressionProcessor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.expressions</a> &gt; <span class="el_source">ExpressionProcessor.java</span></div><h1>ExpressionProcessor.java</h1><pre class="source lang-java linenums">/*
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExpressionProcessor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.expressions</a> &gt; <span class="el_source">ExpressionProcessor.java</span></div><h1>ExpressionProcessor.java</h1><pre class="source lang-java linenums">/*
  * Copyright 2016, Emanuel Rabina (http://www.ultraq.net.nz/)
  *
  * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
@@ -25,6 +25,7 @@ import org.thymeleaf.context.IExpressionContext;
 import org.thymeleaf.standard.expression.FragmentExpression;
 import org.thymeleaf.standard.expression.IStandardExpression;
 import org.thymeleaf.standard.expression.StandardExpressions;
+import org.thymeleaf.util.StringUtils;
 
 /**
  * A simplified API for working with Thymeleaf expressions.
@@ -34,9 +35,9 @@ import org.thymeleaf.standard.expression.StandardExpressions;
  */
 public class ExpressionProcessor {
 
-<span class="fc" id="L37">    private static final Logger logger = LoggerFactory.getLogger(ExpressionProcessor.class);</span>
-<span class="fc" id="L38">    private static final Pattern THYMELEAF_3_FRAGMENT_EXPRESSION = Pattern.compile(&quot;(?s)^~\\{.+\\}$&quot;);</span>
-<span class="fc" id="L39">    private static final Set&lt;String&gt; oldFragmentExpressions = Collections.newSetFromMap(new ConcurrentHashMap&lt;&gt;());</span>
+<span class="fc" id="L38">    private static final Logger logger = LoggerFactory.getLogger(ExpressionProcessor.class);</span>
+<span class="fc" id="L39">    private static final Pattern THYMELEAF_3_FRAGMENT_EXPRESSION = Pattern.compile(&quot;(?s)^~\\{.+\\}$&quot;);</span>
+<span class="fc" id="L40">    private static final Set&lt;String&gt; oldFragmentExpressions = Collections.newSetFromMap(new ConcurrentHashMap&lt;&gt;());</span>
 
     private final IExpressionContext context;
 
@@ -45,9 +46,9 @@ public class ExpressionProcessor {
      *
      * @param context
      */
-<span class="fc" id="L48">    public ExpressionProcessor(IExpressionContext context) {</span>
-<span class="fc" id="L49">        this.context = context;</span>
-<span class="fc" id="L50">    }</span>
+<span class="fc" id="L49">    public ExpressionProcessor(IExpressionContext context) {</span>
+<span class="fc" id="L50">        this.context = context;</span>
+<span class="fc" id="L51">    }</span>
 
     /**
      * Parses an expression, returning the matching expression type.
@@ -56,8 +57,8 @@ public class ExpressionProcessor {
      * @return Matching expression type.
      */
     public IStandardExpression parse(String expression) {
-<span class="fc" id="L59">        return StandardExpressions.getExpressionParser(context.getConfiguration())</span>
-<span class="fc" id="L60">                .parseExpression(context, expression);</span>
+<span class="fc" id="L60">        return StandardExpressions.getExpressionParser(context.getConfiguration())</span>
+<span class="fc" id="L61">                .parseExpression(context, expression);</span>
     }
 
     /**
@@ -70,18 +71,18 @@ public class ExpressionProcessor {
      * @return A fragment expression.
      */
     public FragmentExpression parseFragmentExpression(String expression) {
-<span class="fc bfc" id="L73" title="All 2 branches covered.">        if (!THYMELEAF_3_FRAGMENT_EXPRESSION.matcher(expression).matches()) {</span>
-<span class="pc bpc" id="L74" title="1 of 2 branches missed.">            if (oldFragmentExpressions.add(expression)) {</span>
-<span class="fc" id="L75">                logger.warn(</span>
+<span class="fc bfc" id="L74" title="All 4 branches covered.">        if (!StringUtils.isEmpty(expression) &amp;&amp; !THYMELEAF_3_FRAGMENT_EXPRESSION.matcher(expression).matches()) {</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">            if (oldFragmentExpressions.add(expression)) {</span>
+<span class="fc" id="L76">                logger.warn(</span>
                         &quot;Fragment expression \&quot;{}\&quot; is being wrapped as a Thymeleaf 3 fragment expression (~{...}) for backwards compatibility purposes.  &quot;
                         + &quot;This wrapping will be dropped in the next major version of the expression processor, so please rewrite as a Thymeleaf 3 fragment expression to future-proof your code.  &quot;
                         + &quot;See https://github.com/thymeleaf/thymeleaf/issues/451 for more information.&quot;,
                         expression);
             }
-<span class="fc" id="L81">            return (FragmentExpression) parse(&quot;~{&quot; + expression + &quot;}&quot;);</span>
+<span class="fc" id="L82">            return (FragmentExpression) parse(&quot;~{&quot; + expression + &quot;}&quot;);</span>
         }
 
-<span class="fc" id="L84">        return (FragmentExpression) parse(expression);</span>
+<span class="fc" id="L85">        return (FragmentExpression) parse(expression);</span>
     }
 
     /**
@@ -92,7 +93,7 @@ public class ExpressionProcessor {
      * @return The result of the expression being executed.
      */
     public Object process(String expression) {
-<span class="fc" id="L95">        return parse(expression).execute(context);</span>
+<span class="fc" id="L96">        return parse(expression).execute(context);</span>
     }
 
     /**
@@ -103,7 +104,7 @@ public class ExpressionProcessor {
      * @return The expression as a string.
      */
     public String processAsString(String expression) {
-<span class="fc" id="L106">        return String.valueOf(process(expression));</span>
+<span class="fc" id="L107">        return String.valueOf(process(expression));</span>
     }
 
 }
