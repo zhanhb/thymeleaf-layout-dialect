@@ -313,6 +313,11 @@ upcoming patches so they don't hold up the release.
    locations.
 
 
+### 1.1.3
+ - `null` check before attempting to check a fragment expression, potential fix
+   for this issue over in the layout dialect:
+   https://github.com/ultraq/thymeleaf-layout-dialect/issues/151
+
 ### 1.1.2
  - Relaxed the root element restriction when using the `LEGACYHTML5` template
    mode due to the way the NekoHTML parser works on HTML fragments

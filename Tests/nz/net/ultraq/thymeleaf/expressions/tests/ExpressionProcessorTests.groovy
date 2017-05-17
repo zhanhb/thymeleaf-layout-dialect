@@ -25,7 +25,6 @@ import org.thymeleaf.TemplateEngine
 import org.thymeleaf.context.ExpressionContext
 import org.thymeleaf.standard.expression.FragmentExpression
 import org.thymeleaf.standard.expression.VariableExpression
-import static org.junit.Assert.*
 
 /**
  * Tests for the expression processor module.
@@ -64,7 +63,7 @@ class ExpressionProcessorTests {
 	void parse() {
 
 		def expression = expressionProcessor.parse('${1 + 1}')
-		assertTrue(expression instanceof VariableExpression)
+		assert expression instanceof VariableExpression
 	}
 
 	/**
@@ -76,13 +75,29 @@ class ExpressionProcessorTests {
 		def fragmentExpression
 
 		fragmentExpression = expressionProcessor.parseFragmentExpression('~{hello.html}')
-		assertTrue(fragmentExpression instanceof FragmentExpression)
-		assertEquals(fragmentExpression.templateName.execute(expressionContext), 'hello.html');
+		assert fragmentExpression instanceof FragmentExpression
+		assert fragmentExpression.templateName.execute(expressionContext) == 'hello.html'
 
 		// Backwards compatibility test
 		fragmentExpression = expressionProcessor.parseFragmentExpression('hello.html')
-		assertTrue(fragmentExpression instanceof FragmentExpression)
-		assertEquals('hello.html', fragmentExpression.templateName.execute(expressionContext));
+		assert fragmentExpression instanceof FragmentExpression
+		assert fragmentExpression.templateName.execute(expressionContext) == 'hello.html'
+	}
+
+	/**
+	 * {@code null} testing of fragment expression parsing since it does
+	 * operations on the expression before passing it to the parser.
+	 */
+	@Test
+	void parseFragmentExpressionNull() {
+
+		try {
+			expressionProcessor.parseFragmentExpression(null)
+			assert false
+		}
+		catch (ex) {
+			assert ex instanceof IllegalArgumentException
+		}
 	}
 
 	/**
@@ -97,15 +112,15 @@ class ExpressionProcessorTests {
 			'blah',
 			1)
 			}''')
-		assertTrue(fragmentExpression instanceof FragmentExpression)
-		assertEquals('hello', fragmentExpression.templateName.execute(expressionContext))
+		assert fragmentExpression instanceof FragmentExpression
+		assert fragmentExpression.templateName.execute(expressionContext) == 'hello'
 
 		// Backwards compatibility test
 		fragmentExpression = expressionProcessor.parseFragmentExpression('''hello::fragment(
 			'blah',
 			1)''')
-		assertTrue(fragmentExpression instanceof FragmentExpression)
-		assertEquals('hello', fragmentExpression.templateName.execute(expressionContext))
+		assert fragmentExpression instanceof FragmentExpression
+		assert fragmentExpression.templateName.execute(expressionContext) == 'hello'
 	}
 
 	/**
@@ -115,7 +130,7 @@ class ExpressionProcessorTests {
 	void process() {
 
 		def result = expressionProcessor.process('${1 + 1}')
-		assertEquals(2, result)
+		assert result == 2
 	}
 
 	/**
@@ -125,6 +140,6 @@ class ExpressionProcessorTests {
 	void processAsString() {
 
 		def resultAsString = expressionProcessor.processAsString('${1 + 1}')
-		assertEquals('2', resultAsString)
+		assert resultAsString == '2'
 	}
 }

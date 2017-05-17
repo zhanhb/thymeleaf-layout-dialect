@@ -25,6 +25,7 @@ import org.thymeleaf.context.IExpressionContext;
 import org.thymeleaf.standard.expression.FragmentExpression;
 import org.thymeleaf.standard.expression.IStandardExpression;
 import org.thymeleaf.standard.expression.StandardExpressions;
+import org.thymeleaf.util.StringUtils;
 
 /**
  * A simplified API for working with Thymeleaf expressions.
@@ -70,7 +71,7 @@ public class ExpressionProcessor {
      * @return A fragment expression.
      */
     public FragmentExpression parseFragmentExpression(String expression) {
-        if (!THYMELEAF_3_FRAGMENT_EXPRESSION.matcher(expression).matches()) {
+        if (!StringUtils.isEmpty(expression) && !THYMELEAF_3_FRAGMENT_EXPRESSION.matcher(expression).matches()) {
             if (oldFragmentExpressions.add(expression)) {
                 logger.warn(
                         "Fragment expression \"{}\" is being wrapped as a Thymeleaf 3 fragment expression (~{...}) for backwards compatibility purposes.  "

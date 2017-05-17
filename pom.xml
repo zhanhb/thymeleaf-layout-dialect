@@ -385,9 +385,9 @@
                                 <name>nz/net/ultraq/thymeleaf/expressions/</name>
                                 <manifestEntries>
                                     <Implementation-Title>Thymeleaf Expression Processor</Implementation-Title>
-                                    <Implementation-Version>1.1.2</Implementation-Version>
+                                    <Implementation-Version>1.1.3</Implementation-Version>
                                     <Specification-Title>Thymeleaf Expression Processor</Specification-Title>
-                                    <Specification-Version>1.1.2</Specification-Version>
+                                    <Specification-Version>1.1.3</Specification-Version>
                                 </manifestEntries>
                             </manifestSection>
                         </manifestSections>
