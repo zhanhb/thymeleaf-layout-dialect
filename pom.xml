@@ -260,11 +260,11 @@
     </dependencies>
 
     <build>
-        <sourceDirectory>${project.basedir}/Source</sourceDirectory>
-        <testSourceDirectory>${project.basedir}/Tests</testSourceDirectory>
+        <sourceDirectory>${project.basedir}/source</sourceDirectory>
+        <testSourceDirectory>${project.basedir}/tests</testSourceDirectory>
         <resources>
             <resource>
-                <directory>${project.basedir}/Source</directory>
+                <directory>${project.basedir}/source</directory>
                 <excludes>
                     <exclude>**/*.java</exclude>
                     <exclude>**/*.groovy</exclude>
@@ -273,7 +273,7 @@
         </resources>
         <testResources>
             <testResource>
-                <directory>${project.basedir}/Tests</directory>
+                <directory>${project.basedir}/tests</directory>
                 <excludes>
                     <exclude>**/*.java</exclude>
                     <exclude>**/*.groovy</exclude>
