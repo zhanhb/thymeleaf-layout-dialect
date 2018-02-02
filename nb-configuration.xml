@@ -13,7 +13,6 @@ You can copy and paste the single properties, into the pom.xml file and the IDE 
 That way multiple projects can share the same settings (useful for formatting rules for example).
 Any value defined here will override the pom.xml file value but is only applicable to the current project.
 -->
-        <org-netbeans-modules-editor-indent.text.x-fortran.CodeStyle.project.text-limit-width>132</org-netbeans-modules-editor-indent.text.x-fortran.CodeStyle.project.text-limit-width>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.importGroupsOrder>*;static *</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.importGroupsOrder>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.separateStaticImports>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.separateStaticImports>
         <org-netbeans-modules-editor-indent.CodeStyle.project.text-line-wrap>none</org-netbeans-modules-editor-indent.CodeStyle.project.text-line-wrap>
@@ -27,6 +26,5 @@ Any value defined here will override the pom.xml file value but is only applicab
         <com-junichi11-netbeans-changelf.use-project>true</com-junichi11-netbeans-changelf.use-project>
         <com-junichi11-netbeans-changelf.lf-kind>LF</com-junichi11-netbeans-changelf.lf-kind>
         <com-junichi11-netbeans-changelf.use-global>false</com-junichi11-netbeans-changelf.use-global>
-        <org-netbeans-modules-javascript2-requirejs.enabled>false</org-netbeans-modules-javascript2-requirejs.enabled>
     </properties>
 </project-shared-configuration>

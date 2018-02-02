@@ -16,6 +16,7 @@
 package nz.net.ultraq.thymeleaf.models;
 
 import nz.net.ultraq.thymeleaf.LayoutDialect;
+import nz.net.ultraq.thymeleaf.fragments.CollectFragmentProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
 import nz.net.ultraq.thymeleaf.internal.Extensions;
 import org.thymeleaf.context.ITemplateContext;
@@ -71,7 +72,8 @@ public class AttributeMerger implements ModelMerger {
         // Merge attributes from the source model's root event to the target model's root event
         for (IAttribute sourceAttribute : ((IProcessableElementTag) sourceModel.get(0)).getAllAttributes()) {
             // Don't include layout:fragment processors
-            if (Extensions.equalsName(sourceAttribute, layoutDialectPrefix, FragmentProcessor.PROCESSOR_NAME)) {
+            if (Extensions.equalsName(sourceAttribute, layoutDialectPrefix, FragmentProcessor.PROCESSOR_NAME)
+                    || Extensions.equalsName(sourceAttribute, layoutDialectPrefix, CollectFragmentProcessor.PROCESSOR_DEFINE)) {
                 continue;
             }
 

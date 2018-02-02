@@ -22,6 +22,7 @@ import nz.net.ultraq.thymeleaf.decorators.DecorateProcessor;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor;
 import nz.net.ultraq.thymeleaf.decorators.strategies.AppendingStrategy;
+import nz.net.ultraq.thymeleaf.fragments.CollectFragmentProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
 import nz.net.ultraq.thymeleaf.includes.InsertProcessor;
 import nz.net.ultraq.thymeleaf.includes.ReplaceProcessor;
@@ -81,6 +82,7 @@ public class LayoutDialect extends AbstractProcessorDialect {
                 new InsertProcessor(TemplateMode.HTML, dialectPrefix),
                 new ReplaceProcessor(TemplateMode.HTML, dialectPrefix),
                 new FragmentProcessor(TemplateMode.HTML, dialectPrefix),
+                new CollectFragmentProcessor(TemplateMode.HTML, dialectPrefix),
                 new TitlePatternProcessor(TemplateMode.HTML, dialectPrefix),
                 // Processors available in the XML template mode
                 new StandardXmlNsTagProcessor(TemplateMode.XML, dialectPrefix),
@@ -89,7 +91,8 @@ public class LayoutDialect extends AbstractProcessorDialect {
                 new nz.net.ultraq.thymeleaf.includes.IncludeProcessor(TemplateMode.XML, dialectPrefix),
                 new InsertProcessor(TemplateMode.XML, dialectPrefix),
                 new ReplaceProcessor(TemplateMode.XML, dialectPrefix),
-                new FragmentProcessor(TemplateMode.XML, dialectPrefix)
+                new FragmentProcessor(TemplateMode.XML, dialectPrefix),
+                new CollectFragmentProcessor(TemplateMode.XML, dialectPrefix)
         ));
     }
 

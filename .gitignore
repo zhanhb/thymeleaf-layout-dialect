@@ -7,6 +7,7 @@
 /Classes
 /node_modules
 npm-debug.log
+bin
 
 # IDEs
 /.idea

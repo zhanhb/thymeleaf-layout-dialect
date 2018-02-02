@@ -15,6 +15,7 @@
  */
 package nz.net.ultraq.thymeleaf.fragments;
 
+import java.util.Deque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.models.ElementMerger;
@@ -71,18 +72,21 @@ public class FragmentProcessor extends AbstractAttributeTagProcessor {
         // Emit a warning if found in the <head> section
         if (getTemplateMode() == TemplateMode.HTML) {
             for (IProcessableElementTag element : context.getElementStack()) {
-                if ("head".equals(element.getElementCompleteName()) && warned.compareAndSet(false, true)) {
-                    logger.warn("You don't need to put the layout:fragment/data-layout-fragment attribute into the <head> section - "
-                            + "the decoration process will automatically copy the <head> section of your content templates into your layout page.");
+                if ("head".equals(element.getElementCompleteName())) {
+                    if (warned.compareAndSet(false, true)) {
+                        logger.warn("You don't need to put the layout:fragment/data-layout-fragment attribute into the <head> section - "
+                                + "the decoration process will automatically copy the <head> section of your content templates into your layout page.");
+                    }
                     break;
                 }
             }
         }
 
         // Locate the fragment that corresponds to this decorator/include fragment
-        IModel fragment = FragmentMap.get(context).get(attributeValue);
+        Deque<IModel> fragments = FragmentMap.get(context).get(attributeValue);
         // Replace the tag body with the fragment
-        if (Extensions.asBoolean(fragment)) {
+        if (fragments != null && !fragments.isEmpty()) {
+            IModel fragment = fragments.peekLast();
             IModelFactory modelFactory = context.getModelFactory();
             IModel replacementModel = new ElementMerger(context).merge(modelFactory.createModel(tag), fragment);
 

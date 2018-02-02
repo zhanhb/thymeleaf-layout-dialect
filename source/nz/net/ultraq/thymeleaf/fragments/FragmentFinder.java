@@ -16,6 +16,8 @@
 package nz.net.ultraq.thymeleaf.fragments;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import nz.net.ultraq.thymeleaf.internal.Extensions;
 import org.thymeleaf.model.IModel;
@@ -53,24 +55,40 @@ public class FragmentFinder {
      * @param model Model whose events are to be searched.
      * @return Map of fragment names and their elements.
      */
-    public Map<String, IModel> findFragments(IModel model) {
-        Map<String, IModel> fragments = new LinkedHashMap<>();
+    public Map<String, List<IModel>> findFragments(IModel model) {
+        Map<String, List<IModel>> fragmentsMap = new LinkedHashMap<>();
 
         for (int eventIndex = 0, size = model.size(); eventIndex < size;) {
             ITemplateEvent event = model.get(eventIndex);
             if (event instanceof IOpenElementTag) {
-                String fragmentName = ((IProcessableElementTag) event).getAttributeValue(dialectPrefix, FragmentProcessor.PROCESSOR_NAME);
+                IProcessableElementTag tag = (IProcessableElementTag) event;
+                String fragmentName = tag.getAttributeValue(dialectPrefix, FragmentProcessor.PROCESSOR_NAME);
+                boolean collect = false;
+                if (StringUtils.isEmpty(fragmentName)) {
+                    collect = true;
+                    fragmentName = tag.getAttributeValue(dialectPrefix, CollectFragmentProcessor.PROCESSOR_DEFINE);
+                    if (StringUtils.isEmpty(fragmentName)) {
+                        fragmentName = tag.getAttributeValue(dialectPrefix, CollectFragmentProcessor.PROCESSOR_COLLECT);
+                    }
+                }
                 if (!StringUtils.isEmpty(fragmentName)) {
                     IModel fragment = Extensions.getModel(model, eventIndex);
-                    fragments.put(fragmentName, fragment);
-                    eventIndex += fragment.size();
-                    continue;
+                    List<IModel> list = fragmentsMap.get(fragmentName);
+                    if (list == null) {
+                        list = new LinkedList<>();
+                        fragmentsMap.put(fragmentName, list);
+                    }
+                    list.add(fragment);
+                    if (!collect) {
+                        eventIndex += fragment.size();
+                        continue;
+                    }
                 }
             }
             eventIndex++;
         }
 
-        return fragments;
+        return fragmentsMap;
     }
 
 }

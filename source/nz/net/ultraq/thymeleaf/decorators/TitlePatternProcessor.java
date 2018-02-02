@@ -93,7 +93,7 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
         IModel layoutTitle = (IModel) context.getVariable(LAYOUT_TITLE_KEY);
 
         if (!StringUtils.isEmpty(titlePattern) && titlePattern.contains(TOKEN_DECORATOR_TITLE)) {
-            if (!warned.compareAndSet(false, true)) {
+            if (warned.compareAndSet(false, true)) {
                 logger.warn(
                         "The $DECORATOR_TITLE token is deprecated and will be removed in the next major version of the layout dialect.  "
                         + "Please use the $LAYOUT_TITLE token instead to future-proof your code.  "

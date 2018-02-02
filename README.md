@@ -20,8 +20,11 @@ Copy the JAR from [one of the release bundles](https://github.com/zhanhb/thymele
 placing it in the classpath of your application, or build the project from the
 source code here on GitHub.
 
-### For Maven and Maven-compatible dependency managers
-Add a dependency to your project with the following co-ordinates:
+For installation instructions, examples, and configuration options for version 2
+of the layout dialect, check out the docs pages over on https://zhanhb.github.io/thymeleaf-layout-dialect/
+
+For docs on version 1 of the layout dialect, the classic readme still exists
+over on https://github.com/zhanhb/thymeleaf-layout-dialect/tree/1.4.x
 
  - GroupId: `com.github.zhanhb`
  - ArtifactId: `thymeleaf-layout-dialect`

@@ -94,7 +94,7 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
         TemplateModel fragmentForInclusion = new TemplateModelFinder(context).findFragment(fragmentExpression);
 
         // Gather all fragment parts within the include element, scoping them to this element
-        Map<String, IModel> includeFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);
+        Map<String, List<IModel>> includeFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);
         FragmentMap.setForNode(context, structureHandler, includeFragments);
 
         // Keep track of what template is being processed?  Thymeleaf does this for

@@ -15,6 +15,7 @@
  */
 package nz.net.ultraq.thymeleaf.decorators;
 
+import java.util.List;
 import java.util.Map;
 import nz.net.ultraq.thymeleaf.decorators.html.HtmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
@@ -118,7 +119,7 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
 
         // Gather all fragment parts from this page to apply to the new document
         // after decoration has taken place
-        Map<String, IModel> pageFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);
+        Map<String, List<IModel>> pageFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);
 
         // Choose the decorator to use based on template mode, then apply it
         TemplateMode templateMode = getTemplateMode();

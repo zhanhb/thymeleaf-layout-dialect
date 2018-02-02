@@ -7,10 +7,11 @@ cache:
   - $HOME/.m2
 jdk:
 - oraclejdk8
+- oraclejdk9
 install: ./mvnw deploy -DskipTests=true -Dmaven.javadoc.skip=true -Dmaven.deploy.skip=true -B -V
 script:
 - ./mvnw install -Dmaven.javadoc.skip=true
 - jdk_switcher use openjdk7 && ./mvnw -Djava.version=1.7 surefire:test
 after_success:
 - bash <(curl -s https://codecov.io/bash)
-- jdk_switcher use oraclejdk8 && source .travis/publish.sh
+- jdk_switcher use oraclejdk8 && [ "$TRAVIS_JDK_VERSION" == "oraclejdk8" ] && source .travis/publish.sh || true

@@ -16,6 +16,9 @@
 package nz.net.ultraq.thymeleaf.fragments;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import org.thymeleaf.context.IContext;
 import org.thymeleaf.model.IModel;
@@ -40,9 +43,10 @@ public class FragmentMap extends HashMap<String, IModel> {
      * @param context
      * @return A new or existing fragment collection for the context.
      */
-    public static FragmentMap get(IContext context) {
-        FragmentMap localVariable = (FragmentMap) context.getVariable(FRAGMENT_COLLECTION_KEY);
-        return localVariable != null && !localVariable.isEmpty() ? localVariable : new FragmentMap();
+    public static Map<String, LinkedList<IModel>> get(IContext context) {
+        @SuppressWarnings("unchecked")
+        Map<String, LinkedList<IModel>> localVariable = (Map<String, LinkedList<IModel>>) context.getVariable(FRAGMENT_COLLECTION_KEY);
+        return localVariable != null ? localVariable : new LinkedHashMap<>();
     }
 
     /**
@@ -54,10 +58,23 @@ public class FragmentMap extends HashMap<String, IModel> {
      * @param fragments The new fragments to add to the map.
      */
     public static void setForNode(IContext context, IElementModelStructureHandler structureHandler,
-            Map<String, IModel> fragments) {
-        FragmentMap fragmentMap = (FragmentMap) get(context).clone();
-        fragmentMap.putAll(fragments);
-        structureHandler.setLocalVariable(FRAGMENT_COLLECTION_KEY, fragmentMap);
+            Map<String, List<IModel>> fragments) {
+        Map<String, List<IModel>> res = fragments;
+        Map<String, ? extends List<IModel>> append = get(context);
+        for (Entry<String, ? extends List<IModel>> entry : append.entrySet()) {
+            String key = entry.getKey();
+            List<IModel> value = entry.getValue();
+            List<IModel> list = res.get(key);
+            if (list != null) {
+                LinkedList<IModel> tmp = new LinkedList<>();
+                tmp.addAll(list);
+                tmp.addAll(value);
+                res.put(key, tmp);
+            } else {
+                res.put(key, value);
+            }
+        }
+        structureHandler.setLocalVariable(FRAGMENT_COLLECTION_KEY, res);
     }
 
 }
