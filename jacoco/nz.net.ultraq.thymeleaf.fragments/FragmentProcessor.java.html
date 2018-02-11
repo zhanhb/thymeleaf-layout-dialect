@@ -15,6 +15,7 @@
  */
 package nz.net.ultraq.thymeleaf.fragments;
 
+import java.util.Deque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.models.ElementMerger;
@@ -38,9 +39,9 @@ import org.thymeleaf.templatemode.TemplateMode;
  */
 public class FragmentProcessor extends AbstractAttributeTagProcessor {
 
-<span class="fc" id="L41">    private static final Logger logger = LoggerFactory.getLogger(FragmentProcessor.class);</span>
+<span class="fc" id="L42">    private static final Logger logger = LoggerFactory.getLogger(FragmentProcessor.class);</span>
 
-<span class="fc" id="L43">    private static final AtomicBoolean warned = new AtomicBoolean();</span>
+<span class="fc" id="L44">    private static final AtomicBoolean warned = new AtomicBoolean();</span>
 
     public static final String PROCESSOR_NAME = &quot;fragment&quot;;
     public static final int PROCESSOR_PRECEDENCE = 1;
@@ -52,8 +53,8 @@ public class FragmentProcessor extends AbstractAttributeTagProcessor {
      * @param dialectPrefix
      */
     public FragmentProcessor(TemplateMode templateMode, String dialectPrefix) {
-<span class="fc" id="L55">        super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);</span>
-<span class="fc" id="L56">    }</span>
+<span class="fc" id="L56">        super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);</span>
+<span class="fc" id="L57">    }</span>
 
     /**
      * Inserts the content of fragments into the encountered fragment
@@ -69,31 +70,34 @@ public class FragmentProcessor extends AbstractAttributeTagProcessor {
     protected void doProcess(ITemplateContext context, IProcessableElementTag tag,
             AttributeName attributeName, String attributeValue, IElementTagStructureHandler structureHandler) {
         // Emit a warning if found in the &lt;head&gt; section
-<span class="fc bfc" id="L72" title="All 2 branches covered.">        if (getTemplateMode() == TemplateMode.HTML) {</span>
-<span class="fc bfc" id="L73" title="All 2 branches covered.">            for (IProcessableElementTag element : context.getElementStack()) {</span>
-<span class="pc bpc" id="L74" title="3 of 4 branches missed.">                if (&quot;head&quot;.equals(element.getElementCompleteName()) &amp;&amp; warned.compareAndSet(false, true)) {</span>
-<span class="nc" id="L75">                    logger.warn(&quot;You don't need to put the layout:fragment/data-layout-fragment attribute into the &lt;head&gt; section - &quot;</span>
-                            + &quot;the decoration process will automatically copy the &lt;head&gt; section of your content templates into your layout page.&quot;);
-<span class="nc" id="L77">                    break;</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        if (getTemplateMode() == TemplateMode.HTML) {</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">            for (IProcessableElementTag element : context.getElementStack()) {</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">                if (&quot;head&quot;.equals(element.getElementCompleteName())) {</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">                    if (warned.compareAndSet(false, true)) {</span>
+<span class="nc" id="L77">                        logger.warn(&quot;You don't need to put the layout:fragment/data-layout-fragment attribute into the &lt;head&gt; section - &quot;</span>
+                                + &quot;the decoration process will automatically copy the &lt;head&gt; section of your content templates into your layout page.&quot;);
+                    }
+                    break;
                 }
-<span class="fc" id="L79">            }</span>
+<span class="fc" id="L82">            }</span>
         }
 
         // Locate the fragment that corresponds to this decorator/include fragment
-<span class="fc" id="L83">        IModel fragment = FragmentMap.get(context).get(attributeValue);</span>
+<span class="fc" id="L86">        Deque&lt;IModel&gt; fragments = FragmentMap.get(context).get(attributeValue);</span>
         // Replace the tag body with the fragment
-<span class="fc bfc" id="L85" title="All 2 branches covered.">        if (Extensions.asBoolean(fragment)) {</span>
-<span class="fc" id="L86">            IModelFactory modelFactory = context.getModelFactory();</span>
-<span class="fc" id="L87">            IModel replacementModel = new ElementMerger(context).merge(modelFactory.createModel(tag), fragment);</span>
+<span class="pc bpc" id="L88" title="1 of 4 branches missed.">        if (fragments != null &amp;&amp; !fragments.isEmpty()) {</span>
+<span class="fc" id="L89">            IModel fragment = fragments.peekLast();</span>
+<span class="fc" id="L90">            IModelFactory modelFactory = context.getModelFactory();</span>
+<span class="fc" id="L91">            IModel replacementModel = new ElementMerger(context).merge(modelFactory.createModel(tag), fragment);</span>
 
             // Remove the layout:fragment attribute - Thymeleaf won't do it for us
             // when using StructureHandler.replaceWith(...)
-<span class="fc" id="L91">            replacementModel.replace(0, modelFactory.removeAttribute((IProcessableElementTag) Extensions.first(replacementModel),</span>
-<span class="fc" id="L92">                    getDialectPrefix(), PROCESSOR_NAME));</span>
+<span class="fc" id="L95">            replacementModel.replace(0, modelFactory.removeAttribute((IProcessableElementTag) Extensions.first(replacementModel),</span>
+<span class="fc" id="L96">                    getDialectPrefix(), PROCESSOR_NAME));</span>
 
-<span class="fc" id="L94">            structureHandler.replaceWith(replacementModel, true);</span>
+<span class="fc" id="L98">            structureHandler.replaceWith(replacementModel, true);</span>
         }
-<span class="fc" id="L96">    }</span>
+<span class="fc" id="L100">    }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

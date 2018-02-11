@@ -22,6 +22,7 @@ import nz.net.ultraq.thymeleaf.decorators.DecorateProcessor;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor;
 import nz.net.ultraq.thymeleaf.decorators.strategies.AppendingStrategy;
+import nz.net.ultraq.thymeleaf.fragments.CollectFragmentProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
 import nz.net.ultraq.thymeleaf.includes.InsertProcessor;
 import nz.net.ultraq.thymeleaf.includes.ReplaceProcessor;
@@ -52,16 +53,16 @@ public class LayoutDialect extends AbstractProcessorDialect {
      * @param sortingStrategy
      */
     public LayoutDialect(SortingStrategy sortingStrategy) {
-<span class="fc" id="L55">        super(DIALECT_NAME, DIALECT_PREFIX, DIALECT_PRECEDENCE);</span>
-<span class="fc" id="L56">        this.sortingStrategy = sortingStrategy;</span>
-<span class="fc" id="L57">    }</span>
+<span class="fc" id="L56">        super(DIALECT_NAME, DIALECT_PREFIX, DIALECT_PRECEDENCE);</span>
+<span class="fc" id="L57">        this.sortingStrategy = sortingStrategy;</span>
+<span class="fc" id="L58">    }</span>
 
     /**
      * Constructor, configure the layout dialect with the appending strategy.
      */
     public LayoutDialect() {
-<span class="fc" id="L63">        this(new AppendingStrategy());</span>
-<span class="fc" id="L64">    }</span>
+<span class="fc" id="L64">        this(new AppendingStrategy());</span>
+<span class="fc" id="L65">    }</span>
 
     /**
      * Returns the layout dialect's processors.
@@ -72,7 +73,7 @@ public class LayoutDialect extends AbstractProcessorDialect {
     @Override
     @SuppressWarnings(&quot;deprecation&quot;)
     public Set&lt;IProcessor&gt; getProcessors(String dialectPrefix) {
-<span class="fc" id="L75">        return new LinkedHashSet&lt;&gt;(Arrays.asList(</span>
+<span class="fc" id="L76">        return new LinkedHashSet&lt;&gt;(Arrays.asList(</span>
                 // Processors available in the HTML template mode
                 new StandardXmlNsTagProcessor(TemplateMode.HTML, dialectPrefix),
                 new DecorateProcessor(TemplateMode.HTML, dialectPrefix, sortingStrategy),
@@ -81,6 +82,7 @@ public class LayoutDialect extends AbstractProcessorDialect {
                 new InsertProcessor(TemplateMode.HTML, dialectPrefix),
                 new ReplaceProcessor(TemplateMode.HTML, dialectPrefix),
                 new FragmentProcessor(TemplateMode.HTML, dialectPrefix),
+                new CollectFragmentProcessor(TemplateMode.HTML, dialectPrefix),
                 new TitlePatternProcessor(TemplateMode.HTML, dialectPrefix),
                 // Processors available in the XML template mode
                 new StandardXmlNsTagProcessor(TemplateMode.XML, dialectPrefix),
@@ -89,9 +91,10 @@ public class LayoutDialect extends AbstractProcessorDialect {
                 new nz.net.ultraq.thymeleaf.includes.IncludeProcessor(TemplateMode.XML, dialectPrefix),
                 new InsertProcessor(TemplateMode.XML, dialectPrefix),
                 new ReplaceProcessor(TemplateMode.XML, dialectPrefix),
-                new FragmentProcessor(TemplateMode.XML, dialectPrefix)
+                new FragmentProcessor(TemplateMode.XML, dialectPrefix),
+                new CollectFragmentProcessor(TemplateMode.XML, dialectPrefix)
         ));
     }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

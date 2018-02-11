@@ -93,7 +93,7 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
 <span class="fc" id="L93">        IModel layoutTitle = (IModel) context.getVariable(LAYOUT_TITLE_KEY);</span>
 
 <span class="pc bpc" id="L95" title="2 of 4 branches missed.">        if (!StringUtils.isEmpty(titlePattern) &amp;&amp; titlePattern.contains(TOKEN_DECORATOR_TITLE)) {</span>
-<span class="nc bnc" id="L96" title="All 2 branches missed.">            if (!warned.compareAndSet(false, true)) {</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">            if (warned.compareAndSet(false, true)) {</span>
 <span class="nc" id="L97">                logger.warn(</span>
                         &quot;The $DECORATOR_TITLE token is deprecated and will be removed in the next major version of the layout dialect.  &quot;
                         + &quot;Please use the $LAYOUT_TITLE token instead to future-proof your code.  &quot;
@@ -129,4 +129,4 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
 <span class="fc" id="L129">    }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

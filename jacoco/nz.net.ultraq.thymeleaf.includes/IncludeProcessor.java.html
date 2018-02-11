@@ -94,7 +94,7 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
 <span class="fc" id="L94">        TemplateModel fragmentForInclusion = new TemplateModelFinder(context).findFragment(fragmentExpression);</span>
 
         // Gather all fragment parts within the include element, scoping them to this element
-<span class="fc" id="L97">        Map&lt;String, IModel&gt; includeFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);</span>
+<span class="fc" id="L97">        Map&lt;String, List&lt;IModel&gt;&gt; includeFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);</span>
 <span class="fc" id="L98">        FragmentMap.setForNode(context, structureHandler, includeFragments);</span>
 
         // Keep track of what template is being processed?  Thymeleaf does this for
@@ -139,4 +139,4 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
 <span class="fc" id="L139">    }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

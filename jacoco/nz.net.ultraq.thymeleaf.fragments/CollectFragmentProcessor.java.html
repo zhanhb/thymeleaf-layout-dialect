@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CollectFragmentProcessor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.fragments</a> &gt; <span class="el_source">CollectFragmentProcessor.java</span></div><h1>CollectFragmentProcessor.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2017, Emanuel Rabina (http://www.ultraq.net.nz/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package nz.net.ultraq.thymeleaf.fragments;
+
+import java.util.Queue;
+import java.util.concurrent.atomic.AtomicBoolean;
+import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.models.ElementMerger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.engine.AttributeName;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IModelFactory;
+import org.thymeleaf.model.IProcessableElementTag;
+import org.thymeleaf.processor.element.AbstractAttributeTagProcessor;
+import org.thymeleaf.processor.element.IElementTagStructureHandler;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.util.StringUtils;
+
+/**
+ * Processor produced from FragmentProcessor in order to separate include and
+ * define logic to avoid ambiguity.
+ *
+ * @author zhanhb
+ * @author Emanuel Rabina
+ * @author George Vinokhodov
+ */
+public class CollectFragmentProcessor extends AbstractAttributeTagProcessor {
+
+<span class="fc" id="L44">    private static final Logger logger = LoggerFactory.getLogger(CollectFragmentProcessor.class);</span>
+
+<span class="fc" id="L46">    private static final AtomicBoolean warned = new AtomicBoolean();</span>
+
+    public static final String PROCESSOR_DEFINE = &quot;define&quot;;
+    public static final String PROCESSOR_COLLECT = &quot;collect&quot;;
+    public static final int PROCESSOR_PRECEDENCE = 1;
+
+    /**
+     * Constructor, sets this processor to work on the 'collect' attribute.
+     *
+     * @param templateMode
+     * @param dialectPrefix
+     */
+    public CollectFragmentProcessor(TemplateMode templateMode, String dialectPrefix) {
+
+<span class="fc" id="L60">        super(templateMode, dialectPrefix, null, false, PROCESSOR_COLLECT, true, PROCESSOR_PRECEDENCE, true);</span>
+<span class="fc" id="L61">    }</span>
+
+    /**
+     * Inserts the content of &lt;code&gt;:define&lt;/code&gt; fragments into the
+     * encountered collect placeholder.
+     *
+     * @param context
+     * @param tag
+     * @param attributeName
+     * @param attributeValue
+     * @param structureHandler
+     */
+    @Override
+    @SuppressWarnings(&quot;AssignmentToStaticFieldFromInstanceMethod&quot;)
+    protected void doProcess(ITemplateContext context, IProcessableElementTag tag,
+            AttributeName attributeName, String attributeValue, IElementTagStructureHandler structureHandler) {
+
+        // Emit a warning if found in the &lt;head&gt; section
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">        if (getTemplateMode() == TemplateMode.HTML) {</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">            for (IProcessableElementTag element : context.getElementStack()) {</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">                if (&quot;head&quot;.equals(element.getElementCompleteName())) {</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">                    if (warned.compareAndSet(false, true)) {</span>
+<span class="nc" id="L83">                        logger.warn(</span>
+                                &quot;You don\'t need to put the layout:fragment/data-layout-fragment attribute into the &lt;head&gt; section - &quot;
+                                + &quot;the decoration process will automatically copy the &lt;head&gt; section of your content templates into your layout page.&quot;
+                        );
+                    }
+                    break;
+                }
+<span class="nc" id="L90">            }</span>
+        }
+
+        // All :define fragments we collected, :collect fragments included to determine where to stop.
+        // Fragments after :collect are preserved for the next :collect event
+<span class="fc" id="L95">        Queue&lt;IModel&gt; fragments = FragmentMap.get(context).get(attributeValue);</span>
+
+        // Replace the tag body with the fragment
+<span class="pc bpc" id="L98" title="2 of 4 branches missed.">        if (fragments != null &amp;&amp; !fragments.isEmpty()) {</span>
+<span class="fc" id="L99">            IModelFactory modelFactory = context.getModelFactory();</span>
+<span class="fc" id="L100">            ElementMerger merger = new ElementMerger(context);</span>
+<span class="fc" id="L101">            IModel[] replacementModel = new IModel[]{modelFactory.createModel(tag)};</span>
+<span class="fc" id="L102">            boolean first = true;</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">            while (!fragments.isEmpty()) {</span>
+<span class="fc" id="L104">                IModel fragment = fragments.poll();</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">                if (!StringUtils.isEmpty(((IProcessableElementTag) fragment.get(0)).getAttributeValue(getDialectPrefix(), CollectFragmentProcessor.PROCESSOR_COLLECT))) {</span>
+<span class="fc" id="L106">                    break;</span>
+                }
+<span class="fc bfc" id="L108" title="All 2 branches covered.">                if (first) {</span>
+<span class="fc" id="L109">                    replacementModel[0] = merger.merge(replacementModel[0], fragment);</span>
+<span class="fc" id="L110">                    first = false;</span>
+                } else {
+<span class="fc" id="L112">                    AtomicBoolean firstEvent = new AtomicBoolean(true);</span>
+<span class="fc" id="L113">                    Extensions.each(fragment, event -&gt; {</span>
+<span class="fc bfc" id="L114" title="All 2 branches covered.">                        if (firstEvent.compareAndSet(true, false)) {</span>
+<span class="fc" id="L115">                            replacementModel[0].add(modelFactory.createText(&quot;\n&quot;));</span>
+<span class="fc" id="L116">                            replacementModel[0].add(modelFactory.removeAttribute((IProcessableElementTag) event, getDialectPrefix(), PROCESSOR_DEFINE));</span>
+                        } else {
+<span class="fc" id="L118">                            replacementModel[0].add(event);</span>
+                        }
+<span class="fc" id="L120">                    });</span>
+                }
+<span class="fc" id="L122">            }</span>
+
+            // Remove the layout:collect attribute - Thymeleaf won't do it for us
+            // when using StructureHandler.replaceWith(...)
+<span class="fc" id="L126">            replacementModel[0].replace(0, modelFactory.removeAttribute((IProcessableElementTag) Extensions.first(replacementModel[0]), getDialectPrefix(), PROCESSOR_COLLECT));</span>
+
+<span class="fc" id="L128">            structureHandler.replaceWith(replacementModel[0], true);</span>
+        }
+<span class="fc" id="L130">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

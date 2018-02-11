@@ -16,6 +16,8 @@
 package nz.net.ultraq.thymeleaf.fragments;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import nz.net.ultraq.thymeleaf.internal.Extensions;
 import org.thymeleaf.model.IModel;
@@ -41,9 +43,9 @@ public class FragmentFinder {
      *
      * @param dialectPrefix
      */
-<span class="fc" id="L44">    public FragmentFinder(String dialectPrefix) {</span>
-<span class="fc" id="L45">        this.dialectPrefix = dialectPrefix;</span>
-<span class="fc" id="L46">    }</span>
+<span class="fc" id="L46">    public FragmentFinder(String dialectPrefix) {</span>
+<span class="fc" id="L47">        this.dialectPrefix = dialectPrefix;</span>
+<span class="fc" id="L48">    }</span>
 
     /**
      * Find and return models for layout dialect fragments within the scope of
@@ -53,25 +55,41 @@ public class FragmentFinder {
      * @param model Model whose events are to be searched.
      * @return Map of fragment names and their elements.
      */
-    public Map&lt;String, IModel&gt; findFragments(IModel model) {
-<span class="fc" id="L57">        Map&lt;String, IModel&gt; fragments = new LinkedHashMap&lt;&gt;();</span>
+    public Map&lt;String, List&lt;IModel&gt;&gt; findFragments(IModel model) {
+<span class="fc" id="L59">        Map&lt;String, List&lt;IModel&gt;&gt; fragmentsMap = new LinkedHashMap&lt;&gt;();</span>
 
-<span class="fc bfc" id="L59" title="All 2 branches covered.">        for (int eventIndex = 0, size = model.size(); eventIndex &lt; size;) {</span>
-<span class="fc" id="L60">            ITemplateEvent event = model.get(eventIndex);</span>
-<span class="fc bfc" id="L61" title="All 2 branches covered.">            if (event instanceof IOpenElementTag) {</span>
-<span class="fc" id="L62">                String fragmentName = ((IProcessableElementTag) event).getAttributeValue(dialectPrefix, FragmentProcessor.PROCESSOR_NAME);</span>
-<span class="fc bfc" id="L63" title="All 2 branches covered.">                if (!StringUtils.isEmpty(fragmentName)) {</span>
-<span class="fc" id="L64">                    IModel fragment = Extensions.getModel(model, eventIndex);</span>
-<span class="fc" id="L65">                    fragments.put(fragmentName, fragment);</span>
-<span class="fc" id="L66">                    eventIndex += fragment.size();</span>
-<span class="fc" id="L67">                    continue;</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        for (int eventIndex = 0, size = model.size(); eventIndex &lt; size;) {</span>
+<span class="fc" id="L62">            ITemplateEvent event = model.get(eventIndex);</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">            if (event instanceof IOpenElementTag) {</span>
+<span class="fc" id="L64">                IProcessableElementTag tag = (IProcessableElementTag) event;</span>
+<span class="fc" id="L65">                String fragmentName = tag.getAttributeValue(dialectPrefix, FragmentProcessor.PROCESSOR_NAME);</span>
+<span class="fc" id="L66">                boolean collect = false;</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">                if (StringUtils.isEmpty(fragmentName)) {</span>
+<span class="fc" id="L68">                    collect = true;</span>
+<span class="fc" id="L69">                    fragmentName = tag.getAttributeValue(dialectPrefix, CollectFragmentProcessor.PROCESSOR_DEFINE);</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">                    if (StringUtils.isEmpty(fragmentName)) {</span>
+<span class="fc" id="L71">                        fragmentName = tag.getAttributeValue(dialectPrefix, CollectFragmentProcessor.PROCESSOR_COLLECT);</span>
+                    }
+                }
+<span class="fc bfc" id="L74" title="All 2 branches covered.">                if (!StringUtils.isEmpty(fragmentName)) {</span>
+<span class="fc" id="L75">                    IModel fragment = Extensions.getModel(model, eventIndex);</span>
+<span class="fc" id="L76">                    List&lt;IModel&gt; list = fragmentsMap.get(fragmentName);</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">                    if (list == null) {</span>
+<span class="fc" id="L78">                        list = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L79">                        fragmentsMap.put(fragmentName, list);</span>
+                    }
+<span class="fc" id="L81">                    list.add(fragment);</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">                    if (!collect) {</span>
+<span class="fc" id="L83">                        eventIndex += fragment.size();</span>
+<span class="fc" id="L84">                        continue;</span>
+                    }
                 }
             }
-<span class="fc" id="L70">            eventIndex++;</span>
-<span class="fc" id="L71">        }</span>
+<span class="fc" id="L88">            eventIndex++;</span>
+<span class="fc" id="L89">        }</span>
 
-<span class="fc" id="L73">        return fragments;</span>
+<span class="fc" id="L91">        return fragmentsMap;</span>
     }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

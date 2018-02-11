@@ -16,6 +16,7 @@
 package nz.net.ultraq.thymeleaf.models;
 
 import nz.net.ultraq.thymeleaf.LayoutDialect;
+import nz.net.ultraq.thymeleaf.fragments.CollectFragmentProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
 import nz.net.ultraq.thymeleaf.internal.Extensions;
 import org.thymeleaf.context.ITemplateContext;
@@ -40,9 +41,9 @@ public class AttributeMerger implements ModelMerger {
      *
      * @param context
      */
-<span class="fc" id="L43">    public AttributeMerger(ITemplateContext context) {</span>
-<span class="fc" id="L44">        this.context = context;</span>
-<span class="fc" id="L45">    }</span>
+<span class="fc" id="L44">    public AttributeMerger(ITemplateContext context) {</span>
+<span class="fc" id="L45">        this.context = context;</span>
+<span class="fc" id="L46">    }</span>
 
     /**
      * Merge the attributes of the source element with those of the target
@@ -59,38 +60,39 @@ public class AttributeMerger implements ModelMerger {
     public IModel merge(IModel targetModel, IModel sourceModel) {
         // If one of the parameters is missing return a copy of the other, or
         // nothing if both parameters are missing.
-<span class="fc bfc" id="L62" title="All 4 branches covered.">        if (!Extensions.asBoolean(targetModel) || !Extensions.asBoolean(sourceModel)) {</span>
-<span class="fc bfc" id="L63" title="All 2 branches covered.">            IModel result = Extensions.asBoolean(targetModel) ? targetModel.cloneModel() : null;</span>
-<span class="pc bpc" id="L64" title="1 of 4 branches missed.">            return Extensions.asBoolean(result) ? result : Extensions.asBoolean(sourceModel) ? sourceModel.cloneModel() : null;</span>
+<span class="fc bfc" id="L63" title="All 4 branches covered.">        if (!Extensions.asBoolean(targetModel) || !Extensions.asBoolean(sourceModel)) {</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">            IModel result = Extensions.asBoolean(targetModel) ? targetModel.cloneModel() : null;</span>
+<span class="pc bpc" id="L65" title="1 of 4 branches missed.">            return Extensions.asBoolean(result) ? result : Extensions.asBoolean(sourceModel) ? sourceModel.cloneModel() : null;</span>
         }
 
-<span class="fc" id="L67">        IModel mergedModel = targetModel.cloneModel();</span>
-<span class="fc" id="L68">        String layoutDialectPrefix = Extensions.getPrefixForDialect(context, LayoutDialect.class);</span>
-<span class="fc" id="L69">        String standardDialectPrefix = Extensions.getPrefixForDialect(context, StandardDialect.class);</span>
+<span class="fc" id="L68">        IModel mergedModel = targetModel.cloneModel();</span>
+<span class="fc" id="L69">        String layoutDialectPrefix = Extensions.getPrefixForDialect(context, LayoutDialect.class);</span>
+<span class="fc" id="L70">        String standardDialectPrefix = Extensions.getPrefixForDialect(context, StandardDialect.class);</span>
 
         // Merge attributes from the source model's root event to the target model's root event
-<span class="fc bfc" id="L72" title="All 2 branches covered.">        for (IAttribute sourceAttribute : ((IProcessableElementTag) sourceModel.get(0)).getAllAttributes()) {</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        for (IAttribute sourceAttribute : ((IProcessableElementTag) sourceModel.get(0)).getAllAttributes()) {</span>
             // Don't include layout:fragment processors
-<span class="fc bfc" id="L74" title="All 2 branches covered.">            if (Extensions.equalsName(sourceAttribute, layoutDialectPrefix, FragmentProcessor.PROCESSOR_NAME)) {</span>
-<span class="fc" id="L75">                continue;</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">            if (Extensions.equalsName(sourceAttribute, layoutDialectPrefix, FragmentProcessor.PROCESSOR_NAME)</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">                    || Extensions.equalsName(sourceAttribute, layoutDialectPrefix, CollectFragmentProcessor.PROCESSOR_DEFINE)) {</span>
+<span class="fc" id="L77">                continue;</span>
             }
 
-<span class="fc" id="L78">            IProcessableElementTag mergedEvent = (IProcessableElementTag) Extensions.first(mergedModel);</span>
+<span class="fc" id="L80">            IProcessableElementTag mergedEvent = (IProcessableElementTag) Extensions.first(mergedModel);</span>
             String mergedAttributeValue; // Merge th:with attributes
-<span class="fc bfc" id="L80" title="All 2 branches covered.">            if (Extensions.equalsName(sourceAttribute, standardDialectPrefix, StandardWithTagProcessor.ATTR_NAME)) {</span>
-<span class="fc" id="L81">                mergedAttributeValue = new VariableDeclarationMerger(context).merge(sourceAttribute.getValue(),</span>
-<span class="fc" id="L82">                        mergedEvent.getAttributeValue(standardDialectPrefix, StandardWithTagProcessor.ATTR_NAME));</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">            if (Extensions.equalsName(sourceAttribute, standardDialectPrefix, StandardWithTagProcessor.ATTR_NAME)) {</span>
+<span class="fc" id="L83">                mergedAttributeValue = new VariableDeclarationMerger(context).merge(sourceAttribute.getValue(),</span>
+<span class="fc" id="L84">                        mergedEvent.getAttributeValue(standardDialectPrefix, StandardWithTagProcessor.ATTR_NAME));</span>
             } else { // Copy every other attribute straight
-<span class="fc" id="L84">                mergedAttributeValue = sourceAttribute.getValue();</span>
+<span class="fc" id="L86">                mergedAttributeValue = sourceAttribute.getValue();</span>
             }
 
-<span class="fc" id="L87">            mergedModel.replace(0, context.getModelFactory().replaceAttribute(mergedEvent,</span>
-<span class="fc" id="L88">                    Extensions.getAttributeName(sourceAttribute), sourceAttribute.getAttributeCompleteName(),</span>
+<span class="fc" id="L89">            mergedModel.replace(0, context.getModelFactory().replaceAttribute(mergedEvent,</span>
+<span class="fc" id="L90">                    Extensions.getAttributeName(sourceAttribute), sourceAttribute.getAttributeCompleteName(),</span>
                     mergedAttributeValue));
         }
 
-<span class="fc" id="L92">        return mergedModel;</span>
+<span class="fc" id="L94">        return mergedModel;</span>
     }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

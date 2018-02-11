@@ -104,12 +104,12 @@ public class Extensions {
      * @param closure
      */
     public static void each(@Nullable IModel delegate, @Nonnull ITemplateEventConsumer closure) {
-<span class="nc bnc" id="L107" title="All 2 branches missed.">        if (delegate != null) {</span>
-<span class="nc bnc" id="L108" title="All 2 branches missed.">            for (int i = 0, size = delegate.size(); i &lt; size; i++) {</span>
-<span class="nc" id="L109">                closure.accept(delegate.get(i));</span>
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">        if (delegate != null) {</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">            for (int i = 0, size = delegate.size(); i &lt; size; i++) {</span>
+<span class="fc" id="L109">                closure.accept(delegate.get(i));</span>
             }
         }
-<span class="nc" id="L112">    }</span>
+<span class="fc" id="L112">    }</span>
 
     /**
      * Compare 2 models, returning {@code true} if all of the model's events are
@@ -685,7 +685,7 @@ public class Extensions {
     }
 
     @SuppressWarnings({&quot;UtilityClassWithoutPrivateConstructor&quot;, &quot;NestedAssignment&quot;})
-<span class="nc" id="L688">    private static class DialectPrefixCacheHolder {</span>
+    private static class DialectPrefixCacheHolder {
 
 <span class="fc" id="L690">        private static final ConcurrentWeakIdentityHashMap&lt;IExpressionContext, ConcurrentMap&lt;Class&lt;?&gt;, String&gt;&gt; CACHE</span>
                 = new ConcurrentWeakIdentityHashMap&lt;&gt;(20);
@@ -701,4 +701,4 @@ public class Extensions {
     }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

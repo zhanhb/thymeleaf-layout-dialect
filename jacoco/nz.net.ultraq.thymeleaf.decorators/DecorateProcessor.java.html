@@ -15,6 +15,7 @@
  */
 package nz.net.ultraq.thymeleaf.decorators;
 
+import java.util.List;
 import java.util.Map;
 import nz.net.ultraq.thymeleaf.decorators.html.HtmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
@@ -57,8 +58,8 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
      * @param sortingStrategy
      */
     public DecorateProcessor(TemplateMode templateMode, String dialectPrefix, SortingStrategy sortingStrategy) {
-<span class="fc" id="L60">        this(templateMode, dialectPrefix, sortingStrategy, PROCESSOR_NAME);</span>
-<span class="fc" id="L61">    }</span>
+<span class="fc" id="L61">        this(templateMode, dialectPrefix, sortingStrategy, PROCESSOR_NAME);</span>
+<span class="fc" id="L62">    }</span>
 
     /**
      * Constructor, configurable processor name so that I could support the
@@ -71,9 +72,9 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
      */
     protected DecorateProcessor(TemplateMode templateMode, String dialectPrefix, SortingStrategy sortingStrategy,
             String attributeName) {
-<span class="fc" id="L74">        super(templateMode, dialectPrefix, null, false, attributeName, true, PROCESSOR_PRECEDENCE, false);</span>
-<span class="fc" id="L75">        this.sortingStrategy = sortingStrategy;</span>
-<span class="fc" id="L76">    }</span>
+<span class="fc" id="L75">        super(templateMode, dialectPrefix, null, false, attributeName, true, PROCESSOR_PRECEDENCE, false);</span>
+<span class="fc" id="L76">        this.sortingStrategy = sortingStrategy;</span>
+<span class="fc" id="L77">    }</span>
 
     /**
      * Locates the template to decorate and, once decorated, inserts it into the
@@ -89,55 +90,55 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
     protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
             String attributeValue, IElementModelStructureHandler structureHandler) {
 
-<span class="fc" id="L92">        TemplateModelFinder templateModelFinder = new TemplateModelFinder(context);</span>
+<span class="fc" id="L93">        TemplateModelFinder templateModelFinder = new TemplateModelFinder(context);</span>
 
         // Load the entirety of this template so we can access items outside of the root element
-<span class="fc" id="L95">        String contentTemplateName = context.getTemplateData().getTemplate();</span>
-<span class="fc" id="L96">        IModel contentTemplate = templateModelFinder.findTemplate(contentTemplateName).cloneModel();</span>
+<span class="fc" id="L96">        String contentTemplateName = context.getTemplateData().getTemplate();</span>
+<span class="fc" id="L97">        IModel contentTemplate = templateModelFinder.findTemplate(contentTemplateName).cloneModel();</span>
 
         // Check that the root element is the same as the one currently being processed
-<span class="fc" id="L99">        IOpenElementTag contentRootEvent = (IOpenElementTag) Extensions.find(contentTemplate, event -&gt; event instanceof IOpenElementTag);</span>
-<span class="fc" id="L100">        IProcessableElementTag rootElement = (IProcessableElementTag) Extensions.first(model);</span>
+<span class="fc" id="L100">        IOpenElementTag contentRootEvent = (IOpenElementTag) Extensions.find(contentTemplate, event -&gt; event instanceof IOpenElementTag);</span>
+<span class="fc" id="L101">        IProcessableElementTag rootElement = (IProcessableElementTag) Extensions.first(model);</span>
         // TODO content equals
-<span class="fc bfc" id="L102" title="All 2 branches covered.">        if (!Extensions.equalsIgnoreXmlnsAndThWith(contentRootEvent, context, rootElement)) {</span>
-<span class="fc" id="L103">            throw new IllegalArgumentException(&quot;layout:decorate/data-layout-decorate must appear in the root element of your template&quot;);</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">        if (!Extensions.equalsIgnoreXmlnsAndThWith(contentRootEvent, context, rootElement)) {</span>
+<span class="fc" id="L104">            throw new IllegalArgumentException(&quot;layout:decorate/data-layout-decorate must appear in the root element of your template&quot;);</span>
         }
 
         // Remove the decorate processor from the root element
-<span class="pc bpc" id="L107" title="1 of 2 branches missed.">        if (rootElement.hasAttribute(attributeName)) {</span>
-<span class="fc" id="L108">            rootElement = context.getModelFactory().removeAttribute(rootElement, attributeName);</span>
-<span class="fc" id="L109">            model.replace(0, rootElement);</span>
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">        if (rootElement.hasAttribute(attributeName)) {</span>
+<span class="fc" id="L109">            rootElement = context.getModelFactory().removeAttribute(rootElement, attributeName);</span>
+<span class="fc" id="L110">            model.replace(0, rootElement);</span>
         }
-<span class="fc" id="L111">        Extensions.replaceModel(contentTemplate, Extensions.findIndexOf(contentTemplate, event -&gt; event instanceof IOpenElementTag), model);</span>
+<span class="fc" id="L112">        Extensions.replaceModel(contentTemplate, Extensions.findIndexOf(contentTemplate, event -&gt; event instanceof IOpenElementTag), model);</span>
 
         // Locate the template to decorate
-<span class="fc" id="L114">        FragmentExpression decorateTemplateExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);</span>
-<span class="fc" id="L115">        TemplateModel decorateTemplate = templateModelFinder.findTemplate(decorateTemplateExpression);</span>
-<span class="fc" id="L116">        TemplateData decorateTemplateData = decorateTemplate.getTemplateData();</span>
-<span class="fc" id="L117">        IModel clone = decorateTemplate.cloneModel();</span>
+<span class="fc" id="L115">        FragmentExpression decorateTemplateExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);</span>
+<span class="fc" id="L116">        TemplateModel decorateTemplate = templateModelFinder.findTemplate(decorateTemplateExpression);</span>
+<span class="fc" id="L117">        TemplateData decorateTemplateData = decorateTemplate.getTemplateData();</span>
+<span class="fc" id="L118">        IModel clone = decorateTemplate.cloneModel();</span>
 
         // Gather all fragment parts from this page to apply to the new document
         // after decoration has taken place
-<span class="fc" id="L121">        Map&lt;String, IModel&gt; pageFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);</span>
+<span class="fc" id="L122">        Map&lt;String, List&lt;IModel&gt;&gt; pageFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);</span>
 
         // Choose the decorator to use based on template mode, then apply it
-<span class="fc" id="L124">        TemplateMode templateMode = getTemplateMode();</span>
-<span class="pc bpc" id="L125" title="1 of 4 branches missed.">        XmlDocumentDecorator decorator</span>
+<span class="fc" id="L125">        TemplateMode templateMode = getTemplateMode();</span>
+<span class="pc bpc" id="L126" title="1 of 4 branches missed.">        XmlDocumentDecorator decorator</span>
                 = templateMode == TemplateMode.HTML ? new HtmlDocumentDecorator(context, sortingStrategy)
                         : templateMode == TemplateMode.XML ? new XmlDocumentDecorator(context)
                                 : null;
-<span class="pc bpc" id="L129" title="1 of 2 branches missed.">        if (decorator == null) {</span>
-<span class="nc" id="L130">            throw new IllegalArgumentException(</span>
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">        if (decorator == null) {</span>
+<span class="nc" id="L131">            throw new IllegalArgumentException(</span>
                     &quot;Layout dialect cannot be applied to the &quot; + templateMode + &quot; template mode, only HTML and XML template modes are currently supported&quot;
             );
         }
-<span class="fc" id="L134">        IModel resultTemplate = decorator.decorate(clone, contentTemplate);</span>
-<span class="fc" id="L135">        Extensions.replaceModel(model, 0, resultTemplate);</span>
-<span class="fc" id="L136">        structureHandler.setTemplateData(decorateTemplateData);</span>
+<span class="fc" id="L135">        IModel resultTemplate = decorator.decorate(clone, contentTemplate);</span>
+<span class="fc" id="L136">        Extensions.replaceModel(model, 0, resultTemplate);</span>
+<span class="fc" id="L137">        structureHandler.setTemplateData(decorateTemplateData);</span>
 
         // Save layout fragments for use later by layout:fragment processors
-<span class="fc" id="L139">        FragmentMap.setForNode(context, structureHandler, pageFragments);</span>
-<span class="fc" id="L140">    }</span>
+<span class="fc" id="L140">        FragmentMap.setForNode(context, structureHandler, pageFragments);</span>
+<span class="fc" id="L141">    }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

@@ -16,6 +16,9 @@
 package nz.net.ultraq.thymeleaf.fragments;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import org.thymeleaf.context.IContext;
 import org.thymeleaf.model.IModel;
@@ -29,7 +32,7 @@ import org.thymeleaf.processor.element.IElementModelStructureHandler;
  * @author Emanuel Rabina
  */
 @SuppressWarnings({&quot;serial&quot;, &quot;CloneableImplementsClone&quot;})
-<span class="fc" id="L32">public class FragmentMap extends HashMap&lt;String, IModel&gt; {</span>
+<span class="nc" id="L35">public class FragmentMap extends HashMap&lt;String, IModel&gt; {</span>
 
     private static final String FRAGMENT_COLLECTION_KEY = &quot;LayoutDialect::FragmentCollection&quot;;
 
@@ -40,9 +43,10 @@ import org.thymeleaf.processor.element.IElementModelStructureHandler;
      * @param context
      * @return A new or existing fragment collection for the context.
      */
-    public static FragmentMap get(IContext context) {
-<span class="fc" id="L44">        FragmentMap localVariable = (FragmentMap) context.getVariable(FRAGMENT_COLLECTION_KEY);</span>
-<span class="fc bfc" id="L45" title="All 4 branches covered.">        return localVariable != null &amp;&amp; !localVariable.isEmpty() ? localVariable : new FragmentMap();</span>
+    public static Map&lt;String, LinkedList&lt;IModel&gt;&gt; get(IContext context) {
+        @SuppressWarnings(&quot;unchecked&quot;)
+<span class="fc" id="L48">        Map&lt;String, LinkedList&lt;IModel&gt;&gt; localVariable = (Map&lt;String, LinkedList&lt;IModel&gt;&gt;) context.getVariable(FRAGMENT_COLLECTION_KEY);</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        return localVariable != null ? localVariable : new LinkedHashMap&lt;&gt;();</span>
     }
 
     /**
@@ -54,11 +58,24 @@ import org.thymeleaf.processor.element.IElementModelStructureHandler;
      * @param fragments The new fragments to add to the map.
      */
     public static void setForNode(IContext context, IElementModelStructureHandler structureHandler,
-            Map&lt;String, IModel&gt; fragments) {
-<span class="fc" id="L58">        FragmentMap fragmentMap = (FragmentMap) get(context).clone();</span>
-<span class="fc" id="L59">        fragmentMap.putAll(fragments);</span>
-<span class="fc" id="L60">        structureHandler.setLocalVariable(FRAGMENT_COLLECTION_KEY, fragmentMap);</span>
-<span class="fc" id="L61">    }</span>
+            Map&lt;String, List&lt;IModel&gt;&gt; fragments) {
+<span class="fc" id="L62">        Map&lt;String, List&lt;IModel&gt;&gt; res = fragments;</span>
+<span class="fc" id="L63">        Map&lt;String, ? extends List&lt;IModel&gt;&gt; append = get(context);</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        for (Entry&lt;String, ? extends List&lt;IModel&gt;&gt; entry : append.entrySet()) {</span>
+<span class="fc" id="L65">            String key = entry.getKey();</span>
+<span class="fc" id="L66">            List&lt;IModel&gt; value = entry.getValue();</span>
+<span class="fc" id="L67">            List&lt;IModel&gt; list = res.get(key);</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">            if (list != null) {</span>
+<span class="fc" id="L69">                LinkedList&lt;IModel&gt; tmp = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L70">                tmp.addAll(list);</span>
+<span class="fc" id="L71">                tmp.addAll(value);</span>
+<span class="fc" id="L72">                res.put(key, tmp);</span>
+<span class="fc" id="L73">            } else {</span>
+<span class="fc" id="L74">                res.put(key, value);</span>
+            }
+<span class="fc" id="L76">        }</span>
+<span class="fc" id="L77">        structureHandler.setLocalVariable(FRAGMENT_COLLECTION_KEY, res);</span>
+<span class="fc" id="L78">    }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>
