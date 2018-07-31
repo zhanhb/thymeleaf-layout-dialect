@@ -132,12 +132,12 @@ public class Extensions {
     }
 
     public static boolean equals(@Nullable ITemplateEvent event, @Nullable Object other) {
-        if (event instanceof IProcessableElementTag) {
+        if (event instanceof IStandaloneElementTag) {
+            return equals(((IStandaloneElementTag) event), other);
+        } else if (event instanceof IProcessableElementTag) {
             return equals(((IProcessableElementTag) event), other);
         } else if (event instanceof ICloseElementTag) {
             return equals(((ICloseElementTag) event), other);
-        } else if (event instanceof IStandaloneElementTag) {
-            return equals(((IStandaloneElementTag) event), other);
         } else if (event instanceof IText) {
             return equals(((IText) event), other);
         }
