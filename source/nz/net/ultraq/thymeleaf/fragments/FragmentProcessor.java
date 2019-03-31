@@ -15,7 +15,7 @@
  */
 package nz.net.ultraq.thymeleaf.fragments;
 
-import java.util.Deque;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.models.ElementMerger;
@@ -83,10 +83,10 @@ public class FragmentProcessor extends AbstractAttributeTagProcessor {
         }
 
         // Locate the fragment that corresponds to this decorator/include fragment
-        Deque<IModel> fragments = FragmentMap.get(context).get(attributeValue);
+        List<IModel> fragments = FragmentMap.get(context).get(attributeValue);
         // Replace the tag body with the fragment
         if (fragments != null && !fragments.isEmpty()) {
-            IModel fragment = fragments.peekLast();
+            IModel fragment = fragments.get(0);
             IModelFactory modelFactory = context.getModelFactory();
             IModel replacementModel = new ElementMerger(context).merge(modelFactory.createModel(tag), fragment);
 

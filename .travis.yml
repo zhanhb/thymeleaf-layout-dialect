@@ -8,6 +8,8 @@ cache:
 jdk:
 - oraclejdk8
 - oraclejdk9
+ - openjdk10
+ - openjdk11
 install: ./mvnw deploy -DskipTests=true -Dmaven.javadoc.skip=true -Dmaven.deploy.skip=true -B -V
 script:
 - ./mvnw install -Dmaven.javadoc.skip=true

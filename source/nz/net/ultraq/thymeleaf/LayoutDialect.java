@@ -21,7 +21,6 @@ import java.util.Set;
 import nz.net.ultraq.thymeleaf.decorators.DecorateProcessor;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor;
-import nz.net.ultraq.thymeleaf.decorators.strategies.AppendingStrategy;
 import nz.net.ultraq.thymeleaf.fragments.CollectFragmentProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
 import nz.net.ultraq.thymeleaf.includes.InsertProcessor;
@@ -44,24 +43,37 @@ public class LayoutDialect extends AbstractProcessorDialect {
     public static final String DIALECT_PREFIX = "layout";
     public static final int DIALECT_PRECEDENCE = 10;
 
+    private final boolean autoHeadMerging;
     private final SortingStrategy sortingStrategy;
 
     /**
-     * Constructor, configure the layout dialect with the given sorting
-     * strategy.
+     * Constructor, configure the layout dialect.
+     *
+     * @param sortingStrategy
+     * @param autoHeadMerging Experimental option, set to {@code false} to skip
+     * the automatic merging of an HTML {@code <head>} section.
+     */
+    public LayoutDialect(SortingStrategy sortingStrategy, boolean autoHeadMerging) {
+        super(DIALECT_NAME, DIALECT_PREFIX, DIALECT_PRECEDENCE);
+        this.sortingStrategy = sortingStrategy;
+        this.autoHeadMerging = autoHeadMerging;
+    }
+
+    /**
+     * Constructor, configure the layout dialect.
      *
      * @param sortingStrategy
      */
     public LayoutDialect(SortingStrategy sortingStrategy) {
-        super(DIALECT_NAME, DIALECT_PREFIX, DIALECT_PRECEDENCE);
-        this.sortingStrategy = sortingStrategy;
+        this(sortingStrategy, true);
     }
 
     /**
-     * Constructor, configure the layout dialect with the appending strategy.
+     * Constructor, configure the layout dialect.
      */
+    @SuppressWarnings("deprecation")
     public LayoutDialect() {
-        this(new AppendingStrategy());
+        this(new nz.net.ultraq.thymeleaf.decorators.strategies.AppendingStrategy());
     }
 
     /**
@@ -76,8 +88,8 @@ public class LayoutDialect extends AbstractProcessorDialect {
         return new LinkedHashSet<>(Arrays.asList(
                 // Processors available in the HTML template mode
                 new StandardXmlNsTagProcessor(TemplateMode.HTML, dialectPrefix),
-                new DecorateProcessor(TemplateMode.HTML, dialectPrefix, sortingStrategy),
-                new nz.net.ultraq.thymeleaf.decorators.DecoratorProcessor(TemplateMode.HTML, dialectPrefix, sortingStrategy),
+                new DecorateProcessor(TemplateMode.HTML, dialectPrefix, sortingStrategy, autoHeadMerging),
+                new nz.net.ultraq.thymeleaf.decorators.DecoratorProcessor(TemplateMode.HTML, dialectPrefix, sortingStrategy, autoHeadMerging),
                 new nz.net.ultraq.thymeleaf.includes.IncludeProcessor(TemplateMode.HTML, dialectPrefix),
                 new InsertProcessor(TemplateMode.HTML, dialectPrefix),
                 new ReplaceProcessor(TemplateMode.HTML, dialectPrefix),
@@ -86,8 +98,8 @@ public class LayoutDialect extends AbstractProcessorDialect {
                 new TitlePatternProcessor(TemplateMode.HTML, dialectPrefix),
                 // Processors available in the XML template mode
                 new StandardXmlNsTagProcessor(TemplateMode.XML, dialectPrefix),
-                new DecorateProcessor(TemplateMode.XML, dialectPrefix, sortingStrategy),
-                new nz.net.ultraq.thymeleaf.decorators.DecoratorProcessor(TemplateMode.XML, dialectPrefix, sortingStrategy),
+                new DecorateProcessor(TemplateMode.XML, dialectPrefix, sortingStrategy, autoHeadMerging),
+                new nz.net.ultraq.thymeleaf.decorators.DecoratorProcessor(TemplateMode.XML, dialectPrefix, sortingStrategy, autoHeadMerging),
                 new nz.net.ultraq.thymeleaf.includes.IncludeProcessor(TemplateMode.XML, dialectPrefix),
                 new InsertProcessor(TemplateMode.XML, dialectPrefix),
                 new ReplaceProcessor(TemplateMode.XML, dialectPrefix),

@@ -39,9 +39,6 @@ public class IModelExtensions {
             childModelIterator << {
                 Z.childModelIterator(delegate)
             }
-            clearChildren << {
-                Z.clearChildren(delegate)
-            }
             each << { Closure closure ->
                 Z.each(delegate, closure as ITemplateEventConsumer)
             }
@@ -54,7 +51,16 @@ public class IModelExtensions {
             everyWithIndex << { Closure closure ->
                 Z.everyWithIndex(delegate, closure as ITemplateEventIntPredicate)
             }
+            find << { Closure closure ->
+                Z.find(delegate, closure as ITemplateEventIntPredicate)
+            }
+            findAll << { Closure closure ->
+                Z.findAll(delegate, closure as ITemplateEventIntPredicate)
+            }
             findIndexOf << { Closure closure ->
+                Z.findIndexOf(delegate, closure as ITemplateEventPredicate)
+            }
+            findIndexOfModel << { Closure closure ->
                 Z.findIndexOf(delegate, closure as ITemplateEventPredicate)
             }
             findModel << { Closure closure ->
@@ -66,9 +72,6 @@ public class IModelExtensions {
             getModel << { int pos ->
                 Z.getModel(delegate, pos)
             }
-            indexOf << { IModel model ->
-                Z.indexOf(delegate, model)
-            }
             insertModelWithWhitespace << { int pos, IModel model ->
                 Z.insertModelWithWhitespace(delegate, pos, model)
             }
@@ -78,11 +81,20 @@ public class IModelExtensions {
             isElement << {
                 Z.isElement(delegate)
             }
+            isElementOf << {tagName ->
+                Z.isElementOf(delegate, tagName)
+            }
             isWhitespace << {
                 Z.isWhitespace(delegate)
             }
+            iterator << {
+                Z.iterator(delegate)
+            }
             last << {
                 Z.last(delegate)
+            }
+            removeChildren << {
+                Z.removeChildren(delegate)
             }
             removeFirst << {
                 Z.removeFirst(delegate)
@@ -93,11 +105,14 @@ public class IModelExtensions {
             removeModel << { int pos ->
                 Z.removeModel(delegate, pos)
             }
-            removeModelWithWhitespace << { int pos ->
-                Z.removeModelWithWhitespace(delegate, pos)
-            }
             replaceModel << { int pos, IModel model ->
                 Z.replaceModel(delegate, pos, model)
+            }
+            sizeOfModelAt << { int pos ->
+                Z.sizeOfModelAt(delegate, pos)
+            }
+            trim << {
+                Z.trim(delegate)
             }
         }
     }

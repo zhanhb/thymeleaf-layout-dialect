@@ -15,7 +15,7 @@
  */
 package nz.net.ultraq.thymeleaf.fragments;
 
-import java.util.Queue;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.models.ElementMerger;
@@ -92,7 +92,7 @@ public class CollectFragmentProcessor extends AbstractAttributeTagProcessor {
 
         // All :define fragments we collected, :collect fragments included to determine where to stop.
         // Fragments after :collect are preserved for the next :collect event
-        Queue<IModel> fragments = FragmentMap.get(context).get(attributeValue);
+        List<IModel> fragments = FragmentMap.get(context).get(attributeValue);
 
         // Replace the tag body with the fragment
         if (fragments != null && !fragments.isEmpty()) {
@@ -101,8 +101,8 @@ public class CollectFragmentProcessor extends AbstractAttributeTagProcessor {
             IModel[] replacementModel = new IModel[]{modelFactory.createModel(tag)};
             boolean first = true;
             while (!fragments.isEmpty()) {
-                IModel fragment = fragments.poll();
-                if (!StringUtils.isEmpty(((IProcessableElementTag) fragment.get(0)).getAttributeValue(getDialectPrefix(), CollectFragmentProcessor.PROCESSOR_COLLECT))) {
+                IModel fragment = fragments.remove(0);
+                if (!StringUtils.isEmpty(((IProcessableElementTag) fragment.get(0)).getAttributeValue(getDialectPrefix(), PROCESSOR_COLLECT))) {
                     break;
                 }
                 if (first) {

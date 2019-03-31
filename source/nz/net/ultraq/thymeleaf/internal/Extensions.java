@@ -15,21 +15,22 @@
  */
 package nz.net.ultraq.thymeleaf.internal;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import nz.net.ultraq.thymeleaf.models.extensions.ChildModelIterator;
+import nz.net.ultraq.thymeleaf.models.extensions.EventIterator;
 import org.thymeleaf.DialectConfiguration;
+import org.thymeleaf.context.IContext;
+import org.thymeleaf.context.IEngineContext;
 import org.thymeleaf.context.IExpressionContext;
-import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.dialect.IProcessorDialect;
-import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.model.IAttribute;
 import org.thymeleaf.model.ICloseElementTag;
@@ -41,8 +42,6 @@ import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.model.IStandaloneElementTag;
 import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.model.IText;
-import org.thymeleaf.standard.StandardDialect;
-import org.thymeleaf.util.StringUtils;
 
 /**
  * Additional methods applied to the Thymeleaf class via extension programming.
@@ -60,6 +59,8 @@ import org.thymeleaf.util.StringUtils;
  * @see IExpressionContext
  */
 public class Extensions {
+
+    private static final String DIALECT_PREFIX_PREFIX = "DialectPrefix::";
 
     /**
      * Set that a model evaluates to 'false' if it has no events.
@@ -84,30 +85,14 @@ public class Extensions {
     }
 
     /**
-     * If the model represents an element open to close tags, then this method
-     * removes all of the inner events. Otherwise, it does nothing.
-     *
-     * @param delegate
-     */
-    public static void clearChildren(@Nonnull IModel delegate) {
-        if (isElement(delegate)) {
-            while (delegate.size() > 2) {
-                delegate.remove(1);
-            }
-        }
-    }
-
-    /**
      * Iterate through each event in the model.
      *
      * @param delegate
      * @param closure
      */
     public static void each(@Nullable IModel delegate, @Nonnull ITemplateEventConsumer closure) {
-        if (delegate != null) {
-            for (int i = 0, size = delegate.size(); i < size; i++) {
-                closure.accept(delegate.get(i));
-            }
+        for (Iterator<ITemplateEvent> iterator = iterator(delegate); iterator.hasNext();) {
+            closure.accept(iterator.next());
         }
     }
 
@@ -123,25 +108,10 @@ public class Extensions {
         if (other instanceof IModel) {
             IModel iModel = (IModel) other;
             if (delegate.size() == iModel.size()) {
-                return everyWithIndex(delegate, (event, index) -> {
-                    return equals(event, iModel.get(index));
-                });
+                return everyWithIndex(delegate, (event, index) -> equals(event, iModel.get(index)));
             }
         }
         return false;
-    }
-
-    public static boolean equals(@Nullable ITemplateEvent event, @Nullable Object other) {
-        if (event instanceof IStandaloneElementTag) {
-            return equals(((IStandaloneElementTag) event), other);
-        } else if (event instanceof IProcessableElementTag) {
-            return equals(((IProcessableElementTag) event), other);
-        } else if (event instanceof ICloseElementTag) {
-            return equals(((ICloseElementTag) event), other);
-        } else if (event instanceof IText) {
-            return equals(((IText) event), other);
-        }
-        return Objects.equals(event, other);
     }
 
     /**
@@ -154,29 +124,32 @@ public class Extensions {
      * the other one.
      */
     public static boolean equalsIgnoreWhitespace(@Nonnull IModel delegate, @Nonnull IModel other) {
-        int thisEventIndex = 0;
-        int otherEventIndex = 0;
-
-        final int size1 = delegate.size(), size2 = other.size();
-        for (; thisEventIndex < size1 || otherEventIndex < size2;) {
-            ITemplateEvent thisEvent = delegate.get(thisEventIndex);
-            ITemplateEvent otherEvent = other.get(otherEventIndex);
-            if (isWhitespace(thisEvent)) {
-                thisEventIndex++;
-                continue;
-            } else if (isWhitespace(otherEvent)) {
-                otherEventIndex++;
-                continue;
-            }
-            if (!equals(thisEvent, otherEvent)) {
-                return false;
-            }
-            thisEventIndex++;
-            otherEventIndex++;
+        if (other instanceof IModel) {
+            Iterator<ITemplateEvent> it = iterator(delegate);
+            Iterator<ITemplateEvent> iterator = iterator(other);
+            ITemplateEvent next;
+            ITemplateEvent that;
+            do {
+                do {
+                    if (!it.hasNext()) {
+                        do {
+                            if (!iterator.hasNext()) {
+                                return true;
+                            }
+                        } while (isWhitespace(iterator.next()));
+                        return false;
+                    }
+                    next = it.next();
+                } while (isWhitespace(next));
+                do {
+                    if (!iterator.hasNext()) {
+                        return false;
+                    }
+                    that = iterator.next();
+                } while (isWhitespace(that));
+            } while (equals(next, that));
         }
-
-        return thisEventIndex == size1 && otherEventIndex == size2;
-
+        return false;
     }
 
     /**
@@ -205,15 +178,33 @@ public class Extensions {
      * @return The first event to match the closure criteria, or {@code null} if
      * nothing matched.
      */
+    @Nullable
     public static ITemplateEvent find(@Nonnull IModel delegate, @Nonnull ITemplateEventPredicate closure) {
-        for (int i = 0; i < delegate.size(); i++) {
-            ITemplateEvent event = delegate.get(i);
-            boolean result = closure.test(event);
-            if (result) {
+        for (Iterator<ITemplateEvent> iterator = iterator(delegate); iterator.hasNext();) {
+            ITemplateEvent event = iterator.next();
+            if (closure.test(event)) {
                 return event;
             }
         }
         return null;
+    }
+
+    /**
+     * Find all events in the model that match the given closure.
+     *
+     * @param closure
+     * @return A list of matched events.
+     */
+    @Nonnull
+    public static List<ITemplateEvent> findAll(@Nonnull IModel delegate, @Nonnull ITemplateEventPredicate closure) {
+        ArrayList<ITemplateEvent> answer = new ArrayList<>();
+        for (Iterator<ITemplateEvent> iterator = iterator(delegate); iterator.hasNext();) {
+            ITemplateEvent event = iterator.next();
+            if (closure.test(event)) {
+                answer.add(event);
+            }
+        }
+        return answer;
     }
 
     /**
@@ -237,6 +228,43 @@ public class Extensions {
     }
 
     /**
+     * Returns the index of the first event in the model that meets the criteria
+     * of the given closure, starting from a specified position.
+     *
+     * @param closure
+     * @return The index of the first event to match the closure criteria, or
+     * {@code -1} if nothing matched.
+     */
+    public static int findIndexOf(@Nonnull IModel delegate, int startIndex,
+            @Nonnull ITemplateEventPredicate closure) {
+        for (int i = startIndex, size = delegate.size(); i < size; i++) {
+            ITemplateEvent event = delegate.get(i);
+            boolean result = closure.test(event);
+            if (result) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * A special variant of {@code findIndexOf} that uses models, as I seem to
+     * be using those a lot.
+     *
+     * This doesn't use an equality check, but an object reference check, so if
+     * a submodel is ever located from a parent (eg: any of the {@code find}
+     * methods, you can use this method to find the location of that submodel
+     * within the event queue.
+     *
+     * @param model
+     * @return Index of an extracted submodel within this model.
+     */
+    public static int findIndexOfModel(@Nonnull IModel delegate, IModel model) {
+        ITemplateEvent modelEvent = first(model);
+        return findIndexOf(delegate, event -> equals(event, modelEvent));
+    }
+
+    /**
      * Returns the first instance of a model that meets the given closure
      * criteria.
      *
@@ -247,11 +275,7 @@ public class Extensions {
      */
     @Nullable
     public static IModel findModel(@Nonnull IModel delegate, @Nonnull ITemplateEventPredicate closure) {
-        int eventIndex = findIndexOf(delegate, closure);
-        if (eventIndex != -1) {
-            return getModel(delegate, eventIndex);
-        }
-        return null;
+        return getModel(delegate, findIndexOf(delegate, closure));
     }
 
     /**
@@ -273,37 +297,22 @@ public class Extensions {
      * @param pos
      * @return Model at the given position.
      */
-    @Nonnull
+    @Nullable
     @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     public static IModel getModel(@Nonnull IModel delegate, int pos) {
-        int modelSize = calculateModelSize(delegate, pos);
-        IModel subModel = delegate.cloneModel();
-        int removeBefore = delegate instanceof TemplateModel ? pos - 1 : pos;
-        int removeAfter = subModel.size() - (removeBefore + modelSize);
-        while (removeBefore-- > 0) {
-            removeFirst(subModel);
+        if (0 <= pos && pos < delegate.size()) {
+            IModel clone = delegate.cloneModel();
+            int removeBefore = delegate instanceof TemplateModel ? pos - 1 : pos;
+            int removeAfter = clone.size() - (removeBefore + sizeOfModelAt(delegate, pos));
+            while (removeBefore-- > 0) {
+                removeFirst(clone);
+            }
+            while (removeAfter-- > 0) {
+                removeLast(clone);
+            }
+            return clone;
         }
-        while (removeAfter-- > 0) {
-            removeLast(subModel);
-        }
-        return subModel;
-    }
-
-    /**
-     * Returns the index of the given model within this model.
-     *
-     * This is not an equality check, but an object reference check, so if a
-     * submodel is ever located from a parent (eg: any of the {@code find}
-     * methods, you can use this method to find the location of that submodel
-     * within the event queue.
-     *
-     * @param delegate
-     * @param model
-     * @return Index of an extracted submodel within this model.
-     */
-    public static int indexOf(@Nonnull IModel delegate, @Nonnull IModel model) {
-        ITemplateEvent modelEvent = first(model);
-        return findIndexOf(delegate, event -> event == modelEvent);
+        return null;
     }
 
     /**
@@ -316,18 +325,22 @@ public class Extensions {
      * @param modelFactory
      */
     public static void insertModelWithWhitespace(@Nonnull IModel delegate, int pos, @Nonnull IModel model, @Nonnull IModelFactory modelFactory) {
-        // Use existing whitespace at the insertion point
-        IModel whitespace = getModel(delegate, pos);
-        if (isWhitespace(whitespace)) {
-            delegate.insertModel(pos, model);
-            delegate.insertModel(pos, whitespace);
-        } else {
-            // Generate whitespace, usually inserting into a tag that is immediately
-            // closed so whitespace should be added to either side
-            whitespace = modelFactory.createModel(modelFactory.createText("\n\t"));
-            delegate.insertModel(pos, whitespace);
-            delegate.insertModel(pos, model);
-            delegate.insertModel(pos, whitespace);
+
+        if (0 <= pos && pos <= delegate.size()) {
+
+            // Use existing whitespace at the insertion point
+            IModel whitespace = getModel(delegate, pos);
+            if (asBoolean(whitespace) && isWhitespace(whitespace)) {
+                delegate.insertModel(pos, model);
+                delegate.insertModel(pos, whitespace);
+            } else {
+                // Generate whitespace, usually inserting into a tag that is immediately
+                // closed so whitespace should be added to either side
+                whitespace = modelFactory.createModel(modelFactory.createText("\n\t"));
+                delegate.insertModel(pos, whitespace);
+                delegate.insertModel(pos, model);
+                delegate.insertModel(pos, whitespace);
+            }
         }
     }
 
@@ -341,21 +354,25 @@ public class Extensions {
      * @param modelFactory
      */
     public static void insertWithWhitespace(@Nonnull IModel delegate, int pos, @Nonnull ITemplateEvent event, @Nonnull IModelFactory modelFactory) {
-        // TODO: Because I can't check the parent for whitespace hints, I should
-        //       make this smarter and find whitespace within the model to copy.
-        IModel whitespace = getModel(delegate, pos); // Assumes that whitespace exists at the insertion point
-        if (isWhitespace(whitespace)) {
-            delegate.insert(pos, event);
-            delegate.insertModel(pos, whitespace);
-        } else {
-            IText newLine = modelFactory.createText("\n");
-            if (pos == 0) {
-                delegate.insert(pos, newLine);
+
+        if (0 <= pos && pos <= delegate.size()) {
+
+            // TODO: Because I can't check the parent for whitespace hints, I should
+            //       make this smarter and find whitespace within the model to copy.
+            IModel whitespace = getModel(delegate, pos); // Assumes that whitespace exists at the insertion point
+            if (asBoolean(whitespace) && isWhitespace(whitespace)) {
                 delegate.insert(pos, event);
-            } else if (pos == delegate.size()) {
-                delegate.insert(pos, newLine);
-                delegate.insert(pos, event);
-                delegate.insert(pos, newLine);
+                delegate.insertModel(pos, whitespace);
+            } else {
+                IText newLine = modelFactory.createText("\n");
+                if (pos == 0) {
+                    delegate.insert(pos, newLine);
+                    delegate.insert(pos, event);
+                } else if (pos == delegate.size()) {
+                    delegate.insert(pos, newLine);
+                    delegate.insert(pos, event);
+                    delegate.insert(pos, newLine);
+                }
             }
         }
     }
@@ -373,6 +390,19 @@ public class Extensions {
     }
 
     /**
+     * Returns whether or not this model represents an element of the given
+     * name.
+     *
+     * @param tagName
+     * @return {@code true} if the first event in this model is an opening tag,
+     * the last event is the matching closing tag, and whether the element has
+     * the given tag name.
+     */
+    public static boolean isElementOf(@Nonnull IModel delegate, String tagName) {
+        return isElement(delegate) && ((IElementTag) first(delegate)).getElementCompleteName().equals(tagName);
+    }
+
+    /**
      * Returns whether or not this model represents collapsible whitespace.
      *
      * @param delegate
@@ -383,6 +413,15 @@ public class Extensions {
     }
 
     /**
+     * Used to make this class iterable as an event queue.
+     *
+     * @return A new iterator over the events of this model.
+     */
+    public static Iterator<ITemplateEvent> iterator(IModel delegate) {
+        return new EventIterator(delegate);
+    }
+
+    /**
      * Returns the last event on the model.
      *
      * @param delegate
@@ -390,6 +429,18 @@ public class Extensions {
      */
     public static ITemplateEvent last(@Nonnull IModel delegate) {
         return delegate.get(delegate.size() - 1);
+    }
+
+    /**
+     * If the model represents an element open to close tags, then this method
+     * removes all of the inner events.
+     */
+    public static void removeChildren(@Nonnull IModel delegate) {
+        if (isElement(delegate)) {
+            while (delegate.size() > 2) {
+                delegate.remove(1);
+            }
+        }
     }
 
     /**
@@ -420,25 +471,12 @@ public class Extensions {
      * @param pos
      */
     public static void removeModel(@Nonnull IModel delegate, int pos) {
-        int modelSize = calculateModelSize(delegate, pos);
-        while (modelSize > 0) {
-            delegate.remove(pos);
-            modelSize--;
-        }
-    }
-
-    /**
-     * Removes a models-worth of events from the specified position, plus the
-     * preceeding whitespace event if any.
-     *
-     * @param delegate
-     * @param pos
-     */
-    public static void removeModelWithWhitespace(@Nonnull IModel delegate, int pos) {
-        removeModel(delegate, pos);
-        ITemplateEvent priorEvent = delegate.get(pos - 1);
-        if (isWhitespace(priorEvent)) {
-            delegate.remove(pos - 1);
+        if (0 <= pos && pos < delegate.size()) {
+            int modelSize = sizeOfModelAt(delegate, pos);
+            while (modelSize > 0) {
+                delegate.remove(pos);
+                modelSize--;
+            }
         }
     }
 
@@ -446,12 +484,52 @@ public class Extensions {
      * Replaces the model at the specified index with the given model.
      *
      * @param delegate
-     * @param pos
+     * @param pos A valid index within the current model.
      * @param model
      */
     public static void replaceModel(@Nonnull IModel delegate, int pos, @Nonnull IModel model) {
-        removeModel(delegate, pos);
-        delegate.insertModel(pos, model);
+        if (0 <= pos && pos < delegate.size()) {
+            removeModel(delegate, pos);
+            delegate.insertModel(pos, model);
+        }
+    }
+
+    /**
+     * If an opening element exists at the given position, this method will
+     * return the 'size' of that element (number of events from here to its
+     * matching closing tag).
+     *
+     * @param delegate
+     * @param index
+     * @return Size of an element from the given position, or 1 if the event at
+     * the position isn't an opening element.
+     */
+    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
+    public static int sizeOfModelAt(@Nonnull IModel delegate, int index) {
+        int eventIndex = index;
+        ITemplateEvent event = delegate.get(eventIndex++);
+
+        if (event instanceof IOpenElementTag) {
+            int level = 0;
+            while (true) {
+                event = delegate.get(eventIndex++);
+                if (event instanceof IOpenElementTag) {
+                    level++;
+                } else if (event instanceof ICloseElementTag) {
+                    if (((ICloseElementTag) event).isUnmatched()) {
+                        // Do nothing.  Unmatched closing tags do not correspond to any
+                        // opening element, and so should not affect the model level.
+                    } else if (level == 0) {
+                        break;
+                    } else {
+                        level--;
+                    }
+                }
+            }
+            return eventIndex - index;
+        }
+
+        return 1;
     }
 
     /**
@@ -469,16 +547,61 @@ public class Extensions {
         }
     }
 
+    public static boolean equals(@Nullable ITemplateEvent event, @Nullable Object other) {
+        if (event instanceof IStandaloneElementTag) {
+            return equals(((IStandaloneElementTag) event), other);
+        } else if (event instanceof IProcessableElementTag) {
+            return equals(((IProcessableElementTag) event), other);
+        } else if (event instanceof ICloseElementTag) {
+            return equals(((ICloseElementTag) event), other);
+        } else if (event instanceof IText) {
+            return equals(((IText) event), other);
+        }
+        return Objects.equals(event, other);
+    }
+
     /**
-     * Shortcut to the template name found on the template data object. Only
-     * works if the template was resolved via a name, rather than a string (eg:
-     * anonymous template), in which case this can return the entire template!
+     * Returns whether or not this event represents an opening element.
      *
-     * @param delegate
-     * @return Template name.
+     * @return {@code true} if this event is an opening tag.
      */
-    public static String getTemplate(@Nonnull TemplateModel delegate) {
-        return delegate.getTemplateData().getTemplate();
+    public static boolean isClosingElement(@Nullable ITemplateEvent delegate) {
+        return delegate instanceof ICloseElementTag || delegate instanceof IStandaloneElementTag;
+    }
+
+    /**
+     * Returns whether or not this event represents a closing element of the
+     * given name.
+     *
+     * @param tagName
+     * @return {@code true} if this event is a closing tag and has the given tag
+     * name.
+     */
+    @SuppressWarnings("null")
+    public static boolean isClosingElementOf(@Nullable ITemplateEvent delegate, String tagName) {
+        return isClosingElement(delegate) && ((IElementTag) delegate).getElementCompleteName().equals(tagName);
+    }
+
+    /**
+     * Returns whether or not this event represents an opening element.
+     *
+     * @return {@code true} if this event is an opening tag.
+     */
+    public static boolean isOpeningElement(@Nullable ITemplateEvent delegate) {
+        return delegate instanceof IOpenElementTag || delegate instanceof IStandaloneElementTag;
+    }
+
+    /**
+     * Returns whether or not this event represents an opening element of the
+     * given name.
+     *
+     * @param tagName
+     * @return {@code true} if this event is an opening tag and has the given
+     * tag name.
+     */
+    @SuppressWarnings("null")
+    public static boolean isOpeningElementOf(@Nullable ITemplateEvent delegate, String tagName) {
+        return isOpeningElement(delegate) && ((IElementTag) delegate).getElementCompleteName().equals(tagName);
     }
 
     /**
@@ -503,38 +626,6 @@ public class Extensions {
         return other instanceof IProcessableElementTag
                 && Objects.equals(delegate.getElementCompleteName(), ((IElementTag) other).getElementCompleteName())
                 && Objects.equals(delegate.getAttributeMap(), ((IProcessableElementTag) other).getAttributeMap());
-    }
-
-    /**
-     * For use in comparing one tag with another by the decorator processor when
-     * checking if root elements are the same.
-     *
-     * @param delegate
-     * @param context
-     * @param other
-     * @return {@code true} if this element shares the same name and all
-     * attributes that aren't XML namespace attributes as the other element.
-     */
-    public static boolean equalsIgnoreXmlnsAndThWith(IProcessableElementTag delegate, ITemplateContext context, @Nullable Object other) {
-        if (other instanceof IProcessableElementTag) {
-            IProcessableElementTag element = (IProcessableElementTag) other;
-            if (Objects.equals(delegate.getElementDefinition(), element.getElementDefinition())) {
-                // since getAttributeMap returns a copy
-                Map<String, String> difference = new LinkedHashMap<>(delegate.getAttributeMap());
-                difference.keySet().removeAll(element.getAttributeMap().keySet());
-                if (difference.isEmpty()) {
-                    return true;
-                }
-                String p = getPrefixForDialect(context, StandardDialect.class) + ":with";
-                for (String prefix : difference.keySet()) {
-                    if (!prefix.startsWith("xmlns:") && !prefix.startsWith(p)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -580,16 +671,6 @@ public class Extensions {
     }
 
     /**
-     * Shortcut to the attribute name class on the attribute definition.
-     *
-     * @param delegate
-     * @return Attribute name object.
-     */
-    public static AttributeName getAttributeName(@Nonnull IAttribute delegate) {
-        return delegate.getAttributeDefinition().getAttributeName();
-    }
-
-    /**
      * Compares this text with another.
      *
      * @param delegate
@@ -611,8 +692,46 @@ public class Extensions {
     }
 
     /**
+     * Retrieves an item from the context, or creates one on the context if it
+     * doesn't yet exist.
+     *
+     * @param <T>
+     * @param delegate
+     * @param key
+     * @param closure
+     * @return The item cached on the context through the given key, or first
+     * constructed through the closure.
+     */
+    public static <T> T getOrCreate(@Nonnull IContext delegate, @Nonnull String key, Supplier<T> closure) {
+        if (delegate instanceof IEngineContext) {
+            return getOrCreate((IEngineContext) delegate, key, closure);
+        }
+
+        ConcurrentMap<String, T> dialectPrefixCache = DialectPrefixCacheHolder.getDialectPrefixCache(delegate);
+
+        T value = dialectPrefixCache.get(key);
+        if (value == null) {
+            value = closure.get();
+            if (value != null) {
+                dialectPrefixCache.putIfAbsent(key, value);
+            }
+        }
+        return value;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T getOrCreate(IEngineContext delegate, @Nonnull String key, Supplier<T> closure) {
+        Object value = delegate.getVariable(key);
+        if (value == null) {
+            value = closure.get();
+            delegate.setVariable(key, value);
+        }
+        return (T) value;
+    }
+
+    /**
      * Returns the configured prefix for the given dialect. If the dialect
-     * prefix has not been configured, then the dialect prefix is returned.
+     * prefix has not been configured.
      *
      * @param delegate
      * @param dialectClass
@@ -620,10 +739,7 @@ public class Extensions {
      * dialect being queried hasn't been configured.
      */
     public static String getPrefixForDialect(@Nonnull IExpressionContext delegate, Class<? extends IProcessorDialect> dialectClass) {
-        ConcurrentMap<Class<?>, String> dialectPrefixCache = DialectPrefixCacheHolder.getDialectPrefixCache(delegate);
-
-        String dialectPrefix = dialectPrefixCache.get(dialectClass);
-        if (StringUtils.isEmpty(dialectPrefix)) {
+        return getOrCreate(delegate, DIALECT_PREFIX_PREFIX + dialectClass.getName(), () -> {
             DialectConfiguration dialectConfiguration = null;
             for (DialectConfiguration dialectConfig : delegate.getConfiguration().getDialectConfigurations()) {
                 if (dialectClass.isInstance(dialectConfig.getDialect())) {
@@ -631,67 +747,29 @@ public class Extensions {
                     break;
                 }
             }
-            dialectPrefix = dialectConfiguration != null
-                    ? dialectConfiguration.isPrefixSpecified() ? dialectConfiguration.getPrefix() : ((IProcessorDialect) dialectConfiguration.getDialect()).getPrefix()
-                    : null;
-            if (dialectPrefix != null) {
-                dialectPrefixCache.putIfAbsent(dialectClass, dialectPrefix);
-            }
-        }
-        return dialectPrefix;
-    }
-
-    /**
-     * If an opening element exists at the given position, this method will
-     * return the 'size' of that element (number of events from here to its
-     * matching closing tag). Otherwise, a size of 1 is returned.
-     *
-     * @param model
-     * @param index
-     * @return Size of an element from the given position, or 1 if the event at
-     * the position isn't an opening element.
-     */
-    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
-    private static int calculateModelSize(@Nonnull IModel model, int index) {
-        int eventIndex = index;
-        ITemplateEvent event = model.get(eventIndex++);
-
-        if (event instanceof IOpenElementTag) {
-            int level = 0;
-            while (true) {
-                event = model.get(eventIndex++);
-                if (event instanceof IOpenElementTag) {
-                    level++;
-                } else if (event instanceof ICloseElementTag) {
-                    ICloseElementTag tag = (ICloseElementTag) event;
-                    if (tag.isUnmatched()) {
-                        // Do nothing.  Unmatched closing tags do not correspond to any
-                        // opening element, and so should not affect the model level.
-                    } else if (level == 0) {
-                        break;
-                    } else {
-                        level--;
-                    }
+            if (dialectConfiguration != null) {
+                if (dialectConfiguration.isPrefixSpecified()) {
+                    return dialectConfiguration.getPrefix();
+                } else {
+                    return ((IProcessorDialect) dialectConfiguration.getDialect()).getPrefix();
                 }
             }
-            return eventIndex - index;
-        }
-
-        return 1;
+            return null;
+        });
     }
 
     private Extensions() {
         throw new AssertionError();
     }
 
-    @SuppressWarnings({"UtilityClassWithoutPrivateConstructor", "NestedAssignment"})
+    @SuppressWarnings({"UtilityClassWithoutPrivateConstructor", "NestedAssignment", "rawtypes", "unchecked"})
     private static class DialectPrefixCacheHolder {
 
-        private static final ConcurrentWeakIdentityHashMap<IExpressionContext, ConcurrentMap<Class<?>, String>> CACHE
+        private static final ConcurrentWeakIdentityHashMap<IContext, ConcurrentMap<String, Object>> CACHE
                 = new ConcurrentWeakIdentityHashMap<>(20);
 
-        static ConcurrentMap<Class<?>, String> getDialectPrefixCache(IExpressionContext delegate) {
-            ConcurrentMap<Class<?>, String> dialectPrefixCache, newCache;
+        static <T> ConcurrentMap<String, T> getDialectPrefixCache(IContext delegate) {
+            ConcurrentMap dialectPrefixCache, newCache;
             return (dialectPrefixCache = CACHE.get(delegate)) == null
                     && (dialectPrefixCache = CACHE.putIfAbsent(delegate,
                             newCache = new ConcurrentHashMap<>(4))) == null

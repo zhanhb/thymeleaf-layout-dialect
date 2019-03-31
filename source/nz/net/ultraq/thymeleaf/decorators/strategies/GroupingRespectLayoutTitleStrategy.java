@@ -1,5 +1,5 @@
 /*
- * Copyright 2015, Emanuel Rabina (http://www.ultraq.net.nz/)
+ * Copyright 2019, Emanuel Rabina (http://www.ultraq.net.nz/)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,26 +28,27 @@ import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.model.ITemplateEvent;
 
 /**
- * The {@code <head>} merging strategy which groups like elements together.
+ * A special version of the {@link GroupingStrategy} sorter that respects the
+ * position of the {@code <title>} element within the layout page.
  * <p>
  * The default behaviour of the layout dialect has historically been to place
  * the {@code <title>} element at the beginning of the {@code <head>} element
  * during the decoration process; an arbitrary design decision which made
  * development of this library easier. However, this runs against the
  * expectations of developers who wished to control the order of elements, most
- * notably the position of a {@code <meta charset...>} element.
+ * notably the position of a {@code <meta charset...>} element. This sorting
+ * strategy instead keep {@code <title>}s wherever they exist within the
+ * target/layout template being decorated, and then appending everything else as
+ * normal.
  * <p>
- * This sorting strategy has been updated in 2.4.0 to retain this behaviour as
- * backwards compatibility with the 2.x versions of the layout dialect, but is
- * now deprecated and expected to be replaced by the
- * {@link GroupingRespectLayoutTitleStrategy} sorter from version 3.x onwards.
+ * This will become the default behaviour of the layout dialect from version 3.x
+ * onwards, but was introduced in 2.4.0 to be a non-breaking change.
  *
  * @author zhanhb
  * @author Emanuel Rabina
- * @since 1.2.6
+ * @since 2.4.0
  */
-@Deprecated
-public class GroupingStrategy implements SortingStrategy {
+public class GroupingRespectLayoutTitleStrategy implements SortingStrategy {
 
     /**
      * Figure out the enum for the given model.
@@ -89,8 +90,10 @@ public class GroupingStrategy implements SortingStrategy {
     }
 
     /**
-     * Returns the index of the last set of elements that are of the same 'type'
-     * as the content node. eg: groups scripts with scripts, stylesheets with
+     * For {@code <title>} elements, returns the position of the matching
+     * {@code <title>} in the {@code headModel} argument, otherwise returns the
+     * index of the last set of elements that are of the same 'type' as the
+     * content node. eg: groups scripts with scripts, stylesheets with
      * stylesheets, and so on.
      *
      * @param headModel
@@ -99,21 +102,18 @@ public class GroupingStrategy implements SortingStrategy {
      */
     @Override
     public int findPositionForModel(IModel headModel, IModel childModel) {
+
         // Discard text/whitespace nodes
         if (Extensions.isWhitespace(childModel)) {
             return -1;
         }
 
-        // For backwards compatibility, match the location of any element at the
-        // beginning of the <head> element.
+        // Locate any matching <title> element
         if (Extensions.isElementOf(childModel, "title")) {
-            int firstElementIndex = Extensions.findIndexOf(headModel, 1, Extensions::isOpeningElement);
-            if (firstElementIndex != -1) {
-                return firstElementIndex;
+            int existingTitleIndex = Extensions.findIndexOf(headModel, event -> Extensions.isOpeningElementOf(event, "title"));
+            if (existingTitleIndex != -1) {
+                return existingTitleIndex;
             }
-            // Return the end of the <head> element
-            int positions = headModel.size();
-            return positions > 2 ? 2 : 1;
         }
 
         int type = findMatchingType(childModel);
@@ -133,7 +133,6 @@ public class GroupingStrategy implements SortingStrategy {
                 break;
             }
         }
-
         return 1;
     }
 

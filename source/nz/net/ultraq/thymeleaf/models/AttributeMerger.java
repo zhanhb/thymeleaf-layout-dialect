@@ -87,7 +87,7 @@ public class AttributeMerger implements ModelMerger {
             }
 
             mergedModel.replace(0, context.getModelFactory().replaceAttribute(mergedEvent,
-                    Extensions.getAttributeName(sourceAttribute), sourceAttribute.getAttributeCompleteName(),
+                    sourceAttribute.getAttributeDefinition().getAttributeName(), sourceAttribute.getAttributeCompleteName(),
                     mergedAttributeValue));
         }
 

@@ -103,7 +103,7 @@ public class IncludeProcessor extends AbstractAttributeModelProcessor {
 
         // Replace the children of this element with the children of the included page fragment
         IModel fragmentForInclusionUse = fragmentForInclusion.cloneModel();
-        Extensions.clearChildren(model);
+        Extensions.removeChildren(model);
 
         // Retrieving a model for a template can come with whitspace, so trim those
         // from the model so that we can use the child event iterator.

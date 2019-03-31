@@ -17,6 +17,7 @@ package nz.net.ultraq.thymeleaf.decorators;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import nz.net.ultraq.thymeleaf.decorators.html.HtmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
@@ -24,15 +25,19 @@ import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
 import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
 import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
+import org.thymeleaf.context.IContext;
+import org.thymeleaf.context.IExpressionContext;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.engine.TemplateData;
 import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.model.IModel;
-import org.thymeleaf.model.IOpenElementTag;
 import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
+import org.thymeleaf.standard.StandardDialect;
+import org.thymeleaf.standard.expression.Assignation;
+import org.thymeleaf.standard.expression.AssignationSequence;
 import org.thymeleaf.standard.expression.FragmentExpression;
 import org.thymeleaf.templatemode.TemplateMode;
 
@@ -47,6 +52,43 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
     public static final String PROCESSOR_NAME = "decorate";
     public static final int PROCESSOR_PRECEDENCE = 0;
 
+    /**
+     * Compare the root elements, barring some attributes, to see if they are
+     * the same.
+     *
+     * @param element1
+     * @param element2
+     * @param context
+     * @return {@code true} if the elements share the same name and all
+     * attributes, with the exception of XML namespace declarations and
+     * Thymeleaf's {@code th:with} attribute processor.
+     */
+    private static boolean rootElementsEqual(IProcessableElementTag element1,
+            IProcessableElementTag element2, IContext context) {
+
+        if (element1 != null && element2 != null
+                && Objects.equals(element1.getElementDefinition(), element2.getElementDefinition())) {
+            String maybe = Extensions.getPrefixForDialect((IExpressionContext) context, StandardDialect.class) + ":with";
+            Map<String, String> attributeMap = element2.getAttributeMap();
+            for (Map.Entry<String, String> entry : element1.getAttributeMap().entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                if (key.startsWith("xmlns:") || key.equals(maybe)) {
+                    continue;
+                }
+                if (!attributeMap.containsKey(key)) {
+                    return false;
+                }
+                if (!Objects.equals(value, attributeMap.get(key))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private final boolean autoHeadMerging;
     private final SortingStrategy sortingStrategy;
 
     /**
@@ -56,9 +98,11 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
      * @param templateMode
      * @param dialectPrefix
      * @param sortingStrategy
+     * @param autoHeadMerging
      */
-    public DecorateProcessor(TemplateMode templateMode, String dialectPrefix, SortingStrategy sortingStrategy) {
-        this(templateMode, dialectPrefix, sortingStrategy, PROCESSOR_NAME);
+    public DecorateProcessor(TemplateMode templateMode, String dialectPrefix, SortingStrategy sortingStrategy,
+            boolean autoHeadMerging) {
+        this(templateMode, dialectPrefix, sortingStrategy, autoHeadMerging, PROCESSOR_NAME);
     }
 
     /**
@@ -68,12 +112,14 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
      * @param templateMode
      * @param dialectPrefix
      * @param sortingStrategy
+     * @param autoHeadMerging
      * @param attributeName
      */
     protected DecorateProcessor(TemplateMode templateMode, String dialectPrefix, SortingStrategy sortingStrategy,
-            String attributeName) {
+            boolean autoHeadMerging, String attributeName) {
         super(templateMode, dialectPrefix, null, false, attributeName, true, PROCESSOR_PRECEDENCE, false);
         this.sortingStrategy = sortingStrategy;
+        this.autoHeadMerging = autoHeadMerging;
     }
 
     /**
@@ -97,10 +143,9 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
         IModel contentTemplate = templateModelFinder.findTemplate(contentTemplateName).cloneModel();
 
         // Check that the root element is the same as the one currently being processed
-        IOpenElementTag contentRootEvent = (IOpenElementTag) Extensions.find(contentTemplate, event -> event instanceof IOpenElementTag);
+        IProcessableElementTag contentRootEvent = (IProcessableElementTag) Extensions.find(contentTemplate, event -> event instanceof IProcessableElementTag);
         IProcessableElementTag rootElement = (IProcessableElementTag) Extensions.first(model);
-        // TODO content equals
-        if (!Extensions.equalsIgnoreXmlnsAndThWith(contentRootEvent, context, rootElement)) {
+        if (!rootElementsEqual(contentRootEvent, rootElement, context)) {
             throw new IllegalArgumentException("layout:decorate/data-layout-decorate must appear in the root element of your template");
         }
 
@@ -109,7 +154,7 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
             rootElement = context.getModelFactory().removeAttribute(rootElement, attributeName);
             model.replace(0, rootElement);
         }
-        Extensions.replaceModel(contentTemplate, Extensions.findIndexOf(contentTemplate, event -> event instanceof IOpenElementTag), model);
+        Extensions.replaceModel(contentTemplate, Extensions.findIndexOf(contentTemplate, event -> event instanceof IProcessableElementTag), model);
 
         // Locate the template to decorate
         FragmentExpression decorateTemplateExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);
@@ -124,7 +169,7 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
         // Choose the decorator to use based on template mode, then apply it
         TemplateMode templateMode = getTemplateMode();
         XmlDocumentDecorator decorator
-                = templateMode == TemplateMode.HTML ? new HtmlDocumentDecorator(context, sortingStrategy)
+                = templateMode == TemplateMode.HTML ? new HtmlDocumentDecorator(context, sortingStrategy, autoHeadMerging)
                         : templateMode == TemplateMode.XML ? new XmlDocumentDecorator(context)
                                 : null;
         if (decorator == null) {
@@ -138,6 +183,21 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
 
         // Save layout fragments for use later by layout:fragment processors
         FragmentMap.setForNode(context, structureHandler, pageFragments);
+
+        // Scope variables in fragment definition to template.  Parameters *must* be
+        // named as there is no mechanism for setting their name at the target
+        // layout/template.
+        if (decorateTemplateExpression.hasParameters()) {
+            if (decorateTemplateExpression.hasSyntheticParameters()) {
+                throw new IllegalArgumentException("Fragment parameters must be named when used with layout:decorate/data-layout-decorate");
+            }
+            AssignationSequence parameters = decorateTemplateExpression.getParameters();
+            if (parameters != null) {
+                for (Assignation parameter : parameters) {
+                    structureHandler.setLocalVariable((String) parameter.getLeft().execute(context), parameter.getRight().execute(context));
+                }
+            }
+        }
     }
 
 }

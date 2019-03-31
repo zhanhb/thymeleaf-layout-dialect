@@ -20,19 +20,15 @@ import java.util.Map;
 import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
 import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
-import nz.net.ultraq.thymeleaf.fragments.FragmentParameterNamesExtractor;
-import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
+import nz.net.ultraq.thymeleaf.fragments.FragmentParameterVariableUpdater;
 import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.model.IModel;
-import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
-import org.thymeleaf.standard.expression.Assignation;
-import org.thymeleaf.standard.expression.AssignationSequence;
 import org.thymeleaf.standard.expression.FragmentExpression;
 import org.thymeleaf.templatemode.TemplateMode;
 
@@ -89,28 +85,9 @@ public class ReplaceProcessor extends AbstractAttributeModelProcessor {
         IModel fragmentForReplacementUse = fragmentForReplacement.cloneModel();
         Extensions.replaceModel(model, 0, fragmentForReplacementUse);
 
-        // When fragment parameters aren't named, derive the name from the fragment definition
-        // TODO: Common code across all the inclusion processors
-        if (fragmentExpression.hasSyntheticParameters()) {
-            String fragmentDefinition = ((IProcessableElementTag) Extensions.first(fragmentForReplacementUse)).getAttributeValue(getDialectPrefix(), FragmentProcessor.PROCESSOR_NAME);
-            List<String> parameterNames = new FragmentParameterNamesExtractor().extract(fragmentDefinition);
-
-            AssignationSequence parameters = fragmentExpression.getParameters();
-            if (parameters != null) {
-                int index = 0;
-                for (Assignation parameter : parameters) {
-                    structureHandler.setLocalVariable(parameterNames.get(index), parameter.getRight().execute(context));
-                    ++index;
-                }
-            }
-        } else { // Otherwise, apply values as is
-            AssignationSequence parameters = fragmentExpression.getParameters();
-            if (parameters != null) {
-                for (Assignation parameter : parameters) {
-                    structureHandler.setLocalVariable((String) parameter.getLeft().execute(context), parameter.getRight().execute(context));
-                }
-            }
-        }
+		// Scope variables in fragment definition to current fragment
+		new FragmentParameterVariableUpdater(getDialectPrefix(), context)
+			.updateLocalVariables(fragmentExpression, fragmentForReplacementUse, structureHandler);
     }
 
 }

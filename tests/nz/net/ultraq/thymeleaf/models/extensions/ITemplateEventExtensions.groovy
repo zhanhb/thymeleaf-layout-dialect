@@ -18,7 +18,6 @@ package nz.net.ultraq.thymeleaf.models.extensions;
 
 import nz.net.ultraq.thymeleaf.internal.Extensions as Z;
 import org.thymeleaf.model.ITemplateEvent;
-import org.thymeleaf.model.IText;
 
 /**
  *
@@ -27,6 +26,18 @@ import org.thymeleaf.model.IText;
 class ITemplateEventExtensions {
     static void apply() {
         ITemplateEvent.metaClass {
+			isClosingElement << {
+				Z.isClosingElement(delegate)
+			}
+			isClosingElementOf << {
+				Z.isClosingElementOf(delegate)
+			}
+			isOpeningElement << {
+				Z.isOpeningElement(delegate)
+			}
+			isOpeningElementOf << {
+				Z.isOpeningElementOf(delegate)
+			}
             isWhitespace << {
                 Z.isWhitespace(delegate)
             }

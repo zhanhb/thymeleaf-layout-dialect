@@ -20,8 +20,8 @@ import nz.net.ultraq.thymeleaf.internal.Extensions;
 import org.thymeleaf.model.IModel;
 
 /**
- * This class provides a way for working with a model's immediate children, by
- * converting events into sub-models of their own.
+ * An iterator that works with a model's immediate children, returning each one
+ * as a model of its own.
  *
  * @author zhanhb
  * @author Emanuel Rabina
@@ -29,23 +29,12 @@ import org.thymeleaf.model.IModel;
 public class ChildModelIterator implements Iterator<IModel> {
 
     private final IModel parent;
-
     private int currentIndex = 1;  // Starts after the root element
 
-    /**
-     * Constructor, sets the model to iterate over.
-     *
-     * @param parent
-     */
     public ChildModelIterator(IModel parent) {
         this.parent = parent;
     }
 
-    /**
-     * Returns whether or not there is another model to be retrieved.
-     *
-     * @return {@code true} if there are more events to process as models.
-     */
     @Override
     public boolean hasNext() {
         return currentIndex < (parent.size() - 1);
@@ -68,6 +57,7 @@ public class ChildModelIterator implements Iterator<IModel> {
      *
      * @throws UnsupportedOperationException
      */
+	// TODO: Not needed from Java 8 onwards - default method does this
     @Override
     public void remove() {
         throw new UnsupportedOperationException();

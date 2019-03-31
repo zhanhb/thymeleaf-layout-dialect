@@ -20,19 +20,15 @@ import java.util.Map;
 import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
 import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
-import nz.net.ultraq.thymeleaf.fragments.FragmentParameterNamesExtractor;
-import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
+import nz.net.ultraq.thymeleaf.fragments.FragmentParameterVariableUpdater;
 import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.model.IModel;
-import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
-import org.thymeleaf.standard.expression.Assignation;
-import org.thymeleaf.standard.expression.AssignationSequence;
 import org.thymeleaf.standard.expression.FragmentExpression;
 import org.thymeleaf.templatemode.TemplateMode;
 
@@ -75,7 +71,7 @@ public class InsertProcessor extends AbstractAttributeModelProcessor {
 
         // Locate the page and fragment to insert
         FragmentExpression fragmentExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);
-        TemplateModel fragmentToInsert = new TemplateModelFinder(context).findFragment(fragmentExpression);
+        TemplateModel fragmentForInsertion = new TemplateModelFinder(context).findFragment(fragmentExpression);
 
         // Gather all fragment parts within this element, scoping them to this element
         Map<String, List<IModel>> includeFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);
@@ -83,35 +79,16 @@ public class InsertProcessor extends AbstractAttributeModelProcessor {
 
         // Keep track of what template is being processed?  Thymeleaf does this for
         // its include processor, so I'm just doing the same here.
-        structureHandler.setTemplateData(fragmentToInsert.getTemplateData());
+        structureHandler.setTemplateData(fragmentForInsertion.getTemplateData());
 
         // Replace the children of this element with those of the to-be-inserted page fragment
-        IModel fragmentToInsertUse = fragmentToInsert.cloneModel();
-        Extensions.clearChildren(model);
-        model.insertModel(1, fragmentToInsertUse);
+        IModel fragmentForInsertionUse = fragmentForInsertion.cloneModel();
+        Extensions.removeChildren(model);
+        model.insertModel(1, fragmentForInsertionUse);
 
-        // When fragment parameters aren't named, derive the name from the fragment definition
-        // TODO: Common code across all the inclusion processors
-        if (fragmentExpression.hasSyntheticParameters()) {
-            String fragmentDefinition = ((IProcessableElementTag) Extensions.first(fragmentToInsertUse)).getAttributeValue(getDialectPrefix(), FragmentProcessor.PROCESSOR_NAME);
-            List<String> parameterNames = new FragmentParameterNamesExtractor().extract(fragmentDefinition);
-
-            AssignationSequence parameters = fragmentExpression.getParameters();
-            if (parameters != null) {
-                int index = 0;
-                for (Assignation parameter : parameters) {
-                    structureHandler.setLocalVariable(parameterNames.get(index), parameter.getRight().execute(context));
-                    ++index;
-                }
-            }
-        } else { // Otherwise, apply values as is
-            AssignationSequence parameters = fragmentExpression.getParameters();
-            if (parameters != null) {
-                for (Assignation parameter : parameters) {
-                    structureHandler.setLocalVariable((String) parameter.getLeft().execute(context), parameter.getRight().execute(context));
-                }
-            }
-        }
+        // Scope variables in fragment definition to current fragment
+        new FragmentParameterVariableUpdater(getDialectPrefix(), context)
+                .updateLocalVariables(fragmentExpression, fragmentForInsertionUse, structureHandler);
     }
 
 }

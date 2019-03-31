@@ -49,9 +49,11 @@ public class DecoratorProcessor extends DecorateProcessor {
      * @param templateMode
      * @param dialectPrefix
      * @param sortingStrategy
+	 * @param manualHeadMerging
      */
-    public DecoratorProcessor(TemplateMode templateMode, String dialectPrefix, SortingStrategy sortingStrategy) {
-        super(templateMode, dialectPrefix, sortingStrategy, PROCESSOR_NAME);
+    public DecoratorProcessor(TemplateMode templateMode, String dialectPrefix, SortingStrategy sortingStrategy,
+            boolean manualHeadMerging) {
+        super(templateMode, dialectPrefix, sortingStrategy, manualHeadMerging, PROCESSOR_NAME);
     }
 
     /**

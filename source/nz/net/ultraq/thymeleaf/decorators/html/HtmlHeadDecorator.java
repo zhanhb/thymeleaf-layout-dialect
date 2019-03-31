@@ -18,14 +18,14 @@ package nz.net.ultraq.thymeleaf.decorators.html;
 import java.util.Iterator;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
+import nz.net.ultraq.thymeleaf.decorators.strategies.AppendingStrategy;
+import nz.net.ultraq.thymeleaf.decorators.strategies.GroupingStrategy;
 import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
 import org.thymeleaf.context.ITemplateContext;
-import org.thymeleaf.model.IElementTag;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
-import org.thymeleaf.model.IOpenElementTag;
 
 /**
  * A decorator specific to processing an HTML {@code <head>} element.
@@ -68,20 +68,30 @@ public class HtmlHeadDecorator implements Decorator {
         }
 
         IModelFactory modelFactory = context.getModelFactory();
-        ITemplateEventPredicate isTitle = event -> event instanceof IOpenElementTag && "title".equals(((IElementTag) event).getElementCompleteName());
+        ITemplateEventPredicate isTitle = event -> Extensions.isOpeningElementOf(event, "title");
 
         // New head model based off the target being decorated
         IModel resultHeadModel = new AttributeMerger(context).merge(targetHeadModel, sourceHeadModel);
-        int titleIndex = Extensions.findIndexOf(resultHeadModel, isTitle);
-        if (titleIndex != -1) {
-            Extensions.removeModelWithWhitespace(resultHeadModel, titleIndex);
-        }
 
         // Get the source and target title elements to pass to the title decorator
-        IModel resultTitle = new HtmlTitleDecorator(context).decorate(titleRetriever(targetHeadModel, isTitle),
+        IModel resultTitle = new HtmlTitleDecorator(context).decorate(
+                titleRetriever(targetHeadModel, isTitle),
                 titleRetriever(sourceHeadModel, isTitle)
         );
-        Extensions.insertModelWithWhitespace(resultHeadModel, 1, resultTitle, modelFactory);
+        if (Extensions.asBoolean(resultTitle)) {
+
+            // TODO: Pure hack for retaining 2.x compatibility, remove the <head> from the layout :/
+            if (sortingStrategy instanceof AppendingStrategy || sortingStrategy instanceof GroupingStrategy) {
+                Extensions.removeModel(resultHeadModel, Extensions.findIndexOf(resultHeadModel, isTitle));
+            }
+
+            int targetTitleIndex = sortingStrategy.findPositionForModel(resultHeadModel, resultTitle);
+            if (isTitle.test(resultHeadModel.get(targetTitleIndex))) {
+                Extensions.replaceModel(resultHeadModel, targetTitleIndex, resultTitle);
+            } else {
+                Extensions.insertModelWithWhitespace(resultHeadModel, targetTitleIndex, resultTitle, modelFactory);
+            }
+        }
 
         // Merge the rest of the source <head> elements with the target <head>
         // elements using the current merging strategy
@@ -91,10 +101,9 @@ public class HtmlHeadDecorator implements Decorator {
                 if (isTitle.test(Extensions.first(model))) {
                     continue;
                 }
-                int position = sortingStrategy.findPositionForModel(resultHeadModel, model);
-                if (position != -1) {
-                    Extensions.insertModelWithWhitespace(resultHeadModel, position, model, modelFactory);
-                }
+                Extensions.insertModelWithWhitespace(resultHeadModel,
+                        sortingStrategy.findPositionForModel(resultHeadModel, model),
+                        model, modelFactory);
             }
         }
         return resultHeadModel;

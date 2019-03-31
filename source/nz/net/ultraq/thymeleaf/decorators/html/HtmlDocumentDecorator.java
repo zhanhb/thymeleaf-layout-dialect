@@ -36,6 +36,7 @@ import org.thymeleaf.model.IOpenElementTag;
  */
 public class HtmlDocumentDecorator extends XmlDocumentDecorator {
 
+    private final boolean autoHeadMerging;
     private final SortingStrategy sortingStrategy;
 
     /**
@@ -43,10 +44,12 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
      *
      * @param context
      * @param sortingStrategy
+     * @param autoHeadMerging
      */
-    public HtmlDocumentDecorator(ITemplateContext context, SortingStrategy sortingStrategy) {
+    public HtmlDocumentDecorator(ITemplateContext context, SortingStrategy sortingStrategy, boolean autoHeadMerging) {
         super(context);
         this.sortingStrategy = sortingStrategy;
+        this.autoHeadMerging = autoHeadMerging;
     }
 
     /**
@@ -61,22 +64,32 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
         IModelFactory modelFactory = context.getModelFactory();
         IModel resultDocumentModel = targetDocumentModel.cloneModel();
         // Head decoration
-        ITemplateEventPredicate headModelFinder = event -> {
-            return event instanceof IOpenElementTag && "head".equals(((IElementTag) event).getElementCompleteName());
-        };
-        IModel targetHeadModel = Extensions.findModel(resultDocumentModel, headModelFinder);
-        IModel resultHeadModel = new HtmlHeadDecorator(context, sortingStrategy).decorate(targetHeadModel,
-                Extensions.findModel(sourceDocumentModel, headModelFinder)
-        );
-        if (Extensions.asBoolean(resultHeadModel)) {
-            if (Extensions.asBoolean(targetHeadModel)) {
-                Extensions.replaceModel(resultDocumentModel, Extensions.indexOf(resultDocumentModel, targetHeadModel), resultHeadModel);
-            } else {
-                Extensions.insertModelWithWhitespace(resultDocumentModel, Extensions.findIndexOf(resultDocumentModel, event -> {
-                    return (event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName()))
-                            || (event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName()));
-                }) - 1, resultHeadModel, modelFactory);
+        ITemplateEventPredicate headModelFinder = event -> Extensions.isOpeningElementOf(event, "head");
+
+        if (autoHeadMerging) {
+            IModel targetHeadModel = Extensions.findModel(resultDocumentModel, headModelFinder);
+            IModel resultHeadModel = new HtmlHeadDecorator(context, sortingStrategy).decorate(targetHeadModel,
+                    Extensions.findModel(sourceDocumentModel, headModelFinder)
+            );
+            if (Extensions.asBoolean(resultHeadModel)) {
+                if (Extensions.asBoolean(targetHeadModel)) {
+                    Extensions.replaceModel(resultDocumentModel, Extensions.findIndexOfModel(resultDocumentModel, targetHeadModel), resultHeadModel);
+                } else {
+                    Extensions.insertModelWithWhitespace(resultDocumentModel, Extensions.findIndexOf(resultDocumentModel, event -> {
+                        return (event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName()))
+                                || (event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName()));
+                    }) - 1, resultHeadModel, modelFactory);
+                }
             }
+        } else {
+            // TODO: If autoHeadMerging is false, this really shouldn't be needed as
+            //       the basis for `resultDocumentModel` should be the source model.
+            //       This 'hack' is OK for an experimental option, but the fact that
+            //       it exists means I should rethink how the result model is made.
+            Extensions.replaceModel(resultDocumentModel,
+                    Extensions.findIndexOf(resultDocumentModel, headModelFinder),
+                    Extensions.findModel(sourceDocumentModel, headModelFinder)
+            );
         }
 
         // Body decoration
@@ -89,10 +102,10 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
         );
         if (Extensions.asBoolean(resultBodyModel)) {
             if (Extensions.asBoolean(targetBodyModel)) {
-                Extensions.replaceModel(resultDocumentModel, Extensions.indexOf(resultDocumentModel, targetBodyModel), resultBodyModel);
+                Extensions.replaceModel(resultDocumentModel, Extensions.findIndexOfModel(resultDocumentModel, targetBodyModel), resultBodyModel);
             } else {
                 Extensions.insertModelWithWhitespace(resultDocumentModel, Extensions.findIndexOf(resultDocumentModel, event -> {
-                    return event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName());
+                    return Extensions.isClosingElementOf(event, "html");
                 }) - 1, resultBodyModel, modelFactory);
             }
         }

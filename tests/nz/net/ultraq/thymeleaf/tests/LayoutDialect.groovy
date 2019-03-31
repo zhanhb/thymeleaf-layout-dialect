@@ -36,11 +36,10 @@ public class LayoutDialect extends nz.net.ultraq.thymeleaf.LayoutDialect {
             nz.net.ultraq.thymeleaf.models.extensions.IAttributeExtensions,
             nz.net.ultraq.thymeleaf.models.extensions.ICloseElementTagExtensions,
             nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions,
-            nz.net.ultraq.thymeleaf.models.extensions.IOpenElementTagExtensions,
+            nz.net.ultraq.thymeleaf.models.extensions.IProcessableElementTagExtensions,
             nz.net.ultraq.thymeleaf.models.extensions.IStandaloneElementTagExtensions,
             nz.net.ultraq.thymeleaf.models.extensions.ITemplateEventExtensions,
-            nz.net.ultraq.thymeleaf.models.extensions.ITextExtensions,
-            nz.net.ultraq.thymeleaf.models.extensions.TemplateModelExtensions
+            nz.net.ultraq.thymeleaf.models.extensions.ITextExtensions
         ]*.apply()
     }
 
@@ -49,6 +48,10 @@ public class LayoutDialect extends nz.net.ultraq.thymeleaf.LayoutDialect {
 
     public LayoutDialect(SortingStrategy sortingStrategy) {
         super(sortingStrategy);
+    }
+
+    public LayoutDialect(SortingStrategy sortingStrategy, boolean autoHeadMerging){
+        super(sortingStrategy, autoHeadMerging);
     }
 
 }

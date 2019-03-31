@@ -25,6 +25,7 @@ import org.thymeleaf.model.IDocType;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.model.IOpenElementTag;
+import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.model.ITemplateEvent;
 
 /**
@@ -37,9 +38,7 @@ public class XmlDocumentDecorator implements Decorator {
 
     // Find the root element of each document to work with
     private static IModel rootModelFinder(IModel documentModel) {
-        return Extensions.findModel(documentModel, documentEvent -> {
-            return documentEvent instanceof IOpenElementTag;
-        });
+        return Extensions.findModel(documentModel, documentEvent -> documentEvent instanceof IProcessableElementTag);
     }
 
     private static boolean documentContainsDocType(IModel document) {
