@@ -333,19 +333,28 @@ public class Extensions {
 
         if (0 <= pos && pos <= delegate.size()) {
 
-            // Use existing whitespace at the insertion point
+            // Use existing whitespace found at or before the insertion point
             IModel whitespace = getModel(delegate, pos);
             if (asBoolean(whitespace) && isWhitespace(whitespace)) {
                 delegate.insertModel(pos, model);
                 delegate.insertModel(pos, whitespace);
-            } else {
-                // Generate whitespace, usually inserting into a tag that is immediately
-                // closed so whitespace should be added to either side
-                whitespace = modelFactory.createModel(modelFactory.createText("\n\t"));
-                delegate.insertModel(pos, whitespace);
-                delegate.insertModel(pos, model);
-                delegate.insertModel(pos, whitespace);
+                return;
             }
+            if (pos > 0) {
+                whitespace = getModel(delegate, pos - 1);
+                if (asBoolean(whitespace) && isWhitespace(whitespace)) {
+                    delegate.insertModel(pos, whitespace);
+                    delegate.insertModel(pos, model);
+                    return;
+                }
+            }
+
+            // Generate whitespace, usually inserting into a tag that is immediately
+            // closed so whitespace should be added to either side
+            whitespace = modelFactory.createModel(modelFactory.createText("\n\t"));
+            delegate.insertModel(pos, whitespace);
+            delegate.insertModel(pos, model);
+            delegate.insertModel(pos, whitespace);
         }
     }
 

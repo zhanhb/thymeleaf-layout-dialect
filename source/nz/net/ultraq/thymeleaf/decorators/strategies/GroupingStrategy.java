@@ -111,9 +111,7 @@ public class GroupingStrategy implements SortingStrategy {
             if (firstElementIndex != -1) {
                 return firstElementIndex;
             }
-            // Return the end of the <head> element
-            int positions = headModel.size();
-            return positions > 2 ? 2 : 1;
+            return headModel.size() > 2 ? 2 : 1;
         }
 
         int type = findMatchingType(childModel);
