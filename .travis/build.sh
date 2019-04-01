@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+. /opt/jdk_switcher/jdk_switcher.sh
+
 ./mvnw install -Dmaven.javadoc.skip=true
 if [[ "$TRAVIS_JDK_VERSION" == "oraclejdk8" ]]; then
     jdk_switcher use openjdk7
