@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DecorateProcessor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.decorators</a> &gt; <span class="el_source">DecorateProcessor.java</span></div><h1>DecorateProcessor.java</h1><pre class="source lang-java linenums">/*
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DecorateProcessor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.decorators</a> &gt; <span class="el_source">DecorateProcessor.java</span></div><h1>DecorateProcessor.java</h1><pre class="source lang-java linenums">/*
  * Copyright 2012, Emanuel Rabina (http://www.ultraq.net.nz/)
  *
  * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
@@ -17,6 +17,7 @@ package nz.net.ultraq.thymeleaf.decorators;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import nz.net.ultraq.thymeleaf.decorators.html.HtmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
@@ -24,15 +25,19 @@ import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
 import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
 import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
+import org.thymeleaf.context.IContext;
+import org.thymeleaf.context.IExpressionContext;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.engine.TemplateData;
 import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.model.IModel;
-import org.thymeleaf.model.IOpenElementTag;
 import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
+import org.thymeleaf.standard.StandardDialect;
+import org.thymeleaf.standard.expression.Assignation;
+import org.thymeleaf.standard.expression.AssignationSequence;
 import org.thymeleaf.standard.expression.FragmentExpression;
 import org.thymeleaf.templatemode.TemplateMode;
 
@@ -47,6 +52,43 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
     public static final String PROCESSOR_NAME = &quot;decorate&quot;;
     public static final int PROCESSOR_PRECEDENCE = 0;
 
+    /**
+     * Compare the root elements, barring some attributes, to see if they are
+     * the same.
+     *
+     * @param element1
+     * @param element2
+     * @param context
+     * @return {@code true} if the elements share the same name and all
+     * attributes, with the exception of XML namespace declarations and
+     * Thymeleaf's {@code th:with} attribute processor.
+     */
+    private static boolean rootElementsEqual(IProcessableElementTag element1,
+            IProcessableElementTag element2, IContext context) {
+
+<span class="pc bpc" id="L69" title="2 of 4 branches missed.">        if (element1 != null &amp;&amp; element2 != null</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">                &amp;&amp; Objects.equals(element1.getElementDefinition(), element2.getElementDefinition())) {</span>
+<span class="fc" id="L71">            String maybe = Extensions.getPrefixForDialect((IExpressionContext) context, StandardDialect.class) + &quot;:with&quot;;</span>
+<span class="fc" id="L72">            Map&lt;String, String&gt; attributeMap = element2.getAttributeMap();</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">            for (Map.Entry&lt;String, String&gt; entry : element1.getAttributeMap().entrySet()) {</span>
+<span class="fc" id="L74">                String key = entry.getKey();</span>
+<span class="fc" id="L75">                String value = entry.getValue();</span>
+<span class="fc bfc" id="L76" title="All 4 branches covered.">                if (key.startsWith(&quot;xmlns:&quot;) || key.equals(maybe)) {</span>
+<span class="fc" id="L77">                    continue;</span>
+                }
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">                if (!attributeMap.containsKey(key)) {</span>
+<span class="nc" id="L80">                    return false;</span>
+                }
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">                if (!Objects.equals(value, attributeMap.get(key))) {</span>
+<span class="nc" id="L83">                    return false;</span>
+                }
+<span class="fc" id="L85">            }</span>
+<span class="fc" id="L86">            return true;</span>
+        }
+<span class="fc" id="L88">        return false;</span>
+    }
+
+    private final boolean autoHeadMerging;
     private final SortingStrategy sortingStrategy;
 
     /**
@@ -56,10 +98,12 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
      * @param templateMode
      * @param dialectPrefix
      * @param sortingStrategy
+     * @param autoHeadMerging
      */
-    public DecorateProcessor(TemplateMode templateMode, String dialectPrefix, SortingStrategy sortingStrategy) {
-<span class="fc" id="L61">        this(templateMode, dialectPrefix, sortingStrategy, PROCESSOR_NAME);</span>
-<span class="fc" id="L62">    }</span>
+    public DecorateProcessor(TemplateMode templateMode, String dialectPrefix, SortingStrategy sortingStrategy,
+            boolean autoHeadMerging) {
+<span class="fc" id="L105">        this(templateMode, dialectPrefix, sortingStrategy, autoHeadMerging, PROCESSOR_NAME);</span>
+<span class="fc" id="L106">    }</span>
 
     /**
      * Constructor, configurable processor name so that I could support the
@@ -68,13 +112,15 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
      * @param templateMode
      * @param dialectPrefix
      * @param sortingStrategy
+     * @param autoHeadMerging
      * @param attributeName
      */
     protected DecorateProcessor(TemplateMode templateMode, String dialectPrefix, SortingStrategy sortingStrategy,
-            String attributeName) {
-<span class="fc" id="L75">        super(templateMode, dialectPrefix, null, false, attributeName, true, PROCESSOR_PRECEDENCE, false);</span>
-<span class="fc" id="L76">        this.sortingStrategy = sortingStrategy;</span>
-<span class="fc" id="L77">    }</span>
+            boolean autoHeadMerging, String attributeName) {
+<span class="fc" id="L120">        super(templateMode, dialectPrefix, null, false, attributeName, true, PROCESSOR_PRECEDENCE, false);</span>
+<span class="fc" id="L121">        this.sortingStrategy = sortingStrategy;</span>
+<span class="fc" id="L122">        this.autoHeadMerging = autoHeadMerging;</span>
+<span class="fc" id="L123">    }</span>
 
     /**
      * Locates the template to decorate and, once decorated, inserts it into the
@@ -90,55 +136,69 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
     protected void doProcess(ITemplateContext context, IModel model, AttributeName attributeName,
             String attributeValue, IElementModelStructureHandler structureHandler) {
 
-<span class="fc" id="L93">        TemplateModelFinder templateModelFinder = new TemplateModelFinder(context);</span>
+<span class="fc" id="L139">        TemplateModelFinder templateModelFinder = new TemplateModelFinder(context);</span>
 
         // Load the entirety of this template so we can access items outside of the root element
-<span class="fc" id="L96">        String contentTemplateName = context.getTemplateData().getTemplate();</span>
-<span class="fc" id="L97">        IModel contentTemplate = templateModelFinder.findTemplate(contentTemplateName).cloneModel();</span>
+<span class="fc" id="L142">        String contentTemplateName = context.getTemplateData().getTemplate();</span>
+<span class="fc" id="L143">        IModel contentTemplate = templateModelFinder.findTemplate(contentTemplateName).cloneModel();</span>
 
         // Check that the root element is the same as the one currently being processed
-<span class="fc" id="L100">        IOpenElementTag contentRootEvent = (IOpenElementTag) Extensions.find(contentTemplate, event -&gt; event instanceof IOpenElementTag);</span>
-<span class="fc" id="L101">        IProcessableElementTag rootElement = (IProcessableElementTag) Extensions.first(model);</span>
-        // TODO content equals
-<span class="fc bfc" id="L103" title="All 2 branches covered.">        if (!Extensions.equalsIgnoreXmlnsAndThWith(contentRootEvent, context, rootElement)) {</span>
-<span class="fc" id="L104">            throw new IllegalArgumentException(&quot;layout:decorate/data-layout-decorate must appear in the root element of your template&quot;);</span>
+<span class="fc" id="L146">        IProcessableElementTag contentRootEvent = (IProcessableElementTag) Extensions.find(contentTemplate, event -&gt; event instanceof IProcessableElementTag);</span>
+<span class="fc" id="L147">        IProcessableElementTag rootElement = (IProcessableElementTag) Extensions.first(model);</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">        if (!rootElementsEqual(contentRootEvent, rootElement, context)) {</span>
+<span class="fc" id="L149">            throw new IllegalArgumentException(&quot;layout:decorate/data-layout-decorate must appear in the root element of your template&quot;);</span>
         }
 
         // Remove the decorate processor from the root element
-<span class="pc bpc" id="L108" title="1 of 2 branches missed.">        if (rootElement.hasAttribute(attributeName)) {</span>
-<span class="fc" id="L109">            rootElement = context.getModelFactory().removeAttribute(rootElement, attributeName);</span>
-<span class="fc" id="L110">            model.replace(0, rootElement);</span>
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">        if (rootElement.hasAttribute(attributeName)) {</span>
+<span class="fc" id="L154">            rootElement = context.getModelFactory().removeAttribute(rootElement, attributeName);</span>
+<span class="fc" id="L155">            model.replace(0, rootElement);</span>
         }
-<span class="fc" id="L112">        Extensions.replaceModel(contentTemplate, Extensions.findIndexOf(contentTemplate, event -&gt; event instanceof IOpenElementTag), model);</span>
+<span class="fc" id="L157">        Extensions.replaceModel(contentTemplate, Extensions.findIndexOf(contentTemplate, event -&gt; event instanceof IProcessableElementTag), model);</span>
 
         // Locate the template to decorate
-<span class="fc" id="L115">        FragmentExpression decorateTemplateExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);</span>
-<span class="fc" id="L116">        TemplateModel decorateTemplate = templateModelFinder.findTemplate(decorateTemplateExpression);</span>
-<span class="fc" id="L117">        TemplateData decorateTemplateData = decorateTemplate.getTemplateData();</span>
-<span class="fc" id="L118">        IModel clone = decorateTemplate.cloneModel();</span>
+<span class="fc" id="L160">        FragmentExpression decorateTemplateExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);</span>
+<span class="fc" id="L161">        TemplateModel decorateTemplate = templateModelFinder.findTemplate(decorateTemplateExpression);</span>
+<span class="fc" id="L162">        TemplateData decorateTemplateData = decorateTemplate.getTemplateData();</span>
+<span class="fc" id="L163">        IModel clone = decorateTemplate.cloneModel();</span>
 
         // Gather all fragment parts from this page to apply to the new document
         // after decoration has taken place
-<span class="fc" id="L122">        Map&lt;String, List&lt;IModel&gt;&gt; pageFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);</span>
+<span class="fc" id="L167">        Map&lt;String, List&lt;IModel&gt;&gt; pageFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);</span>
 
         // Choose the decorator to use based on template mode, then apply it
-<span class="fc" id="L125">        TemplateMode templateMode = getTemplateMode();</span>
-<span class="pc bpc" id="L126" title="1 of 4 branches missed.">        XmlDocumentDecorator decorator</span>
-                = templateMode == TemplateMode.HTML ? new HtmlDocumentDecorator(context, sortingStrategy)
+<span class="fc" id="L170">        TemplateMode templateMode = getTemplateMode();</span>
+<span class="pc bpc" id="L171" title="1 of 4 branches missed.">        XmlDocumentDecorator decorator</span>
+                = templateMode == TemplateMode.HTML ? new HtmlDocumentDecorator(context, sortingStrategy, autoHeadMerging)
                         : templateMode == TemplateMode.XML ? new XmlDocumentDecorator(context)
                                 : null;
-<span class="pc bpc" id="L130" title="1 of 2 branches missed.">        if (decorator == null) {</span>
-<span class="nc" id="L131">            throw new IllegalArgumentException(</span>
+<span class="pc bpc" id="L175" title="1 of 2 branches missed.">        if (decorator == null) {</span>
+<span class="nc" id="L176">            throw new IllegalArgumentException(</span>
                     &quot;Layout dialect cannot be applied to the &quot; + templateMode + &quot; template mode, only HTML and XML template modes are currently supported&quot;
             );
         }
-<span class="fc" id="L135">        IModel resultTemplate = decorator.decorate(clone, contentTemplate);</span>
-<span class="fc" id="L136">        Extensions.replaceModel(model, 0, resultTemplate);</span>
-<span class="fc" id="L137">        structureHandler.setTemplateData(decorateTemplateData);</span>
+<span class="fc" id="L180">        IModel resultTemplate = decorator.decorate(clone, contentTemplate);</span>
+<span class="fc" id="L181">        Extensions.replaceModel(model, 0, resultTemplate);</span>
+<span class="fc" id="L182">        structureHandler.setTemplateData(decorateTemplateData);</span>
 
         // Save layout fragments for use later by layout:fragment processors
-<span class="fc" id="L140">        FragmentMap.setForNode(context, structureHandler, pageFragments);</span>
-<span class="fc" id="L141">    }</span>
+<span class="fc" id="L185">        FragmentMap.setForNode(context, structureHandler, pageFragments);</span>
+
+        // Scope variables in fragment definition to template.  Parameters *must* be
+        // named as there is no mechanism for setting their name at the target
+        // layout/template.
+<span class="fc bfc" id="L190" title="All 2 branches covered.">        if (decorateTemplateExpression.hasParameters()) {</span>
+<span class="fc bfc" id="L191" title="All 2 branches covered.">            if (decorateTemplateExpression.hasSyntheticParameters()) {</span>
+<span class="fc" id="L192">                throw new IllegalArgumentException(&quot;Fragment parameters must be named when used with layout:decorate/data-layout-decorate&quot;);</span>
+            }
+<span class="fc" id="L194">            AssignationSequence parameters = decorateTemplateExpression.getParameters();</span>
+<span class="pc bpc" id="L195" title="1 of 2 branches missed.">            if (parameters != null) {</span>
+<span class="fc bfc" id="L196" title="All 2 branches covered.">                for (Assignation parameter : parameters) {</span>
+<span class="fc" id="L197">                    structureHandler.setLocalVariable((String) parameter.getLeft().execute(context), parameter.getRight().execute(context));</span>
+<span class="fc" id="L198">                }</span>
+            }
+        }
+<span class="fc" id="L201">    }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

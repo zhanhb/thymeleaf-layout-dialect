@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LayoutDialect.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf</a> &gt; <span class="el_source">LayoutDialect.java</span></div><h1>LayoutDialect.java</h1><pre class="source lang-java linenums">/*
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LayoutDialect.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf</a> &gt; <span class="el_source">LayoutDialect.java</span></div><h1>LayoutDialect.java</h1><pre class="source lang-java linenums">/*
  * Copyright 2012, Emanuel Rabina (http://www.ultraq.net.nz/)
  *
  * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
@@ -21,7 +21,6 @@ import java.util.Set;
 import nz.net.ultraq.thymeleaf.decorators.DecorateProcessor;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor;
-import nz.net.ultraq.thymeleaf.decorators.strategies.AppendingStrategy;
 import nz.net.ultraq.thymeleaf.fragments.CollectFragmentProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
 import nz.net.ultraq.thymeleaf.includes.InsertProcessor;
@@ -44,25 +43,38 @@ public class LayoutDialect extends AbstractProcessorDialect {
     public static final String DIALECT_PREFIX = &quot;layout&quot;;
     public static final int DIALECT_PRECEDENCE = 10;
 
+    private final boolean autoHeadMerging;
     private final SortingStrategy sortingStrategy;
 
     /**
-     * Constructor, configure the layout dialect with the given sorting
-     * strategy.
+     * Constructor, configure the layout dialect.
+     *
+     * @param sortingStrategy
+     * @param autoHeadMerging Experimental option, set to {@code false} to skip
+     * the automatic merging of an HTML {@code &lt;head&gt;} section.
+     */
+    public LayoutDialect(SortingStrategy sortingStrategy, boolean autoHeadMerging) {
+<span class="fc" id="L57">        super(DIALECT_NAME, DIALECT_PREFIX, DIALECT_PRECEDENCE);</span>
+<span class="fc" id="L58">        this.sortingStrategy = sortingStrategy;</span>
+<span class="fc" id="L59">        this.autoHeadMerging = autoHeadMerging;</span>
+<span class="fc" id="L60">    }</span>
+
+    /**
+     * Constructor, configure the layout dialect.
      *
      * @param sortingStrategy
      */
     public LayoutDialect(SortingStrategy sortingStrategy) {
-<span class="fc" id="L56">        super(DIALECT_NAME, DIALECT_PREFIX, DIALECT_PRECEDENCE);</span>
-<span class="fc" id="L57">        this.sortingStrategy = sortingStrategy;</span>
-<span class="fc" id="L58">    }</span>
+<span class="fc" id="L68">        this(sortingStrategy, true);</span>
+<span class="fc" id="L69">    }</span>
 
     /**
-     * Constructor, configure the layout dialect with the appending strategy.
+     * Constructor, configure the layout dialect.
      */
+    @SuppressWarnings(&quot;deprecation&quot;)
     public LayoutDialect() {
-<span class="fc" id="L64">        this(new AppendingStrategy());</span>
-<span class="fc" id="L65">    }</span>
+<span class="fc" id="L76">        this(new nz.net.ultraq.thymeleaf.decorators.strategies.AppendingStrategy());</span>
+<span class="fc" id="L77">    }</span>
 
     /**
      * Returns the layout dialect's processors.
@@ -73,11 +85,11 @@ public class LayoutDialect extends AbstractProcessorDialect {
     @Override
     @SuppressWarnings(&quot;deprecation&quot;)
     public Set&lt;IProcessor&gt; getProcessors(String dialectPrefix) {
-<span class="fc" id="L76">        return new LinkedHashSet&lt;&gt;(Arrays.asList(</span>
+<span class="fc" id="L88">        return new LinkedHashSet&lt;&gt;(Arrays.asList(</span>
                 // Processors available in the HTML template mode
                 new StandardXmlNsTagProcessor(TemplateMode.HTML, dialectPrefix),
-                new DecorateProcessor(TemplateMode.HTML, dialectPrefix, sortingStrategy),
-                new nz.net.ultraq.thymeleaf.decorators.DecoratorProcessor(TemplateMode.HTML, dialectPrefix, sortingStrategy),
+                new DecorateProcessor(TemplateMode.HTML, dialectPrefix, sortingStrategy, autoHeadMerging),
+                new nz.net.ultraq.thymeleaf.decorators.DecoratorProcessor(TemplateMode.HTML, dialectPrefix, sortingStrategy, autoHeadMerging),
                 new nz.net.ultraq.thymeleaf.includes.IncludeProcessor(TemplateMode.HTML, dialectPrefix),
                 new InsertProcessor(TemplateMode.HTML, dialectPrefix),
                 new ReplaceProcessor(TemplateMode.HTML, dialectPrefix),
@@ -86,8 +98,8 @@ public class LayoutDialect extends AbstractProcessorDialect {
                 new TitlePatternProcessor(TemplateMode.HTML, dialectPrefix),
                 // Processors available in the XML template mode
                 new StandardXmlNsTagProcessor(TemplateMode.XML, dialectPrefix),
-                new DecorateProcessor(TemplateMode.XML, dialectPrefix, sortingStrategy),
-                new nz.net.ultraq.thymeleaf.decorators.DecoratorProcessor(TemplateMode.XML, dialectPrefix, sortingStrategy),
+                new DecorateProcessor(TemplateMode.XML, dialectPrefix, sortingStrategy, autoHeadMerging),
+                new nz.net.ultraq.thymeleaf.decorators.DecoratorProcessor(TemplateMode.XML, dialectPrefix, sortingStrategy, autoHeadMerging),
                 new nz.net.ultraq.thymeleaf.includes.IncludeProcessor(TemplateMode.XML, dialectPrefix),
                 new InsertProcessor(TemplateMode.XML, dialectPrefix),
                 new ReplaceProcessor(TemplateMode.XML, dialectPrefix),
@@ -97,4 +109,4 @@ public class LayoutDialect extends AbstractProcessorDialect {
     }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

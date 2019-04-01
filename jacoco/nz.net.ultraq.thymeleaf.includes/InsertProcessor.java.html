@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InsertProcessor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.includes</a> &gt; <span class="el_source">InsertProcessor.java</span></div><h1>InsertProcessor.java</h1><pre class="source lang-java linenums">/*
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InsertProcessor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.includes</a> &gt; <span class="el_source">InsertProcessor.java</span></div><h1>InsertProcessor.java</h1><pre class="source lang-java linenums">/*
  * Copyright 2016, Emanuel Rabina (http://www.ultraq.net.nz/)
  *
  * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
@@ -20,19 +20,15 @@ import java.util.Map;
 import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
 import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
-import nz.net.ultraq.thymeleaf.fragments.FragmentParameterNamesExtractor;
-import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
+import nz.net.ultraq.thymeleaf.fragments.FragmentParameterVariableUpdater;
 import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.model.IModel;
-import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.processor.element.AbstractAttributeModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
-import org.thymeleaf.standard.expression.Assignation;
-import org.thymeleaf.standard.expression.AssignationSequence;
 import org.thymeleaf.standard.expression.FragmentExpression;
 import org.thymeleaf.templatemode.TemplateMode;
 
@@ -57,8 +53,8 @@ public class InsertProcessor extends AbstractAttributeModelProcessor {
      * @param dialectPrefix
      */
     public InsertProcessor(TemplateMode templateMode, String dialectPrefix) {
-<span class="fc" id="L60">        super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);</span>
-<span class="fc" id="L61">    }</span>
+<span class="fc" id="L56">        super(templateMode, dialectPrefix, null, false, PROCESSOR_NAME, true, PROCESSOR_PRECEDENCE, true);</span>
+<span class="fc" id="L57">    }</span>
 
     /**
      * Locates a page fragment and inserts it in the current template.
@@ -74,45 +70,26 @@ public class InsertProcessor extends AbstractAttributeModelProcessor {
             String attributeValue, IElementModelStructureHandler structureHandler) {
 
         // Locate the page and fragment to insert
-<span class="fc" id="L77">        FragmentExpression fragmentExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);</span>
-<span class="fc" id="L78">        TemplateModel fragmentToInsert = new TemplateModelFinder(context).findFragment(fragmentExpression);</span>
+<span class="fc" id="L73">        FragmentExpression fragmentExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);</span>
+<span class="fc" id="L74">        TemplateModel fragmentForInsertion = new TemplateModelFinder(context).findFragment(fragmentExpression);</span>
 
         // Gather all fragment parts within this element, scoping them to this element
-<span class="fc" id="L81">        Map&lt;String, List&lt;IModel&gt;&gt; includeFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);</span>
-<span class="fc" id="L82">        FragmentMap.setForNode(context, structureHandler, includeFragments);</span>
+<span class="fc" id="L77">        Map&lt;String, List&lt;IModel&gt;&gt; includeFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);</span>
+<span class="fc" id="L78">        FragmentMap.setForNode(context, structureHandler, includeFragments);</span>
 
         // Keep track of what template is being processed?  Thymeleaf does this for
         // its include processor, so I'm just doing the same here.
-<span class="fc" id="L86">        structureHandler.setTemplateData(fragmentToInsert.getTemplateData());</span>
+<span class="fc" id="L82">        structureHandler.setTemplateData(fragmentForInsertion.getTemplateData());</span>
 
         // Replace the children of this element with those of the to-be-inserted page fragment
-<span class="fc" id="L89">        IModel fragmentToInsertUse = fragmentToInsert.cloneModel();</span>
-<span class="fc" id="L90">        Extensions.clearChildren(model);</span>
-<span class="fc" id="L91">        model.insertModel(1, fragmentToInsertUse);</span>
+<span class="fc" id="L85">        IModel fragmentForInsertionUse = fragmentForInsertion.cloneModel();</span>
+<span class="fc" id="L86">        Extensions.removeChildren(model);</span>
+<span class="fc" id="L87">        model.insertModel(1, fragmentForInsertionUse);</span>
 
-        // When fragment parameters aren't named, derive the name from the fragment definition
-        // TODO: Common code across all the inclusion processors
-<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (fragmentExpression.hasSyntheticParameters()) {</span>
-<span class="nc" id="L96">            String fragmentDefinition = ((IProcessableElementTag) Extensions.first(fragmentToInsertUse)).getAttributeValue(getDialectPrefix(), FragmentProcessor.PROCESSOR_NAME);</span>
-<span class="nc" id="L97">            List&lt;String&gt; parameterNames = new FragmentParameterNamesExtractor().extract(fragmentDefinition);</span>
-
-<span class="nc" id="L99">            AssignationSequence parameters = fragmentExpression.getParameters();</span>
-<span class="nc bnc" id="L100" title="All 2 branches missed.">            if (parameters != null) {</span>
-<span class="nc" id="L101">                int index = 0;</span>
-<span class="nc bnc" id="L102" title="All 2 branches missed.">                for (Assignation parameter : parameters) {</span>
-<span class="nc" id="L103">                    structureHandler.setLocalVariable(parameterNames.get(index), parameter.getRight().execute(context));</span>
-<span class="nc" id="L104">                    ++index;</span>
-<span class="nc" id="L105">                }</span>
-            }
-<span class="nc" id="L107">        } else { // Otherwise, apply values as is</span>
-<span class="fc" id="L108">            AssignationSequence parameters = fragmentExpression.getParameters();</span>
-<span class="fc bfc" id="L109" title="All 2 branches covered.">            if (parameters != null) {</span>
-<span class="fc bfc" id="L110" title="All 2 branches covered.">                for (Assignation parameter : parameters) {</span>
-<span class="fc" id="L111">                    structureHandler.setLocalVariable((String) parameter.getLeft().execute(context), parameter.getRight().execute(context));</span>
-<span class="fc" id="L112">                }</span>
-            }
-        }
-<span class="fc" id="L115">    }</span>
+        // Scope variables in fragment definition to current fragment
+<span class="fc" id="L90">        new FragmentParameterVariableUpdater(getDialectPrefix(), context)</span>
+<span class="fc" id="L91">                .updateLocalVariables(fragmentExpression, fragmentForInsertionUse, structureHandler);</span>
+<span class="fc" id="L92">    }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

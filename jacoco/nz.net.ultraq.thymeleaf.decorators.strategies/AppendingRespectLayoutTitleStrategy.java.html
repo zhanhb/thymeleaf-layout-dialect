@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AppendingRespectLayoutTitleStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.decorators.strategies</a> &gt; <span class="el_source">AppendingRespectLayoutTitleStrategy.java</span></div><h1>AppendingRespectLayoutTitleStrategy.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019, Emanuel Rabina (http://www.ultraq.net.nz/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package nz.net.ultraq.thymeleaf.decorators.strategies;
+
+import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
+import nz.net.ultraq.thymeleaf.internal.Extensions;
+import org.thymeleaf.model.IModel;
+
+/**
+ * A special version of the {@link AppendingStrategy} sorter that respects the
+ * position of the {@code &lt;title&gt;} element within the layout page.
+ * &lt;p&gt;
+ * The default behaviour of the layout dialect has historically been to place
+ * the {@code &lt;title&gt;} element at the beginning of the {@code &lt;head&gt;} element
+ * during the decoration process; an arbitrary design decision which made
+ * development of this library easier. However, this runs against the
+ * expectations of developers who wished to control the order of elements, most
+ * notably the position of a {@code &lt;meta charset...&gt;} element. This sorting
+ * strategy instead keep {@code &lt;title&gt;}s wherever they exist within the
+ * target/layout template being decorated, and then appending everything else as
+ * normal.
+ * &lt;p&gt;
+ * This will become the default behaviour of the layout dialect from version 3.x
+ * onwards, but was introduced in 2.4.0 to be a non-breaking change.
+ *
+ * @author zhanhb
+ * @author Emanuel Rabina
+ * @since 2.4.0
+ */
+<span class="nc" id="L43">public class AppendingRespectLayoutTitleStrategy implements SortingStrategy {</span>
+
+    /**
+     * For {@code &lt;title&gt;} elements, returns the position of the matching
+     * {@code &lt;title&gt;} in the {@code headModel} argument, otherwise returns the
+     * position at the end of the {@code &lt;head&gt;} section.
+     *
+     * @param headModel
+     * @param childModel
+     * @return The end of the head model.
+     */
+    @Override
+    public int findPositionForModel(IModel headModel, IModel childModel) {
+
+        // Discard text/whitespace nodes
+<span class="nc bnc" id="L58" title="All 2 branches missed.">        if (Extensions.isWhitespace(childModel)) {</span>
+<span class="nc" id="L59">            return -1;</span>
+        }
+
+        // Locate any matching &lt;title&gt; element
+<span class="nc bnc" id="L63" title="All 2 branches missed.">        if (Extensions.isElementOf(childModel, &quot;title&quot;)) {</span>
+<span class="nc" id="L64">            int existingTitleIndex = Extensions.findIndexOf(headModel, event -&gt; Extensions.isOpeningElementOf(event, &quot;title&quot;));</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">            if (existingTitleIndex != -1) {</span>
+<span class="nc" id="L66">                return existingTitleIndex;</span>
+            }
+        }
+
+        // Return the end of the &lt;head&gt; element
+<span class="nc" id="L71">        int positions = headModel.size();</span>
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        return positions - (positions &gt; 2 ? 2 : 1);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

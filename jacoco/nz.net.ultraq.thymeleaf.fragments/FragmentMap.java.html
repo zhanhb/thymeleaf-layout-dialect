@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FragmentMap.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.fragments</a> &gt; <span class="el_source">FragmentMap.java</span></div><h1>FragmentMap.java</h1><pre class="source lang-java linenums">/*
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FragmentMap.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.fragments</a> &gt; <span class="el_source">FragmentMap.java</span></div><h1>FragmentMap.java</h1><pre class="source lang-java linenums">/*
  * Copyright 2015, Emanuel Rabina (http://www.ultraq.net.nz/)
  *
  * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
@@ -17,9 +17,9 @@ package nz.net.ultraq.thymeleaf.fragments;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nonnull;
 import org.thymeleaf.context.IContext;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
@@ -32,7 +32,7 @@ import org.thymeleaf.processor.element.IElementModelStructureHandler;
  * @author Emanuel Rabina
  */
 @SuppressWarnings({&quot;serial&quot;, &quot;CloneableImplementsClone&quot;})
-<span class="nc" id="L35">public class FragmentMap extends HashMap&lt;String, IModel&gt; {</span>
+<span class="fc" id="L35">public class FragmentMap extends HashMap&lt;String, List&lt;IModel&gt;&gt; {</span>
 
     private static final String FRAGMENT_COLLECTION_KEY = &quot;LayoutDialect::FragmentCollection&quot;;
 
@@ -43,10 +43,10 @@ import org.thymeleaf.processor.element.IElementModelStructureHandler;
      * @param context
      * @return A new or existing fragment collection for the context.
      */
-    public static Map&lt;String, LinkedList&lt;IModel&gt;&gt; get(IContext context) {
+    public static Map&lt;String, List&lt;IModel&gt;&gt; get(IContext context) {
         @SuppressWarnings(&quot;unchecked&quot;)
-<span class="fc" id="L48">        Map&lt;String, LinkedList&lt;IModel&gt;&gt; localVariable = (Map&lt;String, LinkedList&lt;IModel&gt;&gt;) context.getVariable(FRAGMENT_COLLECTION_KEY);</span>
-<span class="fc bfc" id="L49" title="All 2 branches covered.">        return localVariable != null ? localVariable : new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L48">        Map&lt;String, List&lt;IModel&gt;&gt; localVariable = (Map&lt;String, List&lt;IModel&gt;&gt;) context.getVariable(FRAGMENT_COLLECTION_KEY);</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        return localVariable != null ? localVariable : new FragmentMap();</span>
     }
 
     /**
@@ -58,24 +58,21 @@ import org.thymeleaf.processor.element.IElementModelStructureHandler;
      * @param fragments The new fragments to add to the map.
      */
     public static void setForNode(IContext context, IElementModelStructureHandler structureHandler,
-            Map&lt;String, List&lt;IModel&gt;&gt; fragments) {
-<span class="fc" id="L62">        Map&lt;String, List&lt;IModel&gt;&gt; res = fragments;</span>
-<span class="fc" id="L63">        Map&lt;String, ? extends List&lt;IModel&gt;&gt; append = get(context);</span>
-<span class="fc bfc" id="L64" title="All 2 branches covered.">        for (Entry&lt;String, ? extends List&lt;IModel&gt;&gt; entry : append.entrySet()) {</span>
-<span class="fc" id="L65">            String key = entry.getKey();</span>
-<span class="fc" id="L66">            List&lt;IModel&gt; value = entry.getValue();</span>
-<span class="fc" id="L67">            List&lt;IModel&gt; list = res.get(key);</span>
+            @Nonnull Map&lt;String, List&lt;IModel&gt;&gt; fragments) {
+<span class="fc" id="L62">        Map&lt;String, List&lt;IModel&gt;&gt; accumulator = get(context);</span>
+<span class="fc" id="L63">        LinkedHashMap&lt;String, List&lt;IModel&gt;&gt; clone = new LinkedHashMap&lt;&gt;(fragments);</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        for (Entry&lt;String, List&lt;IModel&gt;&gt; entry : accumulator.entrySet()) {</span>
+<span class="fc" id="L65">            String fragmentName = entry.getKey();</span>
+<span class="fc" id="L66">            List&lt;IModel&gt; fragmentList = entry.getValue();</span>
+<span class="fc" id="L67">            List&lt;IModel&gt; list = clone.get(fragmentName);</span>
 <span class="fc bfc" id="L68" title="All 2 branches covered.">            if (list != null) {</span>
-<span class="fc" id="L69">                LinkedList&lt;IModel&gt; tmp = new LinkedList&lt;&gt;();</span>
-<span class="fc" id="L70">                tmp.addAll(list);</span>
-<span class="fc" id="L71">                tmp.addAll(value);</span>
-<span class="fc" id="L72">                res.put(key, tmp);</span>
-<span class="fc" id="L73">            } else {</span>
-<span class="fc" id="L74">                res.put(key, value);</span>
+<span class="fc" id="L69">                list.addAll(fragmentList);</span>
+            } else {
+<span class="fc" id="L71">                clone.put(fragmentName, fragmentList);</span>
             }
-<span class="fc" id="L76">        }</span>
-<span class="fc" id="L77">        structureHandler.setLocalVariable(FRAGMENT_COLLECTION_KEY, res);</span>
-<span class="fc" id="L78">    }</span>
+<span class="fc" id="L73">        }</span>
+<span class="fc" id="L74">        structureHandler.setLocalVariable(FRAGMENT_COLLECTION_KEY, clone);</span>
+<span class="fc" id="L75">    }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
