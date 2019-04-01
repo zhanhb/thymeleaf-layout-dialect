@@ -38,6 +38,9 @@ class ConcurrentWeakIdentityHashMap<K, V> {
     }
 
     public V get(Object key) {
+        if (key == null) {
+            return null;
+        }
         purgeKeys();
         return map.get(new Key<>(key, null));
     }

@@ -17,6 +17,7 @@ package nz.net.ultraq.thymeleaf.internal;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -28,10 +29,16 @@ import static org.junit.Assert.assertSame;
  */
 public class ConcurrentWeakIdentityHashMapTest {
 
+    private ConcurrentWeakIdentityHashMap<Object, Object> instance;
+
+    @Before
+    public void setUp() {
+        instance = new ConcurrentWeakIdentityHashMap<>(16);
+    }
+
     @Test
     @SuppressWarnings("SleepWhileInLoop")
     public void testEnsureRemoved() throws InterruptedException {
-        ConcurrentWeakIdentityHashMap<Object, Object> instance = new ConcurrentWeakIdentityHashMap<>(16);
         instance.putIfAbsent(new Object(), new Object());
         assertEquals(1, instance.size());
         System.gc();
@@ -46,7 +53,6 @@ public class ConcurrentWeakIdentityHashMapTest {
 
     @Test
     public void testMutableKey() {
-        ConcurrentWeakIdentityHashMap<Object, Object> instance = new ConcurrentWeakIdentityHashMap<>(16);
         Map<Object, Object> key = new HashMap<>(1);
         instance.putIfAbsent(key, key);
         // change key hashCode
@@ -55,6 +61,12 @@ public class ConcurrentWeakIdentityHashMapTest {
         assertEquals(1, instance.size());
         key.remove("test1");
         assertSame(key, instance.get(key));
+    }
+
+    @Test
+    public void testGetNull() {
+        // should be ok
+        instance.get(null);
     }
 
 }

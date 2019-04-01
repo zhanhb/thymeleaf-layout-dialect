@@ -417,7 +417,11 @@ public class Extensions {
      *
      * @return A new iterator over the events of this model.
      */
-    public static Iterator<ITemplateEvent> iterator(IModel delegate) {
+    @Nonnull
+    public static Iterator<ITemplateEvent> iterator(@Nullable IModel delegate) {
+        if (delegate == null) {
+            return Collections.emptyIterator();
+        }
         return new EventIterator(delegate);
     }
 
@@ -740,18 +744,12 @@ public class Extensions {
      */
     public static String getPrefixForDialect(@Nonnull IExpressionContext delegate, Class<? extends IProcessorDialect> dialectClass) {
         return getOrCreate(delegate, DIALECT_PREFIX_PREFIX + dialectClass.getName(), () -> {
-            DialectConfiguration dialectConfiguration = null;
             for (DialectConfiguration dialectConfig : delegate.getConfiguration().getDialectConfigurations()) {
                 if (dialectClass.isInstance(dialectConfig.getDialect())) {
-                    dialectConfiguration = dialectConfig;
-                    break;
-                }
-            }
-            if (dialectConfiguration != null) {
-                if (dialectConfiguration.isPrefixSpecified()) {
-                    return dialectConfiguration.getPrefix();
-                } else {
-                    return ((IProcessorDialect) dialectConfiguration.getDialect()).getPrefix();
+                    if (dialectConfig.isPrefixSpecified()) {
+                        return dialectConfig.getPrefix();
+                    }
+                    return ((IProcessorDialect) dialectConfig.getDialect()).getPrefix();
                 }
             }
             return null;
