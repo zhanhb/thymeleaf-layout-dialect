@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.zhanhb</groupId>
     <artifactId>thymeleaf-layout-dialect</artifactId>
-    <version>2.4.1</version>
+    <version>2.4.2.BUILD-SNAPSHOT</version>
     <name>Thymeleaf Layout Dialect</name>
     <description>Thymeleaf Layout Dialect rewritten in java.</description>
     <url>https://github.com/zhanhb/thymeleaf-layout-dialect</url>
@@ -68,7 +68,7 @@
     <scm>
         <connection>scm:git:git@github.com:zhanhb/thymeleaf-layout-dialect.git</connection>
         <developerConnection>scm:git:git@github.com:zhanhb/thymeleaf-layout-dialect.git</developerConnection>
-        <tag>2.4.1.RELEASE</tag>
+        <tag>HEAD</tag>
         <url>https://github.com/zhanhb/thymeleaf-layout-dialect</url>
     </scm>
 
