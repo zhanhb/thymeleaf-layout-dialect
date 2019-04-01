@@ -123,32 +123,36 @@ public class Extensions {
      * @return {@code true} if this model is the same (barring whitespace) as
      * the other one.
      */
-    public static boolean equalsIgnoreWhitespace(@Nonnull IModel delegate, @Nonnull IModel other) {
-        if (other instanceof IModel) {
-            Iterator<ITemplateEvent> it = iterator(delegate);
-            Iterator<ITemplateEvent> iterator = iterator(other);
-            ITemplateEvent next;
-            ITemplateEvent that;
-            do {
-                do {
-                    if (!it.hasNext()) {
-                        do {
-                            if (!iterator.hasNext()) {
-                                return true;
-                            }
-                        } while (isWhitespace(iterator.next()));
-                        return false;
-                    }
-                    next = it.next();
-                } while (isWhitespace(next));
-                do {
-                    if (!iterator.hasNext()) {
-                        return false;
-                    }
-                    that = iterator.next();
-                } while (isWhitespace(that));
-            } while (equals(next, that));
+    public static boolean equalsIgnoreWhitespace(@Nullable IModel delegate, @Nullable IModel other) {
+        if (delegate == other) {
+            return true;
         }
+        if (delegate == null || other == null) {
+            return false;
+        }
+        Iterator<ITemplateEvent> it = iterator(delegate);
+        Iterator<ITemplateEvent> iterator = iterator(other);
+        ITemplateEvent next;
+        ITemplateEvent that;
+        do {
+            do {
+                if (!it.hasNext()) {
+                    do {
+                        if (!iterator.hasNext()) {
+                            return true;
+                        }
+                    } while (isWhitespace(iterator.next()));
+                    return false;
+                }
+                next = it.next();
+            } while (isWhitespace(next));
+            do {
+                if (!iterator.hasNext()) {
+                    return false;
+                }
+                that = iterator.next();
+            } while (isWhitespace(that));
+        } while (equals(next, that));
         return false;
     }
 
@@ -160,9 +164,10 @@ public class Extensions {
      * @param closure
      * @return {@code true} if every event satisfies the closure.
      */
-    public static boolean everyWithIndex(@Nonnull IModel delegate, @Nonnull ITemplateEventIntPredicate closure) {
-        for (int i = 0, size = delegate.size(); i < size; i++) {
-            if (!closure.test(delegate.get(i), i)) {
+    public static boolean everyWithIndex(@Nullable IModel delegate, @Nonnull ITemplateEventIntPredicate closure) {
+        int index = 0;
+        for (Iterator<ITemplateEvent> iterator = iterator(delegate); iterator.hasNext(); ++index) {
+            if (!closure.test(iterator.next(), index)) {
                 return false;
             }
         }
@@ -179,7 +184,7 @@ public class Extensions {
      * nothing matched.
      */
     @Nullable
-    public static ITemplateEvent find(@Nonnull IModel delegate, @Nonnull ITemplateEventPredicate closure) {
+    public static ITemplateEvent find(@Nullable IModel delegate, @Nonnull ITemplateEventPredicate closure) {
         for (Iterator<ITemplateEvent> iterator = iterator(delegate); iterator.hasNext();) {
             ITemplateEvent event = iterator.next();
             if (closure.test(event)) {
@@ -196,7 +201,7 @@ public class Extensions {
      * @return A list of matched events.
      */
     @Nonnull
-    public static List<ITemplateEvent> findAll(@Nonnull IModel delegate, @Nonnull ITemplateEventPredicate closure) {
+    public static List<ITemplateEvent> findAll(@Nullable IModel delegate, @Nonnull ITemplateEventPredicate closure) {
         ArrayList<ITemplateEvent> answer = new ArrayList<>();
         for (Iterator<ITemplateEvent> iterator = iterator(delegate); iterator.hasNext();) {
             ITemplateEvent event = iterator.next();
