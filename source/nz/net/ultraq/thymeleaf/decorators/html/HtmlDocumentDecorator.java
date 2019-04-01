@@ -20,11 +20,8 @@ import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
 import org.thymeleaf.context.ITemplateContext;
-import org.thymeleaf.model.ICloseElementTag;
-import org.thymeleaf.model.IElementTag;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
-import org.thymeleaf.model.IOpenElementTag;
 
 /**
  * A decorator made to work over an HTML document. Decoration for a document
@@ -76,8 +73,8 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
                     Extensions.replaceModel(resultDocumentModel, Extensions.findIndexOfModel(resultDocumentModel, targetHeadModel), resultHeadModel);
                 } else {
                     Extensions.insertModelWithWhitespace(resultDocumentModel, Extensions.findIndexOf(resultDocumentModel, event -> {
-                        return (event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName()))
-                                || (event instanceof ICloseElementTag && "html".equals(((IElementTag) event).getElementCompleteName()));
+                        return Extensions.isOpeningElementOf(event, "body")
+                                || Extensions.isClosingElementOf(event, "html");
                     }) - 1, resultHeadModel, modelFactory);
                 }
             }
@@ -93,9 +90,7 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
         }
 
         // Body decoration
-        ITemplateEventPredicate bodyModelFinder = event -> {
-            return event instanceof IOpenElementTag && "body".equals(((IElementTag) event).getElementCompleteName());
-        };
+        ITemplateEventPredicate bodyModelFinder = event -> Extensions.isOpeningElementOf(event, "body");
         IModel targetBodyModel = Extensions.findModel(resultDocumentModel, bodyModelFinder);
         IModel resultBodyModel = new HtmlBodyDecorator(context).decorate(targetBodyModel,
                 Extensions.findModel(sourceDocumentModel, bodyModelFinder)
