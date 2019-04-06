@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.ITemplateContext;
@@ -160,7 +161,8 @@ public class ModelBuilder {
      * @param parent
      * @param child
      */
-    public void nodeCompleted(IModel parent, IModel child) {
+    @SuppressWarnings("null")
+    public void nodeCompleted(@Nullable IModel parent, @Nullable IModel child) {
         if (Extensions.asBoolean(parent)) {
             parent.insertModel(parent.size() - 1, child);
         }

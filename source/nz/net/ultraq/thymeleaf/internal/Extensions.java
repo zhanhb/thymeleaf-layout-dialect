@@ -104,8 +104,11 @@ public class Extensions {
      * @param other
      * @return {@code true} if this model is the same as the other one.
      */
-    public static boolean equals(IModel delegate, @Nullable Object other) {
-        if (other instanceof IModel) {
+    public static boolean equals(@Nullable IModel delegate, @Nullable Object other) {
+        if (delegate == other) {
+            return true;
+        }
+        if (delegate != null && other instanceof IModel) {
             IModel iModel = (IModel) other;
             if (delegate.size() == iModel.size()) {
                 return everyWithIndex(delegate, (event, index) -> equals(event, iModel.get(index)));
@@ -202,6 +205,7 @@ public class Extensions {
      */
     @Nonnull
     public static List<ITemplateEvent> findAll(@Nullable IModel delegate, @Nonnull ITemplateEventPredicate closure) {
+        @SuppressWarnings("CollectionWithoutInitialCapacity")
         ArrayList<ITemplateEvent> answer = new ArrayList<>();
         for (Iterator<ITemplateEvent> iterator = iterator(delegate); iterator.hasNext();) {
             ITemplateEvent event = iterator.next();
@@ -303,19 +307,16 @@ public class Extensions {
      * @return Model at the given position.
      */
     @Nullable
-    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
+    @SuppressWarnings({"ValueOfIncrementOrDecrementUsed", "AssignmentToMethodParameter"})
     public static IModel getModel(@Nonnull IModel delegate, int pos) {
         if (0 <= pos && pos < delegate.size()) {
-            IModel clone = delegate.cloneModel();
-            int removeBefore = delegate instanceof TemplateModel ? pos - 1 : pos;
-            int removeAfter = clone.size() - (removeBefore + sizeOfModelAt(delegate, pos));
-            while (removeBefore-- > 0) {
-                removeFirst(clone);
+            IModel result = delegate.getConfiguration()
+                    .getModelFactory(delegate.getTemplateMode())
+                    .createModel();
+            for (int size = sizeOfModelAt(delegate, pos); size-- > 0; ++pos) {
+                result.add(delegate.get(pos));
             }
-            while (removeAfter-- > 0) {
-                removeLast(clone);
-            }
-            return clone;
+            return result;
         }
         return null;
     }
@@ -329,7 +330,9 @@ public class Extensions {
      * @param model
      * @param modelFactory
      */
-    public static void insertModelWithWhitespace(@Nonnull IModel delegate, int pos, @Nonnull IModel model, @Nonnull IModelFactory modelFactory) {
+    @SuppressWarnings("null")
+    public static void insertModelWithWhitespace(@Nonnull IModel delegate, int pos,
+            @Nullable IModel model, @Nonnull IModelFactory modelFactory) {
 
         if (0 <= pos && pos <= delegate.size()) {
 
@@ -367,7 +370,9 @@ public class Extensions {
      * @param event
      * @param modelFactory
      */
-    public static void insertWithWhitespace(@Nonnull IModel delegate, int pos, @Nonnull ITemplateEvent event, @Nonnull IModelFactory modelFactory) {
+    @SuppressWarnings("null")
+    public static void insertWithWhitespace(@Nonnull IModel delegate, int pos,
+            @Nullable ITemplateEvent event, @Nonnull IModelFactory modelFactory) {
 
         if (0 <= pos && pos <= delegate.size()) {
 
@@ -412,8 +417,8 @@ public class Extensions {
      * the last event is the matching closing tag, and whether the element has
      * the given tag name.
      */
-    public static boolean isElementOf(@Nonnull IModel delegate, String tagName) {
-        return isElement(delegate) && ((IElementTag) first(delegate)).getElementCompleteName().equals(tagName);
+    public static boolean isElementOf(@Nonnull IModel delegate, @Nullable String tagName) {
+        return isElement(delegate) && Objects.equals(((IElementTag) first(delegate)).getElementCompleteName(), tagName);
     }
 
     /**
@@ -505,9 +510,11 @@ public class Extensions {
      * @param pos A valid index within the current model.
      * @param model
      */
-    public static void replaceModel(@Nonnull IModel delegate, int pos, @Nonnull IModel model) {
+    public static void replaceModel(@Nonnull IModel delegate, int pos, @Nullable IModel model) {
         if (0 <= pos && pos < delegate.size()) {
             removeModel(delegate, pos);
+            // noop if model is null
+            // https://github.com/thymeleaf/thymeleaf/blob/thymeleaf-3.0.11.RELEASE/src/main/java/org/thymeleaf/engine/Model.java#L206
             delegate.insertModel(pos, model);
         }
     }
@@ -534,6 +541,7 @@ public class Extensions {
                 if (event instanceof IOpenElementTag) {
                     level++;
                 } else if (event instanceof ICloseElementTag) {
+                    //noinspection StatementWithEmptyBody
                     if (((ICloseElementTag) event).isUnmatched()) {
                         // Do nothing.  Unmatched closing tags do not correspond to any
                         // opening element, and so should not affect the model level.
@@ -596,8 +604,8 @@ public class Extensions {
      * name.
      */
     @SuppressWarnings("null")
-    public static boolean isClosingElementOf(@Nullable ITemplateEvent delegate, String tagName) {
-        return isClosingElement(delegate) && ((IElementTag) delegate).getElementCompleteName().equals(tagName);
+    public static boolean isClosingElementOf(@Nullable ITemplateEvent delegate, @Nullable String tagName) {
+        return isClosingElement(delegate) && Objects.equals(((IElementTag) delegate).getElementCompleteName(), tagName);
     }
 
     /**
@@ -618,8 +626,8 @@ public class Extensions {
      * tag name.
      */
     @SuppressWarnings("null")
-    public static boolean isOpeningElementOf(@Nullable ITemplateEvent delegate, String tagName) {
-        return isOpeningElement(delegate) && ((IElementTag) delegate).getElementCompleteName().equals(tagName);
+    public static boolean isOpeningElementOf(@Nullable ITemplateEvent delegate, @Nullable String tagName) {
+        return isOpeningElement(delegate) && Objects.equals(((IElementTag) delegate).getElementCompleteName(), tagName);
     }
 
     /**
