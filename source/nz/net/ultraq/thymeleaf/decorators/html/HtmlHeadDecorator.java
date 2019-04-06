@@ -18,8 +18,6 @@ package nz.net.ultraq.thymeleaf.decorators.html;
 import java.util.Iterator;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
-import nz.net.ultraq.thymeleaf.decorators.strategies.AppendingStrategy;
-import nz.net.ultraq.thymeleaf.decorators.strategies.GroupingStrategy;
 import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
@@ -61,6 +59,7 @@ public class HtmlHeadDecorator implements Decorator {
      * @return Result of the decoration.
      */
     @Override
+    @SuppressWarnings("deprecation")
     public IModel decorate(IModel targetHeadModel, IModel sourceHeadModel) {
         // If none of the parameters are present, return nothing
         if (!Extensions.asBoolean(targetHeadModel) && !Extensions.asBoolean(sourceHeadModel)) {
@@ -81,7 +80,8 @@ public class HtmlHeadDecorator implements Decorator {
         if (Extensions.asBoolean(resultTitle)) {
 
             // TODO: Pure hack for retaining 2.x compatibility, remove the <head> from the layout :/
-            if (sortingStrategy instanceof AppendingStrategy || sortingStrategy instanceof GroupingStrategy) {
+            if (sortingStrategy instanceof nz.net.ultraq.thymeleaf.decorators.strategies.AppendingStrategy
+                    || sortingStrategy instanceof nz.net.ultraq.thymeleaf.decorators.strategies.GroupingStrategy) {
                 Extensions.removeModel(resultHeadModel, Extensions.findIndexOf(resultHeadModel, isTitle));
             }
 
