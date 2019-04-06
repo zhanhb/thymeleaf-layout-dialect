@@ -502,6 +502,7 @@
                         <include>**/*Tests.class</include>
                         <include>**/*Executor.class</include>
                         <include>**/*ExecutorGrouping.class</include>
+                        <include>**/*TestExecutor*.class</include>
                     </includes>
                     <excludes>
                         <exclude>**/Abstract*.class</exclude>
