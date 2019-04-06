@@ -437,7 +437,7 @@
                     <excludePackageNames>*.internal.*</excludePackageNames>
                     <locale>en_US</locale>
                     <links>
-                        <link>http://www.thymeleaf.org/apidocs/thymeleaf/${thymeleaf.version}/</link>
+                        <link>https://www.thymeleaf.org/apidocs/thymeleaf/${thymeleaf.version}</link>
                     </links>
                     <outputDirectory>${project.build.directory}/site/apidocs</outputDirectory>
                 </configuration>
