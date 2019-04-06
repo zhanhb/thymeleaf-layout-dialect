@@ -61,10 +61,6 @@
         </contributor>
     </contributors>
 
-    <prerequisites>
-        <maven>3.2</maven>
-    </prerequisites>
-
     <scm>
         <connection>scm:git:git@github.com:zhanhb/thymeleaf-layout-dialect.git</connection>
         <developerConnection>scm:git:git@github.com:zhanhb/thymeleaf-layout-dialect.git</developerConnection>
@@ -118,6 +114,7 @@
         <mockito.version>2.13.0</mockito.version>
         <objenesis.version>2.6</objenesis.version>
         <ognl3.version>3.1.12</ognl3.version>
+        <prerequisites.maven>3.2</prerequisites.maven>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <reflections.version>0.9.11</reflections.version>
         <slf4j.version>1.7.25</slf4j.version>
@@ -364,6 +361,27 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>2.8.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.4.1</version>
+                <executions>
+                    <execution>
+                        <id>enforce-versions</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <message>You are running an older version of Maven. ${project.name} requires at least Maven ${prerequisites.maven}</message>
+                                    <version>[${prerequisites.maven},)</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
