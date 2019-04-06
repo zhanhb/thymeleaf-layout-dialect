@@ -380,6 +380,9 @@
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
+                        <manifestEntries>
+                            <Built-By>zhanhb</Built-By>
+                        </manifestEntries>
                         <manifestSections>
                             <manifestSection>
                                 <name>nz/net/ultraq/thymeleaf/expressions/</name>

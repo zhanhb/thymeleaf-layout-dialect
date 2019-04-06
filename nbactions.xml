@@ -8,7 +8,7 @@
         </packagings>
         <goals>
             <goal>release:perform</goal>
-            <goal>"-Darguments=-s .travis/settings.xml -Prelease-profile -Duser.name=zhanhb"</goal>
+            <goal>"-Darguments=-s .travis/settings.xml -Prelease-profile"</goal>
         </goals>
     </action>
     <action>
