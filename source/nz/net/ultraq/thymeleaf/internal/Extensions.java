@@ -31,7 +31,6 @@ import org.thymeleaf.context.IContext;
 import org.thymeleaf.context.IEngineContext;
 import org.thymeleaf.context.IExpressionContext;
 import org.thymeleaf.dialect.IProcessorDialect;
-import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.model.IAttribute;
 import org.thymeleaf.model.ICloseElementTag;
 import org.thymeleaf.model.IElementTag;
@@ -49,13 +48,13 @@ import org.thymeleaf.model.IText;
  * @author zhanhb
  * @author Emanuel Rabina
  * @see IModel
- * @see TemplateModel
  * @see ITemplateEvent
  * @see IProcessableElementTag
  * @see ICloseElementTag
  * @see IStandaloneElementTag
  * @see IAttribute
  * @see IText
+ * @see IContext
  * @see IExpressionContext
  */
 public class Extensions {
