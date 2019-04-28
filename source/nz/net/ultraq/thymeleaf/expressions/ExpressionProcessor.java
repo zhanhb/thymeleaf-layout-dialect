@@ -37,6 +37,7 @@ public class ExpressionProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(ExpressionProcessor.class);
     private static final Pattern THYMELEAF_3_FRAGMENT_EXPRESSION = Pattern.compile("(?s)^~\\{.+\\}$");
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
     private static final Set<String> oldFragmentExpressions = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     private final IExpressionContext context;

@@ -267,7 +267,7 @@
         <testSourceDirectory>${project.basedir}/tests</testSourceDirectory>
         <resources>
             <resource>
-                <directory>${project.basedir}/source</directory>
+                <directory>${project.build.sourceDirectory}</directory>
                 <excludes>
                     <exclude>**/*.java</exclude>
                     <exclude>**/*.groovy</exclude>
@@ -276,7 +276,7 @@
         </resources>
         <testResources>
             <testResource>
-                <directory>${project.basedir}/tests</directory>
+                <directory>${project.build.testSourceDirectory}</directory>
                 <excludes>
                     <exclude>**/*.java</exclude>
                     <exclude>**/*.groovy</exclude>

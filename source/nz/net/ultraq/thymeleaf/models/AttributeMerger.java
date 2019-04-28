@@ -70,6 +70,7 @@ public class AttributeMerger implements ModelMerger {
         String standardDialectPrefix = Extensions.getPrefixForDialect(context, StandardDialect.class);
 
         // Merge attributes from the source model's root event to the target model's root event
+        // TODO nullable
         for (IAttribute sourceAttribute : ((IProcessableElementTag) sourceModel.get(0)).getAllAttributes()) {
             // Don't include layout:fragment processors
             if (Extensions.equalsName(sourceAttribute, layoutDialectPrefix, FragmentProcessor.PROCESSOR_NAME)
