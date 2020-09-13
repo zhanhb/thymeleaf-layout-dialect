@@ -6,13 +6,12 @@ cache:
   directories:
   - $HOME/.m2
 jdk:
-- oraclejdk8
-- oraclejdk9
-- openjdk10
-- openjdk11
+  - openjdk8
+  - oraclejdk11
+  - openjdk11
 install: ./mvnw deploy -DskipTests=true -Dmaven.javadoc.skip=true -Dmaven.deploy.skip=true -B -V
 script:
-- chmod +x .travis/build.sh && .travis/build.sh
+- source .travis/build.sh
 after_success:
 - bash <(curl -s https://codecov.io/bash)
-- jdk_switcher use oraclejdk8 && [ "$TRAVIS_JDK_VERSION" == "oraclejdk8" ] && source .travis/publish.sh || true
+- jdk_switcher use openjdk8 && [ "$TRAVIS_JDK_VERSION" == "openjdk8" ] && source .travis/publish.sh || true
