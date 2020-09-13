@@ -9,6 +9,8 @@ jdk:
   - openjdk8
   - oraclejdk11
   - openjdk11
+  - oraclejdk14
+  - openjdk14
 install: ./mvnw deploy -DskipTests=true -Dmaven.javadoc.skip=true -Dmaven.deploy.skip=true -B -V
 script:
 - source .travis/build.sh
