@@ -101,24 +101,24 @@
         <argLine>-Dfile.encoding=${file.encoding} -ea</argLine>
         <arguments>-Prelease-profile</arguments>
         <attoparser.version>2.0.5.RELEASE</attoparser.version>
-        <byte-buddy.version>1.9.12</byte-buddy.version>
+        <byte-buddy.version>1.10.14</byte-buddy.version>
         <commons-lang3.version>3.8.1</commons-lang3.version>
         <findbugs-jsr305.version>3.0.2</findbugs-jsr305.version>
-        <groovy.version>2.5.6</groovy.version>
+        <groovy.version>2.5.12</groovy.version>
         <guava.version>20.0</guava.version>
-        <hamcrest.version>2.1</hamcrest.version>
+        <hamcrest.version>2.2</hamcrest.version>
         <java.version>1.8</java.version>
         <javassist.version>3.20.0-GA</javassist.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13</junit.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <mockito.version>2.27.0</mockito.version>
+        <mockito.version>2.28.2</mockito.version>
         <objenesis.version>2.6</objenesis.version>
         <ognl3.version>3.1.12</ognl3.version>
         <prerequisites.maven>3.2</prerequisites.maven>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <reflections.version>0.9.11</reflections.version>
-        <slf4j.version>1.7.26</slf4j.version>
+        <slf4j.version>1.7.30</slf4j.version>
         <thymeleaf-testing.version>3.0.4.RELEASE</thymeleaf-testing.version>
         <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
         <unbescape.version>1.1.6.RELEASE</unbescape.version>
@@ -294,12 +294,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.1.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -313,7 +313,7 @@
             <plugin>
                 <groupId>com.github.ekryd.sortpom</groupId>
                 <artifactId>sortpom-maven-plugin</artifactId>
-                <version>2.10.0</version>
+                <version>2.12.0</version>
                 <executions>
                     <execution>
                         <phase>verify</phase>
@@ -323,6 +323,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <createBackupFile>false</createBackupFile>
                     <sortProperties>true</sortProperties>
                     <nrOfIndentSpace>4</nrOfIndentSpace>
                     <sortDependencies>groupId,artifactId</sortDependencies>
@@ -334,7 +335,7 @@
             <plugin>
                 <groupId>net.orfjackal.retrolambda</groupId>
                 <artifactId>retrolambda-maven-plugin</artifactId>
-                <version>2.5.6</version>
+                <version>2.5.7</version>
                 <executions>
                     <execution>
                         <goals>
@@ -347,7 +348,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>4.2.0</version>
+                <version>5.1.1</version>
                 <extensions>true</extensions>
                 <executions>
                     <execution>
@@ -375,7 +376,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>3.8.1</version>
                 <configuration>
                     <fork>true</fork>
                     <compilerArgs>
@@ -420,7 +421,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>3.2.0</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -448,7 +449,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -477,12 +478,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.7.1</version>
+                <version>3.9.1</version>
                 <executions>
                     <execution>
                         <id>attach-descriptor</id>
@@ -500,19 +501,19 @@
                     <dependency>
                         <groupId>org.apache.maven.skins</groupId>
                         <artifactId>maven-fluido-skin</artifactId>
-                        <version>1.7</version>
+                        <version>1.9</version>
                     </dependency>
                     <dependency>
                         <groupId>org.apache.maven.wagon</groupId>
                         <artifactId>wagon-ssh</artifactId>
-                        <version>3.3.2</version>
+                        <version>3.4.1</version>
                     </dependency>
                 </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -525,7 +526,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.1</version>
+                <version>2.22.2</version>
                 <configuration>
                     <includes>
                         <include>**/*Test.class</include>
@@ -545,12 +546,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.22.1</version>
+                <version>2.22.2</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
                 <artifactId>gmavenplus-plugin</artifactId>
-                <version>1.6.3</version>
+                <version>1.10.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -585,17 +586,17 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.2.0</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
-                <version>2.7</version>
+                <version>2.8.1</version>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.3</version>
+                <version>0.8.5</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -625,7 +626,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.1</version>
             </plugin>
         </plugins>
     </reporting>
