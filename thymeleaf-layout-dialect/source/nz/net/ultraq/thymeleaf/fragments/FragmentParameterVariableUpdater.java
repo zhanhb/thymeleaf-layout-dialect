@@ -16,7 +16,7 @@
 package nz.net.ultraq.thymeleaf.fragments;
 
 import java.util.List;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IProcessableElementTag;
@@ -61,7 +61,7 @@ public class FragmentParameterVariableUpdater {
 
         // When fragment parameters aren't named, derive the name from the fragment definition
         if (fragmentExpression.hasSyntheticParameters()) {
-            String fragmentDefinition = ((IProcessableElementTag) Extensions.first(fragment)).getAttributeValue(dialectPrefix, FragmentProcessor.PROCESSOR_NAME);
+            String fragmentDefinition = ((IProcessableElementTag) IModelExtensions.first(fragment)).getAttributeValue(dialectPrefix, FragmentProcessor.PROCESSOR_NAME);
             List<String> parameterNames = new FragmentParameterNamesExtractor().extract(fragmentDefinition);
             AssignationSequence parameters = fragmentExpression.getParameters();
             if (parameters != null) {
@@ -80,4 +80,13 @@ public class FragmentParameterVariableUpdater {
             }
         }
     }
+
+    public final String getDialectPrefix() {
+        return this.dialectPrefix;
+    }
+
+    public final ITemplateContext getContext() {
+        return this.context;
+    }
+
 }

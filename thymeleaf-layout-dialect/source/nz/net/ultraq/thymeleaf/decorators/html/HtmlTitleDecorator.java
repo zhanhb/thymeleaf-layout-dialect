@@ -16,13 +16,14 @@
 package nz.net.ultraq.thymeleaf.decorators.html;
 
 import java.util.Collections;
-import java.util.Iterator;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
+import nz.net.ultraq.thymeleaf.context.extensions.IContextExtensions;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.internal.ModelBuilder;
 import nz.net.ultraq.thymeleaf.models.ElementMerger;
+import nz.net.ultraq.thymeleaf.models.extensions.ChildModelIterator;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.thymeleaf.context.IEngineContext;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IAttribute;
@@ -44,8 +45,8 @@ public class HtmlTitleDecorator implements Decorator {
 
     // Get the title pattern to use
     private static IAttribute titlePatternProcessorRetriever(IModel titleModel, String layoutDialectPrefix) {
-        if (Extensions.asBoolean(titleModel)) {
-            ITemplateEvent event = Extensions.first(titleModel);
+        if (IModelExtensions.asBoolean(titleModel)) {
+            ITemplateEvent event = IModelExtensions.first(titleModel);
             if (event != null) {
                 return ((IProcessableElementTag) event).getAttribute(layoutDialectPrefix, TitlePatternProcessor.PROCESSOR_NAME);
             }
@@ -64,8 +65,8 @@ public class HtmlTitleDecorator implements Decorator {
             return;
         }
 
-        if (Extensions.asBoolean(titleModel)) {
-            IProcessableElementTag titleTag = (IProcessableElementTag) Extensions.first(titleModel);
+        if (IModelExtensions.asBoolean(titleModel)) {
+            IProcessableElementTag titleTag = (IProcessableElementTag) IModelExtensions.first(titleModel);
 
             // Escapable title from a th:text attribute on the title tag
             if (titleTag.hasAttribute(standardDialectPrefix, StandardTextTagProcessor.ATTR_NAME)) {
@@ -79,9 +80,12 @@ public class HtmlTitleDecorator implements Decorator {
 
             } else {
                 IModel titleChildrenModel = context.getModelFactory().createModel();
-                for (Iterator<IModel> it = Extensions.childModelIterator(titleModel); it.hasNext();) {
-                    IModel model = it.next();
-                    titleChildrenModel.addModel(model);
+                ChildModelIterator it = IModelExtensions.childModelIterator(titleModel);
+                if (it != null) {
+                    while (it.hasNext()) {
+                        IModel model = it.next();
+                        titleChildrenModel.addModel(model);
+                    }
                 }
                 ((IEngineContext) context).setVariable(contextKey, titleChildrenModel);
             }
@@ -111,8 +115,8 @@ public class HtmlTitleDecorator implements Decorator {
     @Override
     public IModel decorate(IModel targetTitleModel, IModel sourceTitleModel) {
         ModelBuilder modelBuilder = new ModelBuilder(context);
-        String layoutDialectPrefix = Extensions.getPrefixForDialect(context, LayoutDialect.class);
-        String standardDialectPrefix = Extensions.getPrefixForDialect(context, StandardDialect.class);
+        String layoutDialectPrefix = IContextExtensions.getPrefixForDialect(context, LayoutDialect.class);
+        String standardDialectPrefix = IContextExtensions.getPrefixForDialect(context, StandardDialect.class);
 
         IAttribute titlePatternProcessor = titlePatternProcessorRetriever(sourceTitleModel, layoutDialectPrefix);
         if (titlePatternProcessor == null) {
@@ -127,12 +131,16 @@ public class HtmlTitleDecorator implements Decorator {
             extractTitle(sourceTitleModel, TitlePatternProcessor.CONTENT_TITLE_KEY, context, standardDialectPrefix, modelBuilder);
             extractTitle(targetTitleModel, TitlePatternProcessor.LAYOUT_TITLE_KEY, context, standardDialectPrefix, modelBuilder);
 
-            resultTitle = new ModelBuilder(context).createNode("title",
+            resultTitle = modelBuilder.createNode("title",
                     Collections.singletonMap(titlePatternProcessor.getAttributeCompleteName(), titlePatternProcessor.getValue()));
         } else {
             resultTitle = new ElementMerger(context).merge(targetTitleModel, sourceTitleModel);
         }
         return resultTitle;
+    }
+
+    public final ITemplateContext getContext() {
+        return this.context;
     }
 
 }

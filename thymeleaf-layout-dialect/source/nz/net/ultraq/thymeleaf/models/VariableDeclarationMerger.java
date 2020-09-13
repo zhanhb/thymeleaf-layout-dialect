@@ -95,4 +95,8 @@ public class VariableDeclarationMerger {
         return buffer.toString();
     }
 
+    public final IExpressionContext getContext() {
+        return this.context;
+    }
+
 }

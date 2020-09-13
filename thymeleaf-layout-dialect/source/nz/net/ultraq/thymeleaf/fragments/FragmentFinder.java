@@ -19,7 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IOpenElementTag;
 import org.thymeleaf.model.IProcessableElementTag;
@@ -72,7 +72,7 @@ public class FragmentFinder {
                     }
                 }
                 if (!StringUtils.isEmpty(fragmentName)) {
-                    IModel fragment = Extensions.getModel(model, eventIndex);
+                    IModel fragment = IModelExtensions.getModel(model, eventIndex);
                     List<IModel> list = fragmentsMap.get(fragmentName);
                     if (list == null) {
                         list = new LinkedList<>();
@@ -89,6 +89,10 @@ public class FragmentFinder {
         }
 
         return fragmentsMap;
+    }
+
+    public final String getDialectPrefix() {
+        return dialectPrefix;
     }
 
 }

@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.ITemplateContext;
@@ -163,7 +164,7 @@ public class ModelBuilder {
      */
     @SuppressWarnings("null")
     public void nodeCompleted(@Nullable IModel parent, @Nullable IModel child) {
-        if (Extensions.asBoolean(parent)) {
+        if (IModelExtensions.asBoolean(parent)) {
             parent.insertModel(parent.size() - 1, child);
         }
     }

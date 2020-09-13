@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.Map;
 import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
-import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
 import nz.net.ultraq.thymeleaf.fragments.FragmentParameterVariableUpdater;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.fragments.extensions.FragmentExtensions;
 import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.engine.TemplateModel;
@@ -75,7 +75,7 @@ public class InsertProcessor extends AbstractAttributeModelProcessor {
 
         // Gather all fragment parts within this element, scoping them to this element
         Map<String, List<IModel>> includeFragments = new FragmentFinder(getDialectPrefix()).findFragments(model);
-        FragmentMap.setForNode(context, structureHandler, includeFragments);
+        FragmentExtensions.setLocalFragmentCollection(structureHandler, context, includeFragments);
 
         // Keep track of what template is being processed?  Thymeleaf does this for
         // its include processor, so I'm just doing the same here.
@@ -83,7 +83,7 @@ public class InsertProcessor extends AbstractAttributeModelProcessor {
 
         // Replace the children of this element with those of the to-be-inserted page fragment
         IModel fragmentForInsertionUse = fragmentForInsertion.cloneModel();
-        Extensions.removeChildren(model);
+        IModelExtensions.removeChildren(model);
         model.insertModel(1, fragmentForInsertionUse);
 
         // Scope variables in fragment definition to current fragment

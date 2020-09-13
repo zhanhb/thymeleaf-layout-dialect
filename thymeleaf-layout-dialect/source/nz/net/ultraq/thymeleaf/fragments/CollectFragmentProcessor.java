@@ -17,8 +17,9 @@ package nz.net.ultraq.thymeleaf.fragments;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.fragments.extensions.FragmentExtensions;
 import nz.net.ultraq.thymeleaf.models.ElementMerger;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.ITemplateContext;
@@ -91,13 +92,13 @@ public class CollectFragmentProcessor extends AbstractAttributeTagProcessor {
 
         // All :define fragments we collected, :collect fragments included to determine where to stop.
         // Fragments after :collect are preserved for the next :collect event
-        List<IModel> fragments = FragmentMap.get(context).get(attributeValue);
+        List<IModel> fragments = FragmentExtensions.getFragmentCollection(context).get(attributeValue);
 
         // Replace the tag body with the fragment
         if (fragments != null && !fragments.isEmpty()) {
             IModelFactory modelFactory = context.getModelFactory();
             ElementMerger merger = new ElementMerger(context);
-            IModel[] replacementModel = new IModel[]{modelFactory.createModel(tag)};
+            IModel[] replacementModel = {modelFactory.createModel(tag)};
             boolean first = true;
             while (!fragments.isEmpty()) {
                 IModel fragment = fragments.remove(0);
@@ -109,7 +110,7 @@ public class CollectFragmentProcessor extends AbstractAttributeTagProcessor {
                     first = false;
                 } else {
                     AtomicBoolean firstEvent = new AtomicBoolean(true);
-                    Extensions.each(fragment, event -> {
+                    IModelExtensions.each(fragment, event -> {
                         if (firstEvent.compareAndSet(true, false)) {
                             replacementModel[0].add(modelFactory.createText("\n"));
                             replacementModel[0].add(modelFactory.removeAttribute((IProcessableElementTag) event, getDialectPrefix(), PROCESSOR_DEFINE));
@@ -122,7 +123,7 @@ public class CollectFragmentProcessor extends AbstractAttributeTagProcessor {
 
             // Remove the layout:collect attribute - Thymeleaf won't do it for us
             // when using StructureHandler.replaceWith(...)
-            replacementModel[0].replace(0, modelFactory.removeAttribute((IProcessableElementTag) Extensions.first(replacementModel[0]), getDialectPrefix(), PROCESSOR_COLLECT));
+            replacementModel[0].replace(0, modelFactory.removeAttribute((IProcessableElementTag) IModelExtensions.first(replacementModel[0]), getDialectPrefix(), PROCESSOR_COLLECT));
 
             structureHandler.replaceWith(replacementModel[0], true);
         }

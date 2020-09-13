@@ -16,9 +16,11 @@
 package nz.net.ultraq.thymeleaf.models;
 
 import nz.net.ultraq.thymeleaf.LayoutDialect;
+import nz.net.ultraq.thymeleaf.context.extensions.IContextExtensions;
 import nz.net.ultraq.thymeleaf.fragments.CollectFragmentProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.models.extensions.IAttributeExtensions;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IAttribute;
 import org.thymeleaf.model.IModel;
@@ -60,27 +62,27 @@ public class AttributeMerger implements ModelMerger {
     public IModel merge(IModel targetModel, IModel sourceModel) {
         // If one of the parameters is missing return a copy of the other, or
         // nothing if both parameters are missing.
-        if (!Extensions.asBoolean(targetModel) || !Extensions.asBoolean(sourceModel)) {
-            IModel result = Extensions.asBoolean(targetModel) ? targetModel.cloneModel() : null;
-            return Extensions.asBoolean(result) ? result : Extensions.asBoolean(sourceModel) ? sourceModel.cloneModel() : null;
+        if (!IModelExtensions.asBoolean(targetModel) || !IModelExtensions.asBoolean(sourceModel)) {
+            IModel result = IModelExtensions.asBoolean(targetModel) ? targetModel.cloneModel() : null;
+            return IModelExtensions.asBoolean(result) ? result : IModelExtensions.asBoolean(sourceModel) ? sourceModel.cloneModel() : null;
         }
 
         IModel mergedModel = targetModel.cloneModel();
-        String layoutDialectPrefix = Extensions.getPrefixForDialect(context, LayoutDialect.class);
-        String standardDialectPrefix = Extensions.getPrefixForDialect(context, StandardDialect.class);
+        String layoutDialectPrefix = IContextExtensions.getPrefixForDialect(context, LayoutDialect.class);
+        String standardDialectPrefix = IContextExtensions.getPrefixForDialect(context, StandardDialect.class);
 
         // Merge attributes from the source model's root event to the target model's root event
         // TODO nullable
         for (IAttribute sourceAttribute : ((IProcessableElementTag) sourceModel.get(0)).getAllAttributes()) {
             // Don't include layout:fragment processors
-            if (Extensions.equalsName(sourceAttribute, layoutDialectPrefix, FragmentProcessor.PROCESSOR_NAME)
-                    || Extensions.equalsName(sourceAttribute, layoutDialectPrefix, CollectFragmentProcessor.PROCESSOR_DEFINE)) {
+            if (IAttributeExtensions.equalsName(sourceAttribute, layoutDialectPrefix, FragmentProcessor.PROCESSOR_NAME)
+                    || IAttributeExtensions.equalsName(sourceAttribute, layoutDialectPrefix, CollectFragmentProcessor.PROCESSOR_DEFINE)) {
                 continue;
             }
 
-            IProcessableElementTag mergedEvent = (IProcessableElementTag) Extensions.first(mergedModel);
+            IProcessableElementTag mergedEvent = (IProcessableElementTag) IModelExtensions.first(mergedModel);
             String mergedAttributeValue; // Merge th:with attributes
-            if (Extensions.equalsName(sourceAttribute, standardDialectPrefix, StandardWithTagProcessor.ATTR_NAME)) {
+            if (IAttributeExtensions.equalsName(sourceAttribute, standardDialectPrefix, StandardWithTagProcessor.ATTR_NAME)) {
                 mergedAttributeValue = new VariableDeclarationMerger(context).merge(sourceAttribute.getValue(),
                         mergedEvent.getAttributeValue(standardDialectPrefix, StandardWithTagProcessor.ATTR_NAME));
             } else { // Copy every other attribute straight
@@ -93,6 +95,10 @@ public class AttributeMerger implements ModelMerger {
         }
 
         return mergedModel;
+    }
+
+    public final ITemplateContext getContext() {
+        return context;
     }
 
 }

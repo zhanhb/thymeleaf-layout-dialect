@@ -60,4 +60,8 @@ public class VariableDeclarationParser {
         return list;
     }
 
+    public final IExpressionContext getContext() {
+        return context;
+    }
+
 }

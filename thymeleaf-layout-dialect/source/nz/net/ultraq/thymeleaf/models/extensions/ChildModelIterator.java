@@ -16,7 +16,6 @@
 package nz.net.ultraq.thymeleaf.models.extensions;
 
 import java.util.Iterator;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
 import org.thymeleaf.model.IModel;
 
 /**
@@ -47,7 +46,7 @@ public class ChildModelIterator implements Iterator<IModel> {
      */
     @Override
     public IModel next() {
-        IModel subModel = Extensions.getModel(parent, currentIndex);
+        IModel subModel = IModelExtensions.getModel(parent, currentIndex);
         currentIndex += subModel.size();
         return subModel;
     }

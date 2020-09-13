@@ -15,7 +15,7 @@
  */
 package nz.net.ultraq.thymeleaf.models;
 
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.AttributeValueQuotes;
 import org.thymeleaf.model.IElementTag;
@@ -57,17 +57,17 @@ public class ElementMerger implements ModelMerger {
     public IModel merge(IModel targetModel, IModel sourceModel) {
         // If one of the parameters is missing return a copy of the other, or
         // nothing if both parameters are missing.
-        if (!Extensions.asBoolean(targetModel) || !Extensions.asBoolean(sourceModel)) {
-            IModel result = Extensions.asBoolean(targetModel) ? targetModel.cloneModel() : null;
-            return Extensions.asBoolean(result) ? result : Extensions.asBoolean(sourceModel) ? sourceModel.cloneModel() : null;
+        if (!IModelExtensions.asBoolean(targetModel) || !IModelExtensions.asBoolean(sourceModel)) {
+            IModel result = IModelExtensions.asBoolean(targetModel) ? targetModel.cloneModel() : null;
+            return IModelExtensions.asBoolean(result) ? result : IModelExtensions.asBoolean(sourceModel) ? sourceModel.cloneModel() : null;
         }
 
         IModelFactory modelFactory = context.getModelFactory();
 
         // The result we want is the source model, but merged into the target root element attributes
-        ITemplateEvent sourceRootEvent = Extensions.first(sourceModel);
+        ITemplateEvent sourceRootEvent = IModelExtensions.first(sourceModel);
         IModel sourceRootElement = modelFactory.createModel(sourceRootEvent);
-        IProcessableElementTag targetRootEvent = (IProcessableElementTag) Extensions.first(targetModel);
+        IProcessableElementTag targetRootEvent = (IProcessableElementTag) IModelExtensions.first(targetModel);
         IModel targetRootElement = modelFactory.createModel(
                 sourceRootEvent instanceof IOpenElementTag
                         ? modelFactory.createOpenElementTag(((IElementTag) sourceRootEvent).getElementCompleteName(),
@@ -78,8 +78,12 @@ public class ElementMerger implements ModelMerger {
                                 : null);
         IModel mergedRootElement = new AttributeMerger(context).merge(targetRootElement, sourceRootElement);
         IModel mergedModel = sourceModel.cloneModel();
-        mergedModel.replace(0, Extensions.first(mergedRootElement));
+        mergedModel.replace(0, IModelExtensions.first(mergedRootElement));
         return mergedModel;
+    }
+
+    public final ITemplateContext getContext() {
+        return context;
     }
 
 }

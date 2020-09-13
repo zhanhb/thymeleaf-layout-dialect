@@ -16,7 +16,8 @@
 package nz.net.ultraq.thymeleaf.decorators.strategies;
 
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
+import nz.net.ultraq.thymeleaf.models.extensions.ITemplateEventExtensions;
 import org.thymeleaf.model.IModel;
 
 /**
@@ -55,13 +56,13 @@ public class AppendingRespectLayoutTitleStrategy implements SortingStrategy {
     public int findPositionForModel(IModel headModel, IModel childModel) {
 
         // Discard text/whitespace nodes
-        if (Extensions.isWhitespace(childModel)) {
+        if (IModelExtensions.isWhitespace(childModel)) {
             return -1;
         }
 
         // Locate any matching <title> element
-        if (Extensions.isElementOf(childModel, "title")) {
-            int existingTitleIndex = Extensions.findIndexOf(headModel, event -> Extensions.isOpeningElementOf(event, "title"));
+        if (IModelExtensions.isElementOf(childModel, "title")) {
+            int existingTitleIndex = IModelExtensions.findIndexOf(headModel, event -> ITemplateEventExtensions.isOpeningElementOf(event, "title"));
             if (existingTitleIndex != -1) {
                 return existingTitleIndex;
             }

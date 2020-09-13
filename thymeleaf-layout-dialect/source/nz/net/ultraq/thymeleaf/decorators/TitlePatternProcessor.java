@@ -18,7 +18,7 @@ package nz.net.ultraq.thymeleaf.decorators;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.ITemplateContext;
@@ -104,7 +104,7 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
 
         // Break the title pattern up into tokens to map to their respective models
         IModel titleModel = modelFactory.createModel();
-        if (Extensions.asBoolean(layoutTitle) && Extensions.asBoolean(contentTitle)) {
+        if (IModelExtensions.asBoolean(layoutTitle) && IModelExtensions.asBoolean(contentTitle)) {
             Matcher matcher = TOKEN_PATTERN.matcher(titlePattern);
             while (matcher.find()) {
                 String text = titlePattern.substring(matcher.regionStart(), matcher.start());
@@ -119,9 +119,9 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
             if (!StringUtils.isEmpty(remainingText)) {
                 titleModel.add(modelFactory.createText(remainingText));
             }
-        } else if (Extensions.asBoolean(contentTitle)) {
+        } else if (IModelExtensions.asBoolean(contentTitle)) {
             titleModel.addModel(contentTitle);
-        } else if (Extensions.asBoolean(layoutTitle)) {
+        } else if (IModelExtensions.asBoolean(layoutTitle)) {
             titleModel.addModel(layoutTitle);
         }
 

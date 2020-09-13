@@ -16,7 +16,8 @@
 package nz.net.ultraq.thymeleaf.decorators.strategies;
 
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
+import nz.net.ultraq.thymeleaf.models.extensions.ITemplateEventExtensions;
 import org.thymeleaf.model.IModel;
 
 /**
@@ -50,7 +51,7 @@ public class AppendingStrategy implements SortingStrategy {
     @Override
     public int findPositionForModel(IModel headModel, IModel childModel) {
         // Discard text/whitespace nodes
-        if (Extensions.isWhitespace(childModel)) {
+        if (IModelExtensions.isWhitespace(childModel)) {
             return -1;
         }
 
@@ -58,8 +59,8 @@ public class AppendingStrategy implements SortingStrategy {
 
         // For backwards compatibility, match the location of any element at the
         // beginning of the <head> element.
-        if (Extensions.isElementOf(childModel, "title")) {
-            int firstElementIndex = Extensions.findIndexOf(headModel, 1, Extensions::isOpeningElement);
+        if (IModelExtensions.isElementOf(childModel, "title")) {
+            int firstElementIndex = IModelExtensions.findIndexOf(headModel, 1, ITemplateEventExtensions::isOpeningElement);
             if (firstElementIndex != -1) {
                 return firstElementIndex;
             }

@@ -17,6 +17,7 @@ package nz.net.ultraq.thymeleaf.fragments;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 
@@ -29,8 +30,6 @@ import javax.annotation.Nonnull;
  */
 public class FragmentParameterNamesExtractor {
 
-    private static final Pattern FRAGMENT_WITH_PARAMETERS_PATTERN = Pattern.compile(".*?\\(.*\\)");
-
     /**
      * Returns a list of parameter names for the given fragment definition.
      *
@@ -39,20 +38,21 @@ public class FragmentParameterNamesExtractor {
      */
     @Nonnull
     public List<String> extract(@Nonnull String fragmentDefinition) {
-
-        List<String> parameterNames;
-        if (FRAGMENT_WITH_PARAMETERS_PATTERN.matcher(fragmentDefinition).matches()) {
-            String parametersDefinition = fragmentDefinition.substring(
-                    fragmentDefinition.indexOf('(') + 1, fragmentDefinition.lastIndexOf(')'));
-            String[] definitions = parametersDefinition.split(",");
-            parameterNames = new ArrayList<>(definitions.length);
-            for (String parameter : definitions) {
-                parameterNames.add(parameter.contains("=") ? parameter.substring(0, parameter.indexOf('=')).trim() : parameter.trim());
+        Matcher matcher = Pattern.compile(".*?\\((.*)\\)").matcher(fragmentDefinition);
+        if (matcher.find()) {
+            String[] split = matcher.group(1).split(",");
+            List<String> result = new ArrayList<>(split.length);
+            for (String string : split) {
+                Matcher matcher1 = Pattern.compile("([^=]+)=?.*").matcher(string);
+                if (!matcher1.find()) {
+                    throw new IndexOutOfBoundsException("index is out of range 0..-1 (index = 0)");
+                }
+                result.add(matcher1.group(1).trim());
             }
+            return result;
         } else {
-            parameterNames = new ArrayList<>(0);
+            return new ArrayList<>(0);
         }
-        return parameterNames;
     }
 
 }

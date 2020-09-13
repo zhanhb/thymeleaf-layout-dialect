@@ -16,8 +16,8 @@
 package nz.net.ultraq.thymeleaf.decorators.xml;
 
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.ICloseElementTag;
 import org.thymeleaf.model.IComment;
@@ -38,7 +38,7 @@ public class XmlDocumentDecorator implements Decorator {
 
     // Find the root element of each document to work with
     private static IModel rootModelFinder(IModel documentModel) {
-        return Extensions.findModel(documentModel, documentEvent -> documentEvent instanceof IProcessableElementTag);
+        return IModelExtensions.findModel(documentModel, documentEvent -> documentEvent instanceof IProcessableElementTag);
     }
 
     private static boolean documentContainsDocType(IModel document) {
@@ -89,10 +89,10 @@ public class XmlDocumentDecorator implements Decorator {
             // Only copy doctypes if the source document doesn't already have one
             if (event instanceof IDocType) {
                 if (!documentContainsDocType(sourceDocumentModel)) {
-                    Extensions.insertWithWhitespace(resultDocumentModel, 0, event, modelFactory);
+                    IModelExtensions.insertWithWhitespace(resultDocumentModel, 0, event, modelFactory);
                 }
             } else if (event instanceof IComment) {
-                Extensions.insertWithWhitespace(resultDocumentModel, 0, event, modelFactory);
+                IModelExtensions.insertWithWhitespace(resultDocumentModel, 0, event, modelFactory);
             } else if (event instanceof IOpenElementTag) {
                 break;
             }
@@ -100,13 +100,17 @@ public class XmlDocumentDecorator implements Decorator {
         for (int i = size - 1; i >= 0; i--) {
             ITemplateEvent event = targetDocumentModel.get(i);
             if (event instanceof IComment) {
-                Extensions.insertWithWhitespace(resultDocumentModel, resultDocumentModel.size(), event, modelFactory);
+                IModelExtensions.insertWithWhitespace(resultDocumentModel, resultDocumentModel.size(), event, modelFactory);
             } else if (event instanceof ICloseElementTag) {
                 break;
             }
         }
 
         return resultDocumentModel;
+    }
+
+    public final ITemplateContext getContext() {
+        return this.context;
     }
 
 }

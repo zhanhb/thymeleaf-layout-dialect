@@ -16,7 +16,7 @@
 
 package nz.net.ultraq.thymeleaf.tests
 
-import nz.net.ultraq.thymeleaf.tests.LayoutDialect
+import nz.net.ultraq.thymeleaf.LayoutDialect
 import nz.net.ultraq.thymeleaf.decorators.strategies.GroupingStrategy
 import nz.net.ultraq.thymeleaf.testing.JUnitTestExecutor
 

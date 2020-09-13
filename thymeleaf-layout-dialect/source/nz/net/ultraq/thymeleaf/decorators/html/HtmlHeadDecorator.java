@@ -15,12 +15,13 @@
  */
 package nz.net.ultraq.thymeleaf.decorators.html;
 
-import java.util.Iterator;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
+import nz.net.ultraq.thymeleaf.models.extensions.ChildModelIterator;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
+import nz.net.ultraq.thymeleaf.models.extensions.ITemplateEventExtensions;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
@@ -34,7 +35,7 @@ import org.thymeleaf.model.IModelFactory;
 public class HtmlHeadDecorator implements Decorator {
 
     private static IModel titleRetriever(IModel headModel, ITemplateEventPredicate isTitle) {
-        return Extensions.asBoolean(headModel) ? Extensions.findModel(headModel, isTitle) : null;
+        return IModelExtensions.asBoolean(headModel) ? IModelExtensions.findModel(headModel, isTitle) : null;
     }
 
     private final ITemplateContext context;
@@ -62,12 +63,12 @@ public class HtmlHeadDecorator implements Decorator {
     @SuppressWarnings("deprecation")
     public IModel decorate(IModel targetHeadModel, IModel sourceHeadModel) {
         // If none of the parameters are present, return nothing
-        if (!Extensions.asBoolean(targetHeadModel) && !Extensions.asBoolean(sourceHeadModel)) {
+        if (!IModelExtensions.asBoolean(targetHeadModel) && !IModelExtensions.asBoolean(sourceHeadModel)) {
             return null;
         }
 
         IModelFactory modelFactory = context.getModelFactory();
-        ITemplateEventPredicate isTitle = event -> Extensions.isOpeningElementOf(event, "title");
+        ITemplateEventPredicate isTitle = event -> ITemplateEventExtensions.isOpeningElementOf(event, "title");
 
         // New head model based off the target being decorated
         IModel resultHeadModel = new AttributeMerger(context).merge(targetHeadModel, sourceHeadModel);
@@ -77,36 +78,47 @@ public class HtmlHeadDecorator implements Decorator {
                 titleRetriever(targetHeadModel, isTitle),
                 titleRetriever(sourceHeadModel, isTitle)
         );
-        if (Extensions.asBoolean(resultTitle)) {
+        if (IModelExtensions.asBoolean(resultTitle)) {
 
             // TODO: Pure hack for retaining 2.x compatibility, remove the <head> from the layout :/
             if (sortingStrategy instanceof nz.net.ultraq.thymeleaf.decorators.strategies.AppendingStrategy
                     || sortingStrategy instanceof nz.net.ultraq.thymeleaf.decorators.strategies.GroupingStrategy) {
-                Extensions.removeModel(resultHeadModel, Extensions.findIndexOf(resultHeadModel, isTitle));
+                IModelExtensions.removeModel(resultHeadModel, IModelExtensions.findIndexOf(resultHeadModel, isTitle));
             }
 
             int targetTitleIndex = sortingStrategy.findPositionForModel(resultHeadModel, resultTitle);
             if (isTitle.test(resultHeadModel.get(targetTitleIndex))) {
-                Extensions.replaceModel(resultHeadModel, targetTitleIndex, resultTitle);
+                IModelExtensions.replaceModel(resultHeadModel, targetTitleIndex, resultTitle);
             } else {
-                Extensions.insertModelWithWhitespace(resultHeadModel, targetTitleIndex, resultTitle, modelFactory);
+                IModelExtensions.insertModelWithWhitespace(resultHeadModel, targetTitleIndex, resultTitle, modelFactory);
             }
         }
 
         // Merge the rest of the source <head> elements with the target <head>
         // elements using the current merging strategy
-        if (Extensions.asBoolean(sourceHeadModel) && Extensions.asBoolean(targetHeadModel)) {
-            for (Iterator<IModel> it = Extensions.childModelIterator(sourceHeadModel); it.hasNext();) {
-                IModel model = it.next();
-                if (isTitle.test(Extensions.first(model))) {
-                    continue;
+        if (IModelExtensions.asBoolean(sourceHeadModel) && IModelExtensions.asBoolean(targetHeadModel)) {
+            ChildModelIterator it = IModelExtensions.childModelIterator(sourceHeadModel);
+            if (it != null) {
+                while (it.hasNext()) {
+                    IModel model = it.next();
+                    if (isTitle.test(IModelExtensions.first(model))) {
+                        continue;
+                    }
+                    IModelExtensions.insertModelWithWhitespace(resultHeadModel,
+                            sortingStrategy.findPositionForModel(resultHeadModel, model),
+                            model, modelFactory);
                 }
-                Extensions.insertModelWithWhitespace(resultHeadModel,
-                        sortingStrategy.findPositionForModel(resultHeadModel, model),
-                        model, modelFactory);
             }
         }
         return resultHeadModel;
+    }
+
+    public final ITemplateContext getContext() {
+        return this.context;
+    }
+
+    public final SortingStrategy getSortingStrategy() {
+        return this.sortingStrategy;
     }
 
 }

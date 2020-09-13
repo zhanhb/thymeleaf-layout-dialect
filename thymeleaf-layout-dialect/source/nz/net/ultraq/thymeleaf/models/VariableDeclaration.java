@@ -38,10 +38,9 @@ public class VariableDeclaration {
      */
     public VariableDeclaration(Assignation assignation) {
         String declaration = assignation.getStringRepresentation();
-        int equalsIndex = declaration.indexOf('=');
-
-        name = declaration.substring(0, equalsIndex);
-        value = declaration.substring(equalsIndex + 1);
+        String[] split = declaration.split("=");
+        name = split[0];
+        value = split[1];
     }
 
     /**

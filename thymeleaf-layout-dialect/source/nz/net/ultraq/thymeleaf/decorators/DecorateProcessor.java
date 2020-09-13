@@ -18,13 +18,14 @@ package nz.net.ultraq.thymeleaf.decorators;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import nz.net.ultraq.thymeleaf.context.extensions.IContextExtensions;
 import nz.net.ultraq.thymeleaf.decorators.html.HtmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
-import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.fragments.extensions.FragmentExtensions;
 import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.thymeleaf.context.IContext;
 import org.thymeleaf.context.IExpressionContext;
 import org.thymeleaf.context.ITemplateContext;
@@ -68,7 +69,7 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
 
         if (element1 != null && element2 != null
                 && Objects.equals(element1.getElementDefinition(), element2.getElementDefinition())) {
-            String maybe = Extensions.getPrefixForDialect((IExpressionContext) context, StandardDialect.class) + ":with";
+            String maybe = IContextExtensions.getPrefixForDialect((IExpressionContext) context, StandardDialect.class) + ":with";
             Map<String, String> attributeMap = element2.getAttributeMap();
             for (Map.Entry<String, String> entry : element1.getAttributeMap().entrySet()) {
                 String key = entry.getKey();
@@ -143,8 +144,8 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
         IModel contentTemplate = templateModelFinder.findTemplate(contentTemplateName).cloneModel();
 
         // Check that the root element is the same as the one currently being processed
-        IProcessableElementTag contentRootEvent = (IProcessableElementTag) Extensions.find(contentTemplate, event -> event instanceof IProcessableElementTag);
-        IProcessableElementTag rootElement = (IProcessableElementTag) Extensions.first(model);
+        IProcessableElementTag contentRootEvent = (IProcessableElementTag) IModelExtensions.find(contentTemplate, event -> event instanceof IProcessableElementTag);
+        IProcessableElementTag rootElement = (IProcessableElementTag) IModelExtensions.first(model);
         if (!rootElementsEqual(contentRootEvent, rootElement, context)) {
             throw new IllegalArgumentException("layout:decorate/data-layout-decorate must appear in the root element of your template");
         }
@@ -154,7 +155,7 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
             rootElement = context.getModelFactory().removeAttribute(rootElement, attributeName);
             model.replace(0, rootElement);
         }
-        Extensions.replaceModel(contentTemplate, Extensions.findIndexOf(contentTemplate, event -> event instanceof IProcessableElementTag), model);
+        IModelExtensions.replaceModel(contentTemplate, IModelExtensions.findIndexOf(contentTemplate, event -> event instanceof IProcessableElementTag), model);
 
         // Locate the template to decorate
         FragmentExpression decorateTemplateExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);
@@ -178,11 +179,11 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
             );
         }
         IModel resultTemplate = decorator.decorate(clone, contentTemplate);
-        Extensions.replaceModel(model, 0, resultTemplate);
+        IModelExtensions.replaceModel(model, 0, resultTemplate);
         structureHandler.setTemplateData(decorateTemplateData);
 
         // Save layout fragments for use later by layout:fragment processors
-        FragmentMap.setForNode(context, structureHandler, pageFragments);
+        FragmentExtensions.setLocalFragmentCollection(structureHandler, context, pageFragments);
 
         // Scope variables in fragment definition to template.  Parameters *must* be
         // named as there is no mechanism for setting their name at the target

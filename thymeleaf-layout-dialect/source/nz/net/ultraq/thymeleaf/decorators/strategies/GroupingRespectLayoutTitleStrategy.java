@@ -16,10 +16,11 @@
 package nz.net.ultraq.thymeleaf.decorators.strategies;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.ListIterator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.models.extensions.ChildModelIterator;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
+import nz.net.ultraq.thymeleaf.models.extensions.ITemplateEventExtensions;
 import org.thymeleaf.model.IComment;
 import org.thymeleaf.model.IElementTag;
 import org.thymeleaf.model.IModel;
@@ -64,7 +65,7 @@ public class GroupingRespectLayoutTitleStrategy implements SortingStrategy {
         final int STYLESHEET = 5;
         final int OTHER = 6;
 
-        ITemplateEvent event = Extensions.first(model);
+        ITemplateEvent event = IModelExtensions.first(model);
 
         if (event instanceof IComment) {
             return COMMENT;
@@ -104,13 +105,13 @@ public class GroupingRespectLayoutTitleStrategy implements SortingStrategy {
     public int findPositionForModel(IModel headModel, IModel childModel) {
 
         // Discard text/whitespace nodes
-        if (Extensions.isWhitespace(childModel)) {
+        if (IModelExtensions.isWhitespace(childModel)) {
             return -1;
         }
 
         // Locate any matching <title> element
-        if (Extensions.isElementOf(childModel, "title")) {
-            int existingTitleIndex = Extensions.findIndexOf(headModel, event -> Extensions.isOpeningElementOf(event, "title"));
+        if (IModelExtensions.isElementOf(childModel, "title")) {
+            int existingTitleIndex = IModelExtensions.findIndexOf(headModel, event -> ITemplateEventExtensions.isOpeningElementOf(event, "title"));
             if (existingTitleIndex != -1) {
                 return existingTitleIndex;
             }
@@ -119,16 +120,19 @@ public class GroupingRespectLayoutTitleStrategy implements SortingStrategy {
         int type = findMatchingType(childModel);
         ArrayList<IModel> list = new ArrayList<>(20);
 
-        for (Iterator<IModel> it = Extensions.childModelIterator(headModel); it.hasNext();) {
-            list.add(it.next());
+        ChildModelIterator it = IModelExtensions.childModelIterator(headModel);
+        if (it != null) {
+            while (it.hasNext()) {
+                list.add(it.next());
+            }
         }
 
         ListIterator<IModel> listIterator = list.listIterator(list.size());
         while (listIterator.hasPrevious()) {
             IModel headSubModel = listIterator.previous();
             if (type == findMatchingType(headSubModel)) {
-                if (Extensions.asBoolean(headModel)) {
-                    return Extensions.findIndexOfModel(headModel, headSubModel) + headSubModel.size();
+                if (IModelExtensions.asBoolean(headModel)) {
+                    return IModelExtensions.findIndexOfModel(headModel, headSubModel) + headSubModel.size();
                 }
                 break;
             }
