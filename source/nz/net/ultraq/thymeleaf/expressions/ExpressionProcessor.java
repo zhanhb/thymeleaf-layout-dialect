@@ -18,7 +18,6 @@ package nz.net.ultraq.thymeleaf.expressions;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.IExpressionContext;
@@ -36,7 +35,6 @@ import org.thymeleaf.util.StringUtils;
 public class ExpressionProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(ExpressionProcessor.class);
-    private static final Pattern THYMELEAF_3_FRAGMENT_EXPRESSION = Pattern.compile("(?s)^~\\{.+\\}$");
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     private static final Set<String> oldFragmentExpressions = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
@@ -65,14 +63,16 @@ public class ExpressionProcessor {
     /**
      * Parses an expression under the assumption it is a fragment expression.
      * This method will wrap fragment expressions written in Thymeleaf 2 syntax
-     * as a temporary backwards compatibility measure for those migrating their
-     * web apps to Thymeleaf 3.
+     * as a backwards compatibility measure for those migrating their web apps
+     * to Thymeleaf 3. (This is because Thymeleaf 3 currently does the same, but
+     * expect this method to go away when Thymeleaf starts enforcing the new
+     * fragment expression syntax itself.)
      *
      * @param expression
      * @return A fragment expression.
      */
     public FragmentExpression parseFragmentExpression(String expression) {
-        if (!StringUtils.isEmpty(expression) && !THYMELEAF_3_FRAGMENT_EXPRESSION.matcher(expression).matches()) {
+        if (!StringUtils.isEmpty(expression) && !expression.matches("(?s)^~\\{.+\\}$")) {
             if (oldFragmentExpressions.add(expression)) {
                 logger.warn(
                         "Fragment expression \"{}\" is being wrapped as a Thymeleaf 3 fragment expression (~{...}) for backwards compatibility purposes.  "
@@ -87,8 +87,8 @@ public class ExpressionProcessor {
     }
 
     /**
-     * Parses and executes an expression, returning the result of the expression
-     * having been parsed and executed.
+     * Parse and executes an expression, returning whatever the type of the
+     * expression result is.
      *
      * @param expression
      * @return The result of the expression being executed.
@@ -106,6 +106,10 @@ public class ExpressionProcessor {
      */
     public String processAsString(String expression) {
         return String.valueOf(process(expression));
+    }
+
+    public final IExpressionContext getContext() {
+        return this.context;
     }
 
 }

@@ -18,128 +18,80 @@ package nz.net.ultraq.thymeleaf.expressions.tests
 
 import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor
 
-import org.junit.Before
-import org.junit.BeforeClass
-import org.junit.Test
 import org.thymeleaf.TemplateEngine
 import org.thymeleaf.context.ExpressionContext
 import org.thymeleaf.standard.expression.FragmentExpression
 import org.thymeleaf.standard.expression.VariableExpression
+import spock.lang.Specification
 
 /**
  * Tests for the expression processor module.
  * 
  * @author Emanuel Rabina
  */
-class ExpressionProcessorTests {
+@SuppressWarnings('GStringExpressionWithinString')
+class ExpressionProcessorTests extends Specification {
 
-	private static TemplateEngine templateEngine
-	private ExpressionContext expressionContext
-	private ExpressionProcessor expressionProcessor
+	private final TemplateEngine templateEngine = new TemplateEngine()
+	private final ExpressionContext expressionContext = new ExpressionContext(templateEngine.configuration)
+	private final ExpressionProcessor expressionProcessor = new ExpressionProcessor(expressionContext)
 
-	/**
-	 * Setup, create the template engine.
-	 */
-	@BeforeClass
-	static void setupTemplateEngine() {
-
-		templateEngine = new TemplateEngine()
+	def "Get a Thymeleaf expression out of the expression processor"() {
+		expect:
+			expressionProcessor.parse('${1 + 1}') instanceof VariableExpression
 	}
 
-	/**
-	 * Test setup, a new expression processor.
-	 */
-	@Before
-	void setupExpressionProcessor() {
-
-		expressionContext = new ExpressionContext(templateEngine.configuration)
-		expressionProcessor = new ExpressionProcessor(expressionContext)
+	def "Returns a fragment expression"() {
+		when:
+			def fragmentExpression = expressionProcessor.parseFragmentExpression('~{hello.html}')
+		then:
+			fragmentExpression instanceof FragmentExpression
+			fragmentExpression.templateName.execute(expressionContext) == 'hello.html'
 	}
 
-	/**
-	 * Test that we get a Thymeleaf expression out of the expression processor.
-	 */
-	@Test
-	void parse() {
-
-		def expression = expressionProcessor.parse('${1 + 1}')
-		assert expression instanceof VariableExpression
+	def "Returns a fragment expression - backwards compatibility wrapping for Thymeleaf 2"() {
+		when:
+			def fragmentExpression = expressionProcessor.parseFragmentExpression('hello.html')
+		then:
+			fragmentExpression instanceof FragmentExpression
+			fragmentExpression.templateName.execute(expressionContext) == 'hello.html'
 	}
 
-	/**
-	 * Test backwards compatibility wrapping for older Thymeleaf 2 expressions.
-	 */
-	@Test
-	void parseFragmentExpression() {
-
-		def fragmentExpression
-
-		fragmentExpression = expressionProcessor.parseFragmentExpression('~{hello.html}')
-		assert fragmentExpression instanceof FragmentExpression
-		assert fragmentExpression.templateName.execute(expressionContext) == 'hello.html'
-
-		// Backwards compatibility test
-		fragmentExpression = expressionProcessor.parseFragmentExpression('hello.html')
-		assert fragmentExpression instanceof FragmentExpression
-		assert fragmentExpression.templateName.execute(expressionContext) == 'hello.html'
-	}
-
-	/**
-	 * {@code null} testing of fragment expression parsing since it does
-	 * operations on the expression before passing it to the parser.
-	 */
-	@Test
-	void parseFragmentExpressionNull() {
-
-		try {
+	def "null testing of fragment expression parsing"() {
+		when:
 			expressionProcessor.parseFragmentExpression(null)
-			assert false
-		}
-		catch (ex) {
-			assert ex instanceof IllegalArgumentException
-		}
+		then:
+			thrown(IllegalArgumentException)
 	}
 
-	/**
-	 * Tests multi-line fragment expressions.
-	 */
-	@Test
-	void parseFragmentExpressionMultiline() {
-
-		def fragmentExpression
-
-		fragmentExpression = expressionProcessor.parseFragmentExpression('''~{hello::fragment(
-			'blah',
-			1)
-			}''')
-		assert fragmentExpression instanceof FragmentExpression
-		assert fragmentExpression.templateName.execute(expressionContext) == 'hello'
-
-		// Backwards compatibility test
-		fragmentExpression = expressionProcessor.parseFragmentExpression('''hello::fragment(
-			'blah',
-			1)''')
-		assert fragmentExpression instanceof FragmentExpression
-		assert fragmentExpression.templateName.execute(expressionContext) == 'hello'
+	def "Multi-line fragment expressions"() {
+		when:
+			def fragmentExpression = expressionProcessor.parseFragmentExpression('''~{hello::fragment(
+				'blah',
+				1)
+				}''')
+		then:
+			fragmentExpression instanceof FragmentExpression
+			fragmentExpression.templateName.execute(expressionContext) == 'hello'
 	}
 
-	/**
-	 * Process the expression this time to get a result.
-	 */
-	@Test
-	void process() {
-
-		def result = expressionProcessor.process('${1 + 1}')
-		assert result == 2
+	def "Multi-line fragment expressions - backwards compatibility wrapping for Thymeleaf 2"() {
+		when:
+			def fragmentExpression = expressionProcessor.parseFragmentExpression('''hello::fragment(
+				'blah',
+				1)''')
+		then:
+			fragmentExpression instanceof FragmentExpression
+			fragmentExpression.templateName.execute(expressionContext) == 'hello'
 	}
 
-	/**
-	 * Process the expression but return as a string result.
-	 */
-	@Test
-	void processAsString() {
+	def "Processing an expression returns a usable result"() {
+		expect:
+			expressionProcessor.process('${1 + 1}') == 2
+	}
 
-		def resultAsString = expressionProcessor.processAsString('${1 + 1}')
-		assert resultAsString == '2'
+	def "Processing an expression returning a string result"() {
+		expect:
+			expressionProcessor.processAsString('${1 + 1}') == '2'
 	}
 }
