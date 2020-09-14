@@ -1,4 +1,7 @@
 #!/bin/bash
+set -e
+
+. /opt/jdk_switcher/jdk_switcher.sh
 
 ./mvnw install -Dmaven.javadoc.skip=true
 if [[ "$TRAVIS_JDK_VERSION" == "openjdk8" ]]; then

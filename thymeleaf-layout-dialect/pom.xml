@@ -1,95 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.github.zhanhb</groupId>
+    <parent>
+        <groupId>com.github.zhanhb</groupId>
+        <artifactId>thymeleaf-layout-dialect-build</artifactId>
+        <version>${revision}</version>
+    </parent>
     <artifactId>thymeleaf-layout-dialect</artifactId>
-    <version>2.5.0.BUILD-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>Thymeleaf Layout Dialect</name>
     <description>Thymeleaf Layout Dialect rewritten in java.</description>
-    <url>https://github.com/zhanhb/thymeleaf-layout-dialect</url>
-    <inceptionYear>2016</inceptionYear>
-
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <id>zhanhb</id>
-            <name>Huangbin Zhan</name>
-            <email>zhanhb88 at gmail.com</email>
-            <roles>
-                <role>author</role>
-                <role>developer</role>
-            </roles>
-            <timezone>Asia/Shanghai</timezone>
-        </developer>
-    </developers>
-
-    <contributors>
-        <contributor>
-            <name>Emanuel Rabina</name>
-            <email>emanuelrabina@gmail.com</email>
-            <organizationUrl>http://www.ultraq.net.nz/</organizationUrl>
-            <roles>
-                <role>developer</role>
-            </roles>
-            <timezone>Pacific/Auckland</timezone>
-        </contributor>
-        <contributor>
-            <name>Justin Munn</name>
-            <roles>
-                <role>developer</role>
-            </roles>
-            <properties>
-                <contribution>https://github.com/ultraq/thymeleaf-layout-dialect/pull/42</contribution>
-            </properties>
-        </contributor>
-        <contributor>
-            <name>Oliver Niekrenz</name>
-            <email>oliver@niekrenz.de</email>
-            <roles>
-                <role>developer</role>
-            </roles>
-            <properties>
-                <contribution>https://github.com/ultraq/thymeleaf-layout-dialect/pull/60</contribution>
-            </properties>
-        </contributor>
-    </contributors>
-
-    <scm>
-        <connection>scm:git:git@github.com:zhanhb/thymeleaf-layout-dialect.git</connection>
-        <developerConnection>scm:git:git@github.com:zhanhb/thymeleaf-layout-dialect.git</developerConnection>
-        <tag>HEAD</tag>
-        <url>https://github.com/zhanhb/thymeleaf-layout-dialect</url>
-    </scm>
-
-    <issueManagement>
-        <system>Github</system>
-        <url>https://github.com/zhanhb/thymeleaf-layout-dialect/issues</url>
-    </issueManagement>
-
-    <ciManagement>
-        <system>Travis CI</system>
-        <url>https://travis-ci.org/zhanhb/thymeleaf-layout-dialect</url>
-    </ciManagement>
 
     <distributionManagement>
-        <repository>
-            <id>ossrh</id>
-            <name>Nexus Release Repository</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </snapshotRepository>
         <site>
             <id>gh-pages</id>
             <name>Thymeleaf Layout Dialect GitHub Pages</name>
@@ -99,24 +21,26 @@
 
     <properties>
         <argLine>-Dfile.encoding=${file.encoding} -ea</argLine>
-        <arguments>-Prelease-profile</arguments>
         <attoparser.version>2.0.5.RELEASE</attoparser.version>
         <byte-buddy.version>1.10.14</byte-buddy.version>
         <commons-lang3.version>3.8.1</commons-lang3.version>
         <findbugs-jsr305.version>3.0.2</findbugs-jsr305.version>
-        <groovy.version>2.5.12</groovy.version>
         <guava.version>20.0</guava.version>
         <hamcrest.version>2.2</hamcrest.version>
-        <java.version>1.8</java.version>
         <javassist.version>3.20.0-GA</javassist.version>
         <junit.version>4.13</junit.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
         <mockito.version>2.28.2</mockito.version>
         <objenesis.version>2.6</objenesis.version>
         <ognl3.version>3.1.12</ognl3.version>
+        <osgi.export>!nz.net.ultraq.thymeleaf.internal,
+            nz.net.ultraq.thymeleaf.expressions;version=1.2.0,
+            nz.net.ultraq.thymeleaf.*</osgi.export>
+        <osgi.import>!nz.net.ultraq.thymeleaf.*,
+            javax.annotation.*;resolution:=optional,
+            org.thymeleaf.*;version="[3.0,4)",
+            *</osgi.import>
+        <osgi.private>nz.net.ultraq.thymeleaf.internal</osgi.private>
         <prerequisites.maven>3.2</prerequisites.maven>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <reflections.version>0.9.11</reflections.version>
         <slf4j.version>1.7.30</slf4j.version>
         <thymeleaf-testing.version>3.0.4.RELEASE</thymeleaf-testing.version>
@@ -165,11 +89,6 @@
                 <groupId>org.attoparser</groupId>
                 <artifactId>attoparser</artifactId>
                 <version>${attoparser.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy</artifactId>
-                <version>${groovy.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -269,79 +188,14 @@
     </dependencies>
 
     <build>
-        <sourceDirectory>${project.basedir}/source</sourceDirectory>
-        <testSourceDirectory>${project.basedir}/tests</testSourceDirectory>
-        <resources>
-            <resource>
-                <directory>${project.build.sourceDirectory}</directory>
-                <excludes>
-                    <exclude>**/*.java</exclude>
-                    <exclude>**/*.groovy</exclude>
-                </excludes>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>${project.build.testSourceDirectory}</directory>
-                <excludes>
-                    <exclude>**/*.java</exclude>
-                    <exclude>**/*.groovy</exclude>
-                </excludes>
-            </testResource>
-        </testResources>
-
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-antrun-plugin</artifactId>
-                    <version>1.8</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.3.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.1.2</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>2.5.3</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
         <plugins>
             <plugin>
                 <groupId>com.github.ekryd.sortpom</groupId>
                 <artifactId>sortpom-maven-plugin</artifactId>
-                <version>2.12.0</version>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sort</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <createBackupFile>false</createBackupFile>
-                    <sortProperties>true</sortProperties>
-                    <nrOfIndentSpace>4</nrOfIndentSpace>
-                    <sortDependencies>groupId,artifactId</sortDependencies>
-                    <sortPlugins>groupId,artifactId</sortPlugins>
-                    <keepBlankLines>true</keepBlankLines>
-                    <expandEmptyElements>false</expandEmptyElements>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>net.orfjackal.retrolambda</groupId>
                 <artifactId>retrolambda-maven-plugin</artifactId>
-                <version>2.5.7</version>
                 <executions>
                     <execution>
                         <goals>
@@ -357,54 +211,19 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>5.1.1</version>
                 <extensions>true</extensions>
-                <executions>
-                    <execution>
-                        <id>bundle-manifest</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>manifest</goal>
-                        </goals>
-                        <configuration>
-                            <instructions>
-                                <Export-Package>!nz.net.ultraq.thymeleaf.internal,
-                                    nz.net.ultraq.thymeleaf.expressions;version=1.2.0,
-                                    nz.net.ultraq.thymeleaf.*</Export-Package>
-                                <Bundle-DocURL>https://github.com/zhanhb/thymeleaf-layout-dialect/</Bundle-DocURL>
-                            </instructions>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
-                <version>3.1.0</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <fork>true</fork>
-                    <compilerArgs>
-                        <arg>-J-Duser.language=en_us</arg>
-                        <arg>-J-Dfile.encoding=${file.encoding}</arg>
-                    </compilerArgs>
-                    <showDeprecation>true</showDeprecation>
-                    <debug>false</debug>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.4.1</version>
                 <executions>
                     <execution>
                         <id>enforce-versions</id>
@@ -425,12 +244,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-install-plugin</artifactId>
-                <version>2.5.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -458,7 +275,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -480,19 +296,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <arguments>${arguments}</arguments>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.9.1</version>
                 <executions>
                     <execution>
                         <id>attach-descriptor</id>
@@ -522,7 +333,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -535,7 +345,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
                 <configuration>
                     <includes>
                         <include>**/*Test.class</include>
@@ -555,12 +364,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.22.2</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
                 <artifactId>gmavenplus-plugin</artifactId>
-                <version>1.10.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -595,17 +402,18 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.2.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
-                <version>2.8.1</version>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.5</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -621,46 +429,7 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <excludes>
-                        <exclude>**/extensions/*Extensions.class</exclude>
-                    </excludes>
-                </configuration>
             </plugin>
         </plugins>
     </build>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>3.1.1</version>
-            </plugin>
-        </plugins>
-    </reporting>
-
-    <profiles>
-        <profile>
-            <id>release-profile</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

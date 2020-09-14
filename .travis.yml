@@ -1,3 +1,4 @@
+dist: trusty
 language: java
 before_cache:
 - ./mvnw build-helper:remove-project-artifact
@@ -13,7 +14,7 @@ jdk:
   - openjdk14
 install: ./mvnw deploy -DskipTests=true -Dmaven.javadoc.skip=true -Dmaven.deploy.skip=true -B -V
 script:
-- source .travis/build.sh
+- chmod +x .travis/build.sh && .travis/build.sh
 after_success:
 - bash <(curl -s https://codecov.io/bash)
 - jdk_switcher use openjdk8 && [ "$TRAVIS_JDK_VERSION" == "openjdk8" ] && source .travis/publish.sh || true
