@@ -37,6 +37,7 @@
             nz.net.ultraq.thymeleaf.*</osgi.export>
         <osgi.import>!nz.net.ultraq.thymeleaf.*,
             javax.annotation.*;resolution:=optional,
+            org.codehaus.groovy.runtime.*;resolution:=optional,
             org.thymeleaf.*;version="[3.0,4)",
             *</osgi.import>
         <osgi.private>nz.net.ultraq.thymeleaf.internal</osgi.private>

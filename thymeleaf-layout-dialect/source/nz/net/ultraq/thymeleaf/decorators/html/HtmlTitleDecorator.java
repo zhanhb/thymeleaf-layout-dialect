@@ -17,9 +17,9 @@ package nz.net.ultraq.thymeleaf.decorators.html;
 
 import java.util.Collections;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
-import nz.net.ultraq.thymeleaf.context.extensions.IContextExtensions;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor;
+import nz.net.ultraq.thymeleaf.internal.IContextDelegate;
 import nz.net.ultraq.thymeleaf.internal.ModelBuilder;
 import nz.net.ultraq.thymeleaf.models.ElementMerger;
 import nz.net.ultraq.thymeleaf.models.extensions.ChildModelIterator;
@@ -115,8 +115,8 @@ public class HtmlTitleDecorator implements Decorator {
     @Override
     public IModel decorate(IModel targetTitleModel, IModel sourceTitleModel) {
         ModelBuilder modelBuilder = new ModelBuilder(context);
-        String layoutDialectPrefix = IContextExtensions.getPrefixForDialect(context, LayoutDialect.class);
-        String standardDialectPrefix = IContextExtensions.getPrefixForDialect(context, StandardDialect.class);
+        String layoutDialectPrefix = IContextDelegate.getPrefixForDialect(context, LayoutDialect.class);
+        String standardDialectPrefix = IContextDelegate.getPrefixForDialect(context, StandardDialect.class);
 
         IAttribute titlePatternProcessor = titlePatternProcessorRetriever(sourceTitleModel, layoutDialectPrefix);
         if (titlePatternProcessor == null) {

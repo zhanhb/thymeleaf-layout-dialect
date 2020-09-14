@@ -16,9 +16,9 @@
 package nz.net.ultraq.thymeleaf.models;
 
 import nz.net.ultraq.thymeleaf.LayoutDialect;
-import nz.net.ultraq.thymeleaf.context.extensions.IContextExtensions;
 import nz.net.ultraq.thymeleaf.fragments.CollectFragmentProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentProcessor;
+import nz.net.ultraq.thymeleaf.internal.IContextDelegate;
 import nz.net.ultraq.thymeleaf.models.extensions.IAttributeExtensions;
 import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.thymeleaf.context.ITemplateContext;
@@ -68,8 +68,8 @@ public class AttributeMerger implements ModelMerger {
         }
 
         IModel mergedModel = targetModel.cloneModel();
-        String layoutDialectPrefix = IContextExtensions.getPrefixForDialect(context, LayoutDialect.class);
-        String standardDialectPrefix = IContextExtensions.getPrefixForDialect(context, StandardDialect.class);
+        String layoutDialectPrefix = IContextDelegate.getPrefixForDialect(context, LayoutDialect.class);
+        String standardDialectPrefix = IContextDelegate.getPrefixForDialect(context, StandardDialect.class);
 
         // Merge attributes from the source model's root event to the target model's root event
         // TODO nullable

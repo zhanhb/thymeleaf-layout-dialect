@@ -18,16 +18,15 @@ package nz.net.ultraq.thymeleaf.decorators;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import nz.net.ultraq.thymeleaf.context.extensions.IContextExtensions;
 import nz.net.ultraq.thymeleaf.decorators.html.HtmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
 import nz.net.ultraq.thymeleaf.fragments.extensions.FragmentExtensions;
+import nz.net.ultraq.thymeleaf.internal.IContextDelegate;
 import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
 import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.thymeleaf.context.IContext;
-import org.thymeleaf.context.IExpressionContext;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.engine.TemplateData;
@@ -69,7 +68,7 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
 
         if (element1 != null && element2 != null
                 && Objects.equals(element1.getElementDefinition(), element2.getElementDefinition())) {
-            String maybe = IContextExtensions.getPrefixForDialect((IExpressionContext) context, StandardDialect.class) + ":with";
+            String maybe = IContextDelegate.getPrefixForDialect(context, StandardDialect.class) + ":with";
             Map<String, String> attributeMap = element2.getAttributeMap();
             for (Map.Entry<String, String> entry : element1.getAttributeMap().entrySet()) {
                 String key = entry.getKey();

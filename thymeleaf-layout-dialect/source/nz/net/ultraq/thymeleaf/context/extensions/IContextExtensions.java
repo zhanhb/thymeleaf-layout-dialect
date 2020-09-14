@@ -15,8 +15,6 @@
  */
 package nz.net.ultraq.thymeleaf.context.extensions;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import javax.annotation.Nonnull;
 import nz.net.ultraq.thymeleaf.internal.Supplier;
 import org.thymeleaf.DialectConfiguration;
@@ -59,30 +57,13 @@ public class IContextExtensions {
      * constructed through the closure.
      */
     public static <T> T getOrCreate(@Nonnull IContext self, @Nonnull String key, Supplier<T> closure) {
-        if (self instanceof IEngineContext) {
-            return getOrCreate((IEngineContext) self, key, closure);
+        @SuppressWarnings("unchecked")
+        T result = (T) getAt(self, key);
+        if (result == null) {
+            result = closure.get();
+            putAt(self, key, result);
         }
-
-        ConcurrentMap<String, T> dialectPrefixCache = DialectPrefixCacheHolder.getDialectPrefixCache(self);
-
-        T value = dialectPrefixCache.get(key);
-        if (value == null) {
-            value = closure.get();
-            if (value != null) {
-                dialectPrefixCache.putIfAbsent(key, value);
-            }
-        }
-        return value;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> T getOrCreate(IEngineContext delegate, @Nonnull String key, Supplier<T> closure) {
-        Object value = delegate.getVariable(key);
-        if (value == null) {
-            value = closure.get();
-            delegate.setVariable(key, value);
-        }
-        return (T) value;
+        return result;
     }
 
     /**
@@ -94,9 +75,9 @@ public class IContextExtensions {
      * @return The configured prefix for the dialect, or {@code null} if the
      * dialect being queried hasn't been configured.
      */
-    public static String getPrefixForDialect(@Nonnull IExpressionContext self, Class<? extends IProcessorDialect> dialectClass) {
+    public static String getPrefixForDialect(@Nonnull IContext self, Class<? extends IProcessorDialect> dialectClass) {
         return getOrCreate(self, DIALECT_PREFIX_PREFIX + dialectClass.getName(), () -> {
-            for (DialectConfiguration dialectConfig : self.getConfiguration().getDialectConfigurations()) {
+            for (DialectConfiguration dialectConfig : ((IExpressionContext) self).getConfiguration().getDialectConfigurations()) {
                 if (dialectClass.isInstance(dialectConfig.getDialect())) {
                     if (dialectConfig.isPrefixSpecified()) {
                         return dialectConfig.getPrefix();
@@ -117,27 +98,7 @@ public class IContextExtensions {
      * @param value The value to set.
      */
     public static void putAt(IContext self, String name, Object value) {
-        if (self instanceof IEngineContext) {
-            ((IEngineContext) self).setVariable(name, value);
-        } else {
-            DialectPrefixCacheHolder.getDialectPrefixCache(self).put(name, value);
-        }
-    }
-
-    @SuppressWarnings({"UtilityClassWithoutPrivateConstructor", "NestedAssignment", "rawtypes", "unchecked"})
-    private static class DialectPrefixCacheHolder {
-
-        private static final ConcurrentWeakIdentityHashMap<IContext, ConcurrentMap<String, Object>> CACHE
-                = new ConcurrentWeakIdentityHashMap<>(20);
-
-        static <T> ConcurrentMap<String, T> getDialectPrefixCache(IContext delegate) {
-            ConcurrentMap dialectPrefixCache, newCache;
-            return (dialectPrefixCache = CACHE.get(delegate)) == null
-                    && (dialectPrefixCache = CACHE.putIfAbsent(delegate,
-                            newCache = new ConcurrentHashMap<>(4))) == null
-                            ? newCache : dialectPrefixCache;
-        }
-
+        ((IEngineContext) self).setVariable(name, value);
     }
 
 }
