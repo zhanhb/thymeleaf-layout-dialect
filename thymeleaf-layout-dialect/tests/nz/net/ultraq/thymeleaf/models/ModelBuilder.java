@@ -30,7 +30,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  * @author zhanhb
  * @author Emanuel Rabina
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings("unchecked")
 public class ModelBuilder extends BuilderSupport {
 
     private final nz.net.ultraq.thymeleaf.internal.ModelBuilder builder;
