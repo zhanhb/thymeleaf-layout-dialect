@@ -1,20 +1,23 @@
 dist: trusty
 language: java
-before_cache:
-- ./mvnw build-helper:remove-project-artifact
-- find $HOME/.m2/ -type d -name '*-SNAPSHOT' -exec rm -rf {} \; 2>/dev/null
-cache:
-  directories:
-  - $HOME/.m2
 jdk:
+  - openjdk7
   - openjdk8
   - oraclejdk11
   - openjdk11
   - oraclejdk14
   - openjdk14
-install: ./mvnw deploy -DskipTests=true -Dmaven.javadoc.skip=true -Dmaven.deploy.skip=true -B -V
+cache:
+  directories:
+    - $HOME/.m2
+install:
+  - if [ "$TRAVIS_JDK_VERSION" = openjdk7 ]; then jdk_switcher use openjdk8; fi
+  - ./mvnw -V deploy -Dmaven.main.skip=true -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dmaven.deploy.skip=true -Dmaven.install.skip=true
 script:
-- chmod +x .travis/build.sh && .travis/build.sh
+  - if [ "$TRAVIS_JDK_VERSION" = openjdk8 ] && git config --get remote.origin.url 2>&1 | grep -F https://github.com/zhanhb/thymeleaf-layout-dialect -q && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./mvnw -s .travis/settings.xml deploy; else ./mvnw install; fi
+  - if [ "$TRAVIS_JDK_VERSION" = openjdk7 ]; then jdk_switcher use "$TRAVIS_JDK_VERSION"; ./mvnw -Djava.version=1.7 surefire:test; jdk_switcher use openjdk8; fi
+before_cache:
+  - ./mvnw build-helper:remove-project-artifact
+  - find ~/.m2/ -type d -name '*-SNAPSHOT' -exec rm -rf '{}' \; 2>/dev/null
 after_success:
-- bash <(curl -s https://codecov.io/bash)
-- jdk_switcher use openjdk8 && [ "$TRAVIS_JDK_VERSION" == "openjdk8" ] && source .travis/publish.sh || true
+  - bash <(curl -s https://codecov.io/bash)

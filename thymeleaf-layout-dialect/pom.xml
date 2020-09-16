@@ -257,7 +257,6 @@
                         </manifest>
                         <manifestEntries>
                             <Automatic-Module-Name>nz.net.ultraq.thymeleaf</Automatic-Module-Name>
-                            <Built-By>zhanhb</Built-By>
                         </manifestEntries>
                         <manifestSections>
                             <manifestSection>
@@ -266,7 +265,7 @@
                                     <Implementation-Title>Thymeleaf Expression Processor</Implementation-Title>
                                     <Implementation-Version>1.2.0</Implementation-Version>
                                     <Specification-Title>Thymeleaf Expression Processor</Specification-Title>
-                                    <Specification-Version>1.2.0</Specification-Version>
+                                    <Specification-Version>1.2</Specification-Version>
                                 </manifestEntries>
                             </manifestSection>
                         </manifestSections>
@@ -286,7 +285,7 @@
                 </executions>
                 <configuration>
                     <additionalJOption>-J-Dfile.encoding=${file.encoding}</additionalJOption>
-                    <excludePackageNames>*.internal.*</excludePackageNames>
+                    <excludePackageNames>*.internal</excludePackageNames>
                     <locale>en_US</locale>
                     <links>
                         <link>https://www.thymeleaf.org/apidocs/thymeleaf/${thymeleaf.version}</link>
@@ -311,6 +310,9 @@
                         <goals>
                             <goal>attach-descriptor</goal>
                         </goals>
+                        <configuration>
+                            <pomPackagingOnly>false</pomPackagingOnly>
+                        </configuration>
                     </execution>
                 </executions>
                 <dependencies>
