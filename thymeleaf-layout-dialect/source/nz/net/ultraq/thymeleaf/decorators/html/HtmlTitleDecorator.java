@@ -17,6 +17,7 @@ package nz.net.ultraq.thymeleaf.decorators.html;
 
 import java.util.Collections;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
+import nz.net.ultraq.thymeleaf.context.extensions.IContextExtensions;
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
 import nz.net.ultraq.thymeleaf.decorators.TitlePatternProcessor;
 import nz.net.ultraq.thymeleaf.internal.IContextDelegate;
@@ -24,7 +25,6 @@ import nz.net.ultraq.thymeleaf.internal.ModelBuilder;
 import nz.net.ultraq.thymeleaf.models.ElementMerger;
 import nz.net.ultraq.thymeleaf.models.extensions.ChildModelIterator;
 import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
-import org.thymeleaf.context.IEngineContext;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IAttribute;
 import org.thymeleaf.model.IModel;
@@ -61,7 +61,7 @@ public class HtmlTitleDecorator implements Decorator {
     private static void extractTitle(IModel titleModel, String contextKey, ITemplateContext context, String standardDialectPrefix, ModelBuilder modelBuilder) {
 
         // This title part already exists from a previous run, so do nothing
-        if (context.containsVariable(contextKey)) {
+        if (IContextExtensions.getAt(context, contextKey) != null) {
             return;
         }
 
@@ -70,12 +70,12 @@ public class HtmlTitleDecorator implements Decorator {
 
             // Escapable title from a th:text attribute on the title tag
             if (titleTag.hasAttribute(standardDialectPrefix, StandardTextTagProcessor.ATTR_NAME)) {
-                ((IEngineContext) context).setVariable(contextKey, build(modelBuilder,
+                IContextExtensions.putAt(context, contextKey, build(modelBuilder,
                         "th:text", titleTag.getAttributeValue(standardDialectPrefix, StandardTextTagProcessor.ATTR_NAME)));
             } // Unescaped title from a th:utext attribute on the title tag, or
             // whatever happens to be within the title tag
             else if (titleTag.hasAttribute(standardDialectPrefix, StandardUtextTagProcessor.ATTR_NAME)) {
-                ((IEngineContext) context).setVariable(contextKey, build(modelBuilder,
+                IContextExtensions.putAt(context, contextKey, build(modelBuilder,
                         "th:utext", titleTag.getAttributeValue(standardDialectPrefix, StandardUtextTagProcessor.ATTR_NAME)));
 
             } else {
@@ -87,7 +87,7 @@ public class HtmlTitleDecorator implements Decorator {
                         titleChildrenModel.addModel(model);
                     }
                 }
-                ((IEngineContext) context).setVariable(contextKey, titleChildrenModel);
+                IContextExtensions.putAt(context, contextKey, titleChildrenModel);
             }
         }
     }
