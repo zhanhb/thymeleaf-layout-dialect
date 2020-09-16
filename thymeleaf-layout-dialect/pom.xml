@@ -322,11 +322,6 @@
                         <version>2.0.4</version>
                     </dependency>
                     <dependency>
-                        <groupId>org.apache.maven.skins</groupId>
-                        <artifactId>maven-fluido-skin</artifactId>
-                        <version>1.9</version>
-                    </dependency>
-                    <dependency>
                         <groupId>org.apache.maven.wagon</groupId>
                         <artifactId>wagon-ssh</artifactId>
                         <version>3.4.1</version>
@@ -435,4 +430,17 @@
             </plugin>
         </plugins>
     </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <configuration>
+                    <packaging>jar</packaging>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+
 </project>

@@ -428,6 +428,17 @@
                     </plugin>
                 </plugins>
             </build>
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-project-info-reports-plugin</artifactId>
+                        <configuration>
+                            <webAccessUrl>https://github.com/zhanhb/thymeleaf-layout-dialect/tree/${project.scm.tag}</webAccessUrl>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </reporting>
         </profile>
     </profiles>
 </project>
