@@ -16,7 +16,8 @@
 package nz.net.ultraq.thymeleaf.decorators.strategies;
 
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
+import nz.net.ultraq.thymeleaf.models.extensions.ITemplateEventExtensions;
 import org.thymeleaf.model.IModel;
 
 /**
@@ -40,7 +41,7 @@ import org.thymeleaf.model.IModel;
  * @author Emanuel Rabina
  * @since 2.4.0
  */
-<span class="nc" id="L43">public class AppendingRespectLayoutTitleStrategy implements SortingStrategy {</span>
+<span class="fc" id="L44">public class AppendingRespectLayoutTitleStrategy implements SortingStrategy {</span>
 
     /**
      * For {@code &lt;title&gt;} elements, returns the position of the matching
@@ -55,21 +56,21 @@ import org.thymeleaf.model.IModel;
     public int findPositionForModel(IModel headModel, IModel childModel) {
 
         // Discard text/whitespace nodes
-<span class="nc bnc" id="L58" title="All 2 branches missed.">        if (Extensions.isWhitespace(childModel)) {</span>
-<span class="nc" id="L59">            return -1;</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        if (IModelExtensions.isWhitespace(childModel)) {</span>
+<span class="fc" id="L60">            return -1;</span>
         }
 
         // Locate any matching &lt;title&gt; element
-<span class="nc bnc" id="L63" title="All 2 branches missed.">        if (Extensions.isElementOf(childModel, &quot;title&quot;)) {</span>
-<span class="nc" id="L64">            int existingTitleIndex = Extensions.findIndexOf(headModel, event -&gt; Extensions.isOpeningElementOf(event, &quot;title&quot;));</span>
-<span class="nc bnc" id="L65" title="All 2 branches missed.">            if (existingTitleIndex != -1) {</span>
-<span class="nc" id="L66">                return existingTitleIndex;</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        if (IModelExtensions.isElementOf(childModel, &quot;title&quot;)) {</span>
+<span class="fc" id="L65">            int existingTitleIndex = IModelExtensions.findIndexOf(headModel, event -&gt; ITemplateEventExtensions.isOpeningElementOf(event, &quot;title&quot;));</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">            if (existingTitleIndex != -1) {</span>
+<span class="nc" id="L67">                return existingTitleIndex;</span>
             }
         }
 
         // Return the end of the &lt;head&gt; element
-<span class="nc" id="L71">        int positions = headModel.size();</span>
-<span class="nc bnc" id="L72" title="All 2 branches missed.">        return positions - (positions &gt; 2 ? 2 : 1);</span>
+<span class="fc" id="L72">        int positions = headModel.size();</span>
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">        return positions - (positions &gt; 2 ? 2 : 1);</span>
     }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

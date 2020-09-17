@@ -16,7 +16,7 @@
 package nz.net.ultraq.thymeleaf.fragments;
 
 import java.util.List;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IProcessableElementTag;
@@ -61,7 +61,7 @@ public class FragmentParameterVariableUpdater {
 
         // When fragment parameters aren't named, derive the name from the fragment definition
 <span class="fc bfc" id="L63" title="All 2 branches covered.">        if (fragmentExpression.hasSyntheticParameters()) {</span>
-<span class="fc" id="L64">            String fragmentDefinition = ((IProcessableElementTag) Extensions.first(fragment)).getAttributeValue(dialectPrefix, FragmentProcessor.PROCESSOR_NAME);</span>
+<span class="fc" id="L64">            String fragmentDefinition = ((IProcessableElementTag) IModelExtensions.first(fragment)).getAttributeValue(dialectPrefix, FragmentProcessor.PROCESSOR_NAME);</span>
 <span class="fc" id="L65">            List&lt;String&gt; parameterNames = new FragmentParameterNamesExtractor().extract(fragmentDefinition);</span>
 <span class="fc" id="L66">            AssignationSequence parameters = fragmentExpression.getParameters();</span>
 <span class="pc bpc" id="L67" title="1 of 2 branches missed.">            if (parameters != null) {</span>
@@ -80,5 +80,14 @@ public class FragmentParameterVariableUpdater {
             }
         }
 <span class="fc" id="L82">    }</span>
+
+    public final String getDialectPrefix() {
+<span class="nc" id="L85">        return this.dialectPrefix;</span>
+    }
+
+    public final ITemplateContext getContext() {
+<span class="nc" id="L89">        return this.context;</span>
+    }
+
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

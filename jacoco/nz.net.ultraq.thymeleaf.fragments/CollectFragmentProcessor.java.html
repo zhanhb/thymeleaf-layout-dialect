@@ -17,8 +17,9 @@ package nz.net.ultraq.thymeleaf.fragments;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.fragments.extensions.FragmentExtensions;
 import nz.net.ultraq.thymeleaf.models.ElementMerger;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.ITemplateContext;
@@ -41,9 +42,9 @@ import org.thymeleaf.util.StringUtils;
  */
 public class CollectFragmentProcessor extends AbstractAttributeTagProcessor {
 
-<span class="fc" id="L44">    private static final Logger logger = LoggerFactory.getLogger(CollectFragmentProcessor.class);</span>
+<span class="fc" id="L45">    private static final Logger logger = LoggerFactory.getLogger(CollectFragmentProcessor.class);</span>
 
-<span class="fc" id="L46">    private static final AtomicBoolean warned = new AtomicBoolean();</span>
+<span class="fc" id="L47">    private static final AtomicBoolean warned = new AtomicBoolean();</span>
 
     public static final String PROCESSOR_DEFINE = &quot;define&quot;;
     public static final String PROCESSOR_COLLECT = &quot;collect&quot;;
@@ -57,8 +58,8 @@ public class CollectFragmentProcessor extends AbstractAttributeTagProcessor {
      */
     public CollectFragmentProcessor(TemplateMode templateMode, String dialectPrefix) {
 
-<span class="fc" id="L60">        super(templateMode, dialectPrefix, null, false, PROCESSOR_COLLECT, true, PROCESSOR_PRECEDENCE, true);</span>
-<span class="fc" id="L61">    }</span>
+<span class="fc" id="L61">        super(templateMode, dialectPrefix, null, false, PROCESSOR_COLLECT, true, PROCESSOR_PRECEDENCE, true);</span>
+<span class="fc" id="L62">    }</span>
 
     /**
      * Inserts the content of &lt;code&gt;:define&lt;/code&gt; fragments into the
@@ -71,7 +72,6 @@ public class CollectFragmentProcessor extends AbstractAttributeTagProcessor {
      * @param structureHandler
      */
     @Override
-    @SuppressWarnings(&quot;AssignmentToStaticFieldFromInstanceMethod&quot;)
     protected void doProcess(ITemplateContext context, IProcessableElementTag tag,
             AttributeName attributeName, String attributeValue, IElementTagStructureHandler structureHandler) {
 
@@ -92,13 +92,13 @@ public class CollectFragmentProcessor extends AbstractAttributeTagProcessor {
 
         // All :define fragments we collected, :collect fragments included to determine where to stop.
         // Fragments after :collect are preserved for the next :collect event
-<span class="fc" id="L95">        List&lt;IModel&gt; fragments = FragmentMap.get(context).get(attributeValue);</span>
+<span class="fc" id="L95">        List&lt;IModel&gt; fragments = FragmentExtensions.getFragmentCollection(context).get(attributeValue);</span>
 
         // Replace the tag body with the fragment
 <span class="pc bpc" id="L98" title="2 of 4 branches missed.">        if (fragments != null &amp;&amp; !fragments.isEmpty()) {</span>
 <span class="fc" id="L99">            IModelFactory modelFactory = context.getModelFactory();</span>
 <span class="fc" id="L100">            ElementMerger merger = new ElementMerger(context);</span>
-<span class="fc" id="L101">            IModel[] replacementModel = new IModel[]{modelFactory.createModel(tag)};</span>
+<span class="fc" id="L101">            IModel[] replacementModel = {modelFactory.createModel(tag)};</span>
 <span class="fc" id="L102">            boolean first = true;</span>
 <span class="fc bfc" id="L103" title="All 2 branches covered.">            while (!fragments.isEmpty()) {</span>
 <span class="fc" id="L104">                IModel fragment = fragments.remove(0);</span>
@@ -110,7 +110,7 @@ public class CollectFragmentProcessor extends AbstractAttributeTagProcessor {
 <span class="fc" id="L110">                    first = false;</span>
                 } else {
 <span class="fc" id="L112">                    AtomicBoolean firstEvent = new AtomicBoolean(true);</span>
-<span class="fc" id="L113">                    Extensions.each(fragment, event -&gt; {</span>
+<span class="fc" id="L113">                    IModelExtensions.each(fragment, event -&gt; {</span>
 <span class="fc bfc" id="L114" title="All 2 branches covered.">                        if (firstEvent.compareAndSet(true, false)) {</span>
 <span class="fc" id="L115">                            replacementModel[0].add(modelFactory.createText(&quot;\n&quot;));</span>
 <span class="fc" id="L116">                            replacementModel[0].add(modelFactory.removeAttribute((IProcessableElementTag) event, getDialectPrefix(), PROCESSOR_DEFINE));</span>
@@ -123,11 +123,11 @@ public class CollectFragmentProcessor extends AbstractAttributeTagProcessor {
 
             // Remove the layout:collect attribute - Thymeleaf won't do it for us
             // when using StructureHandler.replaceWith(...)
-<span class="fc" id="L126">            replacementModel[0].replace(0, modelFactory.removeAttribute((IProcessableElementTag) Extensions.first(replacementModel[0]), getDialectPrefix(), PROCESSOR_COLLECT));</span>
+<span class="fc" id="L126">            replacementModel[0].replace(0, modelFactory.removeAttribute((IProcessableElementTag) IModelExtensions.first(replacementModel[0]), getDialectPrefix(), PROCESSOR_COLLECT));</span>
 
 <span class="fc" id="L128">            structureHandler.replaceWith(replacementModel[0], true);</span>
         }
 <span class="fc" id="L130">    }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

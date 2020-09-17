@@ -22,11 +22,11 @@ import nz.net.ultraq.thymeleaf.decorators.html.HtmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
 import nz.net.ultraq.thymeleaf.expressions.ExpressionProcessor;
 import nz.net.ultraq.thymeleaf.fragments.FragmentFinder;
-import nz.net.ultraq.thymeleaf.fragments.FragmentMap;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.fragments.extensions.FragmentExtensions;
+import nz.net.ultraq.thymeleaf.internal.IContextDelegate;
 import nz.net.ultraq.thymeleaf.models.TemplateModelFinder;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.thymeleaf.context.IContext;
-import org.thymeleaf.context.IExpressionContext;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AttributeName;
 import org.thymeleaf.engine.TemplateData;
@@ -68,7 +68,7 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
 
 <span class="pc bpc" id="L69" title="2 of 4 branches missed.">        if (element1 != null &amp;&amp; element2 != null</span>
 <span class="fc bfc" id="L70" title="All 2 branches covered.">                &amp;&amp; Objects.equals(element1.getElementDefinition(), element2.getElementDefinition())) {</span>
-<span class="fc" id="L71">            String maybe = Extensions.getPrefixForDialect((IExpressionContext) context, StandardDialect.class) + &quot;:with&quot;;</span>
+<span class="fc" id="L71">            String maybe = IContextDelegate.getPrefixForDialect(context, StandardDialect.class) + &quot;:with&quot;;</span>
 <span class="fc" id="L72">            Map&lt;String, String&gt; attributeMap = element2.getAttributeMap();</span>
 <span class="fc bfc" id="L73" title="All 2 branches covered.">            for (Map.Entry&lt;String, String&gt; entry : element1.getAttributeMap().entrySet()) {</span>
 <span class="fc" id="L74">                String key = entry.getKey();</span>
@@ -143,8 +143,8 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
 <span class="fc" id="L143">        IModel contentTemplate = templateModelFinder.findTemplate(contentTemplateName).cloneModel();</span>
 
         // Check that the root element is the same as the one currently being processed
-<span class="fc" id="L146">        IProcessableElementTag contentRootEvent = (IProcessableElementTag) Extensions.find(contentTemplate, event -&gt; event instanceof IProcessableElementTag);</span>
-<span class="fc" id="L147">        IProcessableElementTag rootElement = (IProcessableElementTag) Extensions.first(model);</span>
+<span class="fc" id="L146">        IProcessableElementTag contentRootEvent = (IProcessableElementTag) IModelExtensions.find(contentTemplate, event -&gt; event instanceof IProcessableElementTag);</span>
+<span class="fc" id="L147">        IProcessableElementTag rootElement = (IProcessableElementTag) IModelExtensions.first(model);</span>
 <span class="fc bfc" id="L148" title="All 2 branches covered.">        if (!rootElementsEqual(contentRootEvent, rootElement, context)) {</span>
 <span class="fc" id="L149">            throw new IllegalArgumentException(&quot;layout:decorate/data-layout-decorate must appear in the root element of your template&quot;);</span>
         }
@@ -154,7 +154,7 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
 <span class="fc" id="L154">            rootElement = context.getModelFactory().removeAttribute(rootElement, attributeName);</span>
 <span class="fc" id="L155">            model.replace(0, rootElement);</span>
         }
-<span class="fc" id="L157">        Extensions.replaceModel(contentTemplate, Extensions.findIndexOf(contentTemplate, event -&gt; event instanceof IProcessableElementTag), model);</span>
+<span class="fc" id="L157">        IModelExtensions.replaceModel(contentTemplate, IModelExtensions.findIndexOf(contentTemplate, event -&gt; event instanceof IProcessableElementTag), model);</span>
 
         // Locate the template to decorate
 <span class="fc" id="L160">        FragmentExpression decorateTemplateExpression = new ExpressionProcessor(context).parseFragmentExpression(attributeValue);</span>
@@ -178,11 +178,11 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
             );
         }
 <span class="fc" id="L180">        IModel resultTemplate = decorator.decorate(clone, contentTemplate);</span>
-<span class="fc" id="L181">        Extensions.replaceModel(model, 0, resultTemplate);</span>
+<span class="fc" id="L181">        IModelExtensions.replaceModel(model, 0, resultTemplate);</span>
 <span class="fc" id="L182">        structureHandler.setTemplateData(decorateTemplateData);</span>
 
         // Save layout fragments for use later by layout:fragment processors
-<span class="fc" id="L185">        FragmentMap.setForNode(context, structureHandler, pageFragments);</span>
+<span class="fc" id="L185">        FragmentExtensions.setLocalFragmentCollection(structureHandler, context, pageFragments);</span>
 
         // Scope variables in fragment definition to template.  Parameters *must* be
         // named as there is no mechanism for setting their name at the target
@@ -201,4 +201,4 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
 <span class="fc" id="L201">    }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

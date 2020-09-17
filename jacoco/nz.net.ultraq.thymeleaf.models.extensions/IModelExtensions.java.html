@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IModelExtensions.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.models.extensions</a> &gt; <span class="el_source">IModelExtensions.java</span></div><h1>IModelExtensions.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2016, Emanuel Rabina (http://www.ultraq.net.nz/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package nz.net.ultraq.thymeleaf.models.extensions;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import nz.net.ultraq.thymeleaf.internal.ITemplateEventConsumer;
+import nz.net.ultraq.thymeleaf.internal.ITemplateEventIntPredicate;
+import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
+import org.thymeleaf.model.ICloseElementTag;
+import org.thymeleaf.model.IElementTag;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.model.IModelFactory;
+import org.thymeleaf.model.IOpenElementTag;
+import org.thymeleaf.model.ITemplateEvent;
+import org.thymeleaf.model.IText;
+
+/**
+ * Meta-programming extensions to the {@link IModel} class.
+ *
+ * @author zhanhb
+ * @author Emanuel Rabina
+ */
+<span class="nc" id="L42">public class IModelExtensions {</span>
+
+    /**
+     * Set that a model evaluates to 'false' if it has no events.
+     *
+     * @param self
+     * @return {@code true} if this model has events.
+     */
+    public static boolean asBoolean(@Nullable IModel self) {
+<span class="fc bfc" id="L51" title="All 4 branches covered.">        return self != null &amp;&amp; self.size() &gt; 0;</span>
+    }
+
+    /**
+     * If this model represents an element, then this method returns an iterator
+     * over any potential child items as models of their own.
+     *
+     * @param self
+     * @return New model iterator.
+     */
+    @Nullable
+    public static ChildModelIterator childModelIterator(@Nonnull IModel self) {
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">        return isElement(self) ? new ChildModelIterator(self) : null;</span>
+    }
+
+    /**
+     * Iterate through each event in the model.
+     *
+     * @param self
+     * @param closure
+     */
+    public static void each(@Nullable IModel self, @Nonnull ITemplateEventConsumer closure) {
+<span class="fc" id="L73">        Iterator&lt;ITemplateEvent&gt; it = maskNull(self);</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        while (it.hasNext()) {</span>
+<span class="fc" id="L75">            closure.accept(it.next());</span>
+        }
+<span class="fc" id="L77">    }</span>
+
+    /**
+     * Compare 2 models, returning {@code true} if all of the model's events are
+     * equal.
+     *
+     * @param self
+     * @param other
+     * @return {@code true} if this model is the same as the other one.
+     */
+    public static boolean equals(IModel self, Object other) {
+<span class="pc bpc" id="L88" title="2 of 4 branches missed.">        if (self != null &amp;&amp; other instanceof IModel) {</span>
+<span class="fc" id="L89">            IModel iModel = (IModel) other;</span>
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">            if (self.size() == iModel.size()) {</span>
+<span class="fc" id="L91">                return everyWithIndex(self, (event, index) -&gt; ITemplateEventExtensions.equals(event, iModel.get(index)));</span>
+            }
+        }
+<span class="nc" id="L94">        return false;</span>
+    }
+
+    /**
+     * Compare 2 models, returning {@code true} if all of the model's events
+     * non-whitespace events are equal.
+     *
+     * @param self
+     * @param other
+     * @return {@code true} if this model is the same (barring whitespace) as
+     * the other one.
+     */
+    public static boolean equalsIgnoreWhitespace(@Nullable IModel self, @Nullable IModel other) {
+<span class="fc" id="L107">        Iterator&lt;ITemplateEvent&gt; it = maskNull(self);</span>
+<span class="fc" id="L108">        Iterator&lt;ITemplateEvent&gt; iterator = maskNull(other);</span>
+        ITemplateEvent next;
+        ITemplateEvent that;
+        do {
+            do {
+<span class="fc bfc" id="L113" title="All 2 branches covered.">                if (!it.hasNext()) {</span>
+                    do {
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">                        if (!iterator.hasNext()) {</span>
+<span class="fc" id="L116">                            return true;</span>
+                        }
+<span class="nc bnc" id="L118" title="All 2 branches missed.">                    } while (ITemplateEventExtensions.isWhitespace(iterator.next()));</span>
+<span class="nc" id="L119">                    return false;</span>
+                }
+<span class="fc" id="L121">                next = it.next();</span>
+<span class="pc bpc" id="L122" title="1 of 2 branches missed.">            } while (ITemplateEventExtensions.isWhitespace(next));</span>
+            do {
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">                if (!iterator.hasNext()) {</span>
+<span class="nc" id="L125">                    return false;</span>
+                }
+<span class="fc" id="L127">                that = iterator.next();</span>
+<span class="fc bfc" id="L128" title="All 2 branches covered.">            } while (ITemplateEventExtensions.isWhitespace(that));</span>
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">        } while (ITemplateEventExtensions.equals(next, that));</span>
+<span class="nc" id="L130">        return false;</span>
+    }
+
+    /**
+     * Return {@code true} only if all the events in the model return
+     * {@code true} for the given closure.
+     *
+     * @param self
+     * @param closure
+     * @return {@code true} if every event satisfies the closure.
+     */
+    public static boolean everyWithIndex(@Nullable IModel self, @Nonnull ITemplateEventIntPredicate closure) {
+<span class="fc" id="L142">        int index = 0;</span>
+<span class="fc bfc" id="L143" title="All 2 branches covered.">        for (Iterator&lt;ITemplateEvent&gt; it = maskNull(self); it.hasNext(); ++index) {</span>
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">            if (!closure.test(it.next(), index)) {</span>
+<span class="nc" id="L145">                return false;</span>
+            }
+        }
+<span class="fc" id="L148">        return true;</span>
+    }
+
+    /**
+     * Returns the first event in the model that meets the criteria of the given
+     * closure.
+     *
+     * @param self
+     * @param closure
+     * @return The first event to match the closure criteria, or {@code null} if
+     * nothing matched.
+     */
+    @Nullable
+    public static ITemplateEvent find(@Nullable IModel self, @Nonnull ITemplateEventPredicate closure) {
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">        for (Iterator&lt;ITemplateEvent&gt; it = maskNull(self); it.hasNext();) {</span>
+<span class="fc" id="L163">            ITemplateEvent event = it.next();</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">            if (closure.test(event)) {</span>
+<span class="fc" id="L165">                return event;</span>
+            }
+<span class="fc" id="L167">        }</span>
+<span class="nc" id="L168">        return null;</span>
+    }
+
+    /**
+     * Find all events in the model that match the given closure.
+     *
+     * @param self
+     * @param closure
+     * @return A list of matched events.
+     */
+    @Nonnull
+    public static List&lt;ITemplateEvent&gt; findAll(@Nullable IModel self, @Nonnull ITemplateEventPredicate closure) {
+        @SuppressWarnings(&quot;CollectionWithoutInitialCapacity&quot;)
+<span class="nc" id="L181">        ArrayList&lt;ITemplateEvent&gt; answer = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L182" title="All 2 branches missed.">        for (Iterator&lt;ITemplateEvent&gt; it = maskNull(self); it.hasNext();) {</span>
+<span class="nc" id="L183">            ITemplateEvent event = it.next();</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">            if (closure.test(event)) {</span>
+<span class="nc" id="L185">                answer.add(event);</span>
+            }
+<span class="nc" id="L187">        }</span>
+<span class="nc" id="L188">        return answer;</span>
+    }
+
+    /**
+     * Returns the index of the first event in the model that meets the criteria
+     * of the given closure.
+     *
+     * @param self
+     * @param closure
+     * @return The index of the first event to match the closure criteria, or
+     * {@code -1} if nothing matched.
+     */
+    public static int findIndexOf(@Nonnull IModel self, @Nonnull ITemplateEventPredicate closure) {
+<span class="fc bfc" id="L201" title="All 2 branches covered.">        for (int i = 0, size = self.size(); i &lt; size; i++) {</span>
+<span class="fc" id="L202">            ITemplateEvent event = self.get(i);</span>
+<span class="fc" id="L203">            boolean result = closure.test(event);</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">            if (result) {</span>
+<span class="fc" id="L205">                return i;</span>
+            }
+        }
+<span class="fc" id="L208">        return -1;</span>
+    }
+
+    /**
+     * Returns the index of the first event in the model that meets the criteria
+     * of the given closure, starting from a specified position.
+     *
+     * @param self
+     * @param closure
+     * @return The index of the first event to match the closure criteria, or
+     * {@code -1} if nothing matched.
+     */
+    public static int findIndexOf(@Nonnull IModel self, int startIndex,
+            @Nonnull ITemplateEventPredicate closure) {
+<span class="fc bfc" id="L222" title="All 2 branches covered.">        for (int i = startIndex, size = self.size(); i &lt; size; i++) {</span>
+<span class="fc" id="L223">            ITemplateEvent event = self.get(i);</span>
+<span class="fc" id="L224">            boolean result = closure.test(event);</span>
+<span class="fc bfc" id="L225" title="All 2 branches covered.">            if (result) {</span>
+<span class="fc" id="L226">                return i;</span>
+            }
+        }
+<span class="fc" id="L229">        return -1;</span>
+    }
+
+    /**
+     * A special variant of {@code findIndexOf} that uses models, as I seem to
+     * be using those a lot.
+     *
+     * This doesn't use an equality check, but an object reference check, so if
+     * a submodel is ever located from a parent (eg: any of the {@code find}
+     * methods, you can use this method to find the location of that submodel
+     * within the event queue.
+     *
+     * @param self
+     * @param model
+     * @return Index of an extracted submodel within this model.
+     */
+    public static int findIndexOfModel(@Nonnull IModel self, IModel model) {
+<span class="fc" id="L246">        ITemplateEvent modelEvent = first(model);</span>
+<span class="fc" id="L247">        return findIndexOf(self, event -&gt; ITemplateEventExtensions.equals(event, modelEvent));</span>
+    }
+
+    /**
+     * Returns the first instance of a model that meets the given closure
+     * criteria.
+     *
+     * @param self
+     * @param closure
+     * @return A model over the event that matches the closure criteria, or
+     * {@code null} if nothing matched.
+     */
+    public static IModel findModel(@Nonnull IModel self, @Nonnull ITemplateEventPredicate closure) {
+<span class="fc" id="L260">        return getModel(self, findIndexOf(self, closure));</span>
+    }
+
+    /**
+     * Returns the first event on the model.
+     *
+     * @param self
+     * @return The model's first event.
+     */
+    public static ITemplateEvent first(@Nonnull IModel self) {
+<span class="fc" id="L270">        return self.get(0);</span>
+    }
+
+    /**
+     * Returns the model at the given index. If the event at the index is an
+     * opening element, then the returned model will consist of that element and
+     * all the way through to the matching closing element.
+     *
+     * @param self
+     * @param pos A valid index within the current model.
+     * @return Model at the given position, or `null` if the position is outside
+     * of the event queue.
+     */
+    @Nullable
+    @SuppressWarnings({&quot;ValueOfIncrementOrDecrementUsed&quot;, &quot;AssignmentToMethodParameter&quot;})
+    public static IModel getModel(@Nonnull IModel self, int pos) {
+<span class="fc bfc" id="L286" title="All 4 branches covered.">        if (0 &lt;= pos &amp;&amp; pos &lt; self.size()) {</span>
+<span class="fc" id="L287">            IModel result = self.getConfiguration()</span>
+<span class="fc" id="L288">                    .getModelFactory(self.getTemplateMode())</span>
+<span class="fc" id="L289">                    .createModel();</span>
+<span class="fc bfc" id="L290" title="All 2 branches covered.">            for (int size = sizeOfModelAt(self, pos); size-- &gt; 0; ++pos) {</span>
+<span class="fc" id="L291">                result.add(self.get(pos));</span>
+            }
+<span class="fc" id="L293">            return result;</span>
+        }
+<span class="fc" id="L295">        return null;</span>
+    }
+
+    /**
+     * Inserts a model, creating a whitespace event before it so that it appears
+     * in line with all the existing events.
+     *
+     * @param self
+     * @param pos A valid index within the current model.
+     * @param model
+     * @param modelFactory
+     */
+    @SuppressWarnings(&quot;null&quot;)
+    public static void insertModelWithWhitespace(@Nonnull IModel self, int pos,
+            @Nullable IModel model, @Nonnull IModelFactory modelFactory) {
+
+<span class="pc bpc" id="L311" title="1 of 4 branches missed.">        if (0 &lt;= pos &amp;&amp; pos &lt;= self.size()) {</span>
+
+            // Use existing whitespace found at or before the insertion point
+<span class="fc" id="L314">            IModel whitespace = getModel(self, pos);</span>
+<span class="pc bpc" id="L315" title="1 of 4 branches missed.">            if (asBoolean(whitespace) &amp;&amp; isWhitespace(whitespace)) {</span>
+<span class="fc" id="L316">                self.insertModel(pos, model);</span>
+<span class="fc" id="L317">                self.insertModel(pos, whitespace);</span>
+<span class="fc" id="L318">                return;</span>
+            }
+<span class="pc bpc" id="L320" title="1 of 2 branches missed.">            if (pos &gt; 0) {</span>
+<span class="fc" id="L321">                whitespace = getModel(self, pos - 1);</span>
+<span class="pc bpc" id="L322" title="1 of 4 branches missed.">                if (asBoolean(whitespace) &amp;&amp; isWhitespace(whitespace)) {</span>
+<span class="fc" id="L323">                    self.insertModel(pos, whitespace);</span>
+<span class="fc" id="L324">                    self.insertModel(pos, model);</span>
+<span class="fc" id="L325">                    return;</span>
+                }
+            }
+
+            // Generate whitespace, usually inserting into a tag that is immediately
+            // closed so whitespace should be added to either side
+<span class="fc" id="L331">            whitespace = modelFactory.createModel(modelFactory.createText(&quot;\n\t&quot;));</span>
+<span class="fc" id="L332">            self.insertModel(pos, whitespace);</span>
+<span class="fc" id="L333">            self.insertModel(pos, model);</span>
+<span class="fc" id="L334">            self.insertModel(pos, whitespace);</span>
+        }
+<span class="fc" id="L336">    }</span>
+
+    /**
+     * Inserts an event, creating a whitespace event before it so that it
+     * appears in line with all the existing events.
+     *
+     * @param self
+     * @param pos A valid index within the current model.
+     * @param event
+     * @param modelFactory
+     */
+    @SuppressWarnings(&quot;null&quot;)
+    public static void insertWithWhitespace(@Nonnull IModel self, int pos,
+            @Nullable ITemplateEvent event, @Nonnull IModelFactory modelFactory) {
+
+<span class="pc bpc" id="L351" title="2 of 4 branches missed.">        if (0 &lt;= pos &amp;&amp; pos &lt;= self.size()) {</span>
+
+            // TODO: Because I can't check the parent for whitespace hints, I should
+            //       make this smarter and find whitespace within the model to copy.
+<span class="fc" id="L355">            IModel whitespace = getModel(self, pos); // Assumes that whitespace exists at the insertion point</span>
+<span class="pc bpc" id="L356" title="1 of 4 branches missed.">            if (asBoolean(whitespace) &amp;&amp; isWhitespace(whitespace)) {</span>
+<span class="nc" id="L357">                self.insert(pos, event);</span>
+<span class="nc" id="L358">                self.insertModel(pos, whitespace);</span>
+            } else {
+<span class="fc" id="L360">                IText newLine = modelFactory.createText(&quot;\n&quot;);</span>
+<span class="fc bfc" id="L361" title="All 2 branches covered.">                if (pos == 0) {</span>
+<span class="fc" id="L362">                    self.insert(pos, newLine);</span>
+<span class="fc" id="L363">                    self.insert(pos, event);</span>
+<span class="pc bpc" id="L364" title="1 of 2 branches missed.">                } else if (pos == self.size()) {</span>
+<span class="fc" id="L365">                    self.insert(pos, newLine);</span>
+<span class="fc" id="L366">                    self.insert(pos, event);</span>
+<span class="fc" id="L367">                    self.insert(pos, newLine);</span>
+                }
+            }
+        }
+<span class="fc" id="L371">    }</span>
+
+    /**
+     * Returns whether or not this model represents an element with potential
+     * child elements.
+     *
+     * @param self
+     * @return {@code true} if the first event in this model is an opening tag
+     * and the last event is the matching closing tag.
+     */
+    public static boolean isElement(@Nonnull IModel self) {
+<span class="pc bpc" id="L382" title="1 of 4 branches missed.">        return first(self) instanceof IOpenElementTag &amp;&amp; last(self) instanceof ICloseElementTag;</span>
+    }
+
+    /**
+     * Returns whether or not this model represents an element of the given
+     * name.
+     *
+     * @param self
+     * @param tagName
+     * @return {@code true} if the first event in this model is an opening tag,
+     * the last event is the matching closing tag, and whether the element has
+     * the given tag name.
+     */
+    public static boolean isElementOf(@Nonnull IModel self, String tagName) {
+<span class="fc bfc" id="L396" title="All 4 branches covered.">        return isElement(self) &amp;&amp; Objects.equals(((IElementTag) first(self)).getElementCompleteName(), tagName);</span>
+    }
+
+    /**
+     * Returns whether or not this model represents collapsible whitespace.
+     *
+     * @param self
+     * @return {@code true} if this is a collapsible text model.
+     */
+    public static boolean isWhitespace(@Nonnull IModel self) {
+<span class="fc bfc" id="L406" title="All 4 branches covered.">        return self.size() == 1 &amp;&amp; ITemplateEventExtensions.isWhitespace(first(self));</span>
+    }
+
+    /**
+     * Used to make this class iterable as an event queue.
+     *
+     * @param self
+     * @return A new iterator over the events of this model.
+     */
+    @Nonnull
+    public static EventIterator iterator(@Nonnull IModel self) {
+<span class="fc" id="L417">        return new EventIterator(self);</span>
+    }
+
+    private static Iterator&lt;ITemplateEvent&gt; maskNull(@Nullable IModel self) {
+<span class="pc bpc" id="L421" title="1 of 2 branches missed.">        Iterator&lt;ITemplateEvent&gt; result = self != null ? iterator(self) : null;</span>
+<span class="pc bpc" id="L422" title="1 of 2 branches missed.">        return result != null ? result : Collections.emptyIterator();</span>
+    }
+
+    /**
+     * Returns the last event on the model.
+     *
+     * @param self
+     * @return The model's last event.
+     */
+    public static ITemplateEvent last(@Nonnull IModel self) {
+<span class="fc" id="L432">        return self.get(self.size() - 1);</span>
+    }
+
+    /**
+     * If the model represents an element open to close tags, then this method
+     * removes all of the inner events.
+     *
+     * @param self
+     */
+    public static void removeChildren(@Nonnull IModel self) {
+<span class="pc bpc" id="L442" title="1 of 2 branches missed.">        if (isElement(self)) {</span>
+<span class="fc bfc" id="L443" title="All 2 branches covered.">            while (self.size() &gt; 2) {</span>
+<span class="fc" id="L444">                self.remove(1);</span>
+            }
+        }
+<span class="fc" id="L447">    }</span>
+
+    /**
+     * Removes the first event on the model.
+     *
+     * @param self
+     */
+    public static void removeFirst(@Nonnull IModel self) {
+<span class="nc" id="L455">        self.remove(0);</span>
+<span class="nc" id="L456">    }</span>
+
+    /**
+     * Removes the last event on the model.
+     *
+     * @param self
+     */
+    public static void removeLast(@Nonnull IModel self) {
+<span class="fc" id="L464">        self.remove(self.size() - 1);</span>
+<span class="fc" id="L465">    }</span>
+
+    /**
+     * Removes a models-worth of events from the specified position. What this
+     * means is that, if the event at the position is an opening element, then
+     * it, and everything up to and including its matching end element, is
+     * removed.
+     *
+     * @param self
+     * @param pos A valid index within the current model.
+     */
+    public static void removeModel(@Nonnull IModel self, int pos) {
+<span class="pc bpc" id="L477" title="1 of 4 branches missed.">        if (0 &lt;= pos &amp;&amp; pos &lt; self.size()) {</span>
+<span class="fc" id="L478">            int modelSize = sizeOfModelAt(self, pos);</span>
+<span class="fc bfc" id="L479" title="All 2 branches covered.">            while (modelSize &gt; 0) {</span>
+<span class="fc" id="L480">                self.remove(pos);</span>
+<span class="fc" id="L481">                modelSize--;</span>
+            }
+        }
+<span class="fc" id="L484">    }</span>
+
+    /**
+     * Replaces the model at the specified index with the given model.
+     *
+     * @param self
+     * @param pos A valid index within the current model.
+     * @param model
+     */
+    public static void replaceModel(@Nonnull IModel self, int pos, @Nullable IModel model) {
+<span class="pc bpc" id="L494" title="2 of 4 branches missed.">        if (0 &lt;= pos &amp;&amp; pos &lt; self.size()) {</span>
+<span class="fc" id="L495">            removeModel(self, pos);</span>
+            // noop if model is null
+            // https://github.com/thymeleaf/thymeleaf/blob/thymeleaf-3.0.11.RELEASE/src/main/java/org/thymeleaf/engine/Model.java#L206
+<span class="fc" id="L498">            self.insertModel(pos, model);</span>
+        }
+<span class="fc" id="L500">    }</span>
+
+    /**
+     * If an opening element exists at the given position, this method will
+     * return the 'size' of that element (number of events from here to its
+     * matching closing tag).
+     *
+     * @param self
+     * @param index
+     * @return Size of an element from the given position, or 1 if the event at
+     * the position isn't an opening element.
+     */
+    @SuppressWarnings(&quot;ValueOfIncrementOrDecrementUsed&quot;)
+    public static int sizeOfModelAt(@Nonnull IModel self, int index) {
+<span class="fc" id="L514">        int eventIndex = index;</span>
+<span class="fc" id="L515">        ITemplateEvent event = self.get(eventIndex++);</span>
+
+<span class="fc bfc" id="L517" title="All 2 branches covered.">        if (event instanceof IOpenElementTag) {</span>
+<span class="fc" id="L518">            int level = 0;</span>
+            while (true) {
+<span class="fc" id="L520">                event = self.get(eventIndex++);</span>
+<span class="fc bfc" id="L521" title="All 2 branches covered.">                if (event instanceof IOpenElementTag) {</span>
+<span class="fc" id="L522">                    level++;</span>
+<span class="fc bfc" id="L523" title="All 2 branches covered.">                } else if (event instanceof ICloseElementTag) {</span>
+                    //noinspection StatementWithEmptyBody
+<span class="fc bfc" id="L525" title="All 2 branches covered.">                    if (((ICloseElementTag) event).isUnmatched()) {</span>
+                        // Do nothing.  Unmatched closing tags do not correspond to any
+                        // opening element, and so should not affect the model level.
+<span class="fc bfc" id="L528" title="All 2 branches covered.">                    } else if (level == 0) {</span>
+<span class="fc" id="L529">                        break;</span>
+                    } else {
+<span class="fc" id="L531">                        level--;</span>
+                    }
+                }
+            }
+<span class="fc" id="L535">            return eventIndex - index;</span>
+        }
+
+<span class="fc" id="L538">        return 1;</span>
+    }
+
+    /**
+     * Removes whitespace events from the head and tail of the model's
+     * underlying event queue.
+     *
+     * @param self
+     */
+    public static void trim(@Nonnull IModel self) {
+<span class="pc bpc" id="L548" title="1 of 2 branches missed.">        while (ITemplateEventExtensions.isWhitespace(first(self))) {</span>
+<span class="nc" id="L549">            removeFirst(self);</span>
+        }
+<span class="fc bfc" id="L551" title="All 2 branches covered.">        while (ITemplateEventExtensions.isWhitespace(last(self))) {</span>
+<span class="fc" id="L552">            removeLast(self);</span>
+        }
+<span class="fc" id="L554">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

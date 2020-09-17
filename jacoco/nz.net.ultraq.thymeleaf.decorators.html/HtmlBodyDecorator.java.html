@@ -16,8 +16,8 @@
 package nz.net.ultraq.thymeleaf.decorators.html;
 
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
 
@@ -51,12 +51,16 @@ public class HtmlBodyDecorator implements Decorator {
     public IModel decorate(IModel targetBodyModel, IModel sourceBodyModel) {
         // If one of the parameters is missing return a copy of the other, or
         // nothing if both parameters are missing.
-<span class="fc bfc" id="L54" title="All 4 branches covered.">        if (!Extensions.asBoolean(targetBodyModel) || !Extensions.asBoolean(sourceBodyModel)) {</span>
-<span class="fc bfc" id="L55" title="All 2 branches covered.">            IModel result = Extensions.asBoolean(targetBodyModel) ? targetBodyModel.cloneModel() : null;</span>
-<span class="fc bfc" id="L56" title="All 4 branches covered.">            return Extensions.asBoolean(result) ? result : Extensions.asBoolean(sourceBodyModel) ? sourceBodyModel.cloneModel() : null;</span>
+<span class="fc bfc" id="L54" title="All 4 branches covered.">        if (!IModelExtensions.asBoolean(targetBodyModel) || !IModelExtensions.asBoolean(sourceBodyModel)) {</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">            IModel result = IModelExtensions.asBoolean(targetBodyModel) ? targetBodyModel.cloneModel() : null;</span>
+<span class="fc bfc" id="L56" title="All 4 branches covered.">            return IModelExtensions.asBoolean(result) ? result : IModelExtensions.asBoolean(sourceBodyModel) ? sourceBodyModel.cloneModel() : null;</span>
         }
 <span class="fc" id="L58">        return new AttributeMerger(context).merge(targetBodyModel, sourceBodyModel);</span>
     }
 
+    public final ITemplateContext getContext() {
+<span class="nc" id="L62">        return context;</span>
+    }
+
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

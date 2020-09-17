@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.Nullable;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.ITemplateContext;
@@ -40,9 +42,9 @@ import org.thymeleaf.util.StringUtils;
  */
 public class ModelBuilder {
 
-<span class="fc" id="L43">    private static final Logger logger = LoggerFactory.getLogger(ModelBuilder.class);</span>
+<span class="fc" id="L45">    private static final Logger logger = LoggerFactory.getLogger(ModelBuilder.class);</span>
 
-<span class="fc" id="L45">    private static final Set&lt;String&gt; encounteredVoidTags = Collections.newSetFromMap(new ConcurrentHashMap&lt;&gt;());</span>
+<span class="fc" id="L47">    private static final Set&lt;String&gt; encounteredVoidTags = Collections.newSetFromMap(new ConcurrentHashMap&lt;&gt;());</span>
 
     private final ElementDefinitions elementDefinitions;
     private final IModelFactory modelFactory;
@@ -54,8 +56,8 @@ public class ModelBuilder {
      * @param context
      */
     public ModelBuilder(ITemplateContext context) {
-<span class="fc" id="L57">        this(context.getModelFactory(), context.getConfiguration().getElementDefinitions(), context.getTemplateMode());</span>
-<span class="fc" id="L58">    }</span>
+<span class="fc" id="L59">        this(context.getModelFactory(), context.getConfiguration().getElementDefinitions(), context.getTemplateMode());</span>
+<span class="fc" id="L60">    }</span>
 
     /**
      * Constructor, create a new model builder.
@@ -64,11 +66,11 @@ public class ModelBuilder {
      * @param elementDefinitions
      * @param templateMode
      */
-<span class="fc" id="L67">    public ModelBuilder(IModelFactory modelFactory, ElementDefinitions elementDefinitions, TemplateMode templateMode) {</span>
-<span class="fc" id="L68">        this.modelFactory = modelFactory;</span>
-<span class="fc" id="L69">        this.elementDefinitions = elementDefinitions;</span>
-<span class="fc" id="L70">        this.templateMode = templateMode;</span>
-<span class="fc" id="L71">    }</span>
+<span class="fc" id="L69">    public ModelBuilder(IModelFactory modelFactory, ElementDefinitions elementDefinitions, TemplateMode templateMode) {</span>
+<span class="fc" id="L70">        this.modelFactory = modelFactory;</span>
+<span class="fc" id="L71">        this.elementDefinitions = elementDefinitions;</span>
+<span class="fc" id="L72">        this.templateMode = templateMode;</span>
+<span class="fc" id="L73">    }</span>
 
     /**
      * Create a model for the given element.
@@ -77,7 +79,7 @@ public class ModelBuilder {
      * @return New model representing an element with the given name.
      */
     public IModel createNode(String name) {
-<span class="fc" id="L80">        return createNode(name, null, null);</span>
+<span class="fc" id="L82">        return createNode(name, null, null);</span>
     }
 
     /**
@@ -89,7 +91,7 @@ public class ModelBuilder {
      * content.
      */
     public IModel createNode(String name, String value) {
-<span class="fc" id="L92">        return createNode(name, null, value);</span>
+<span class="fc" id="L94">        return createNode(name, null, value);</span>
     }
 
     /**
@@ -101,7 +103,7 @@ public class ModelBuilder {
      * attributes.
      */
     public IModel createNode(String name, Map&lt;String, String&gt; attributes) {
-<span class="fc" id="L104">        return createNode(name, attributes, null);</span>
+<span class="fc" id="L106">        return createNode(name, attributes, null);</span>
     }
 
     /**
@@ -114,43 +116,43 @@ public class ModelBuilder {
      * attributes, and content.
      */
     public IModel createNode(String name, Map&lt;String, String&gt; attributes, String value) {
-<span class="fc" id="L117">        Objects.requireNonNull(name);</span>
+<span class="fc" id="L119">        Objects.requireNonNull(name);</span>
 
-<span class="fc" id="L119">        IModel model = modelFactory.createModel();</span>
-<span class="fc" id="L120">        HTMLElementDefinition elementDefinition = (HTMLElementDefinition) elementDefinitions.forName(templateMode, name);</span>
+<span class="fc" id="L121">        IModel model = modelFactory.createModel();</span>
+<span class="fc" id="L122">        HTMLElementDefinition elementDefinition = (HTMLElementDefinition) elementDefinitions.forName(templateMode, name);</span>
 
         // Standalone element
-<span class="fc bfc" id="L123" title="All 2 branches covered.">        if (elementDefinition.getType() == HTMLElementType.VOID) {</span>
-<span class="pc bpc" id="L124" title="1 of 4 branches missed.">            if (attributes != null &amp;&amp; attributes.containsKey(&quot;standalone&quot;)) {</span>
-<span class="fc" id="L125">                attributes.remove(&quot;standalone&quot;);</span>
-<span class="fc" id="L126">                model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, true));</span>
-<span class="pc bpc" id="L127" title="1 of 4 branches missed.">            } else if (attributes != null &amp;&amp; attributes.containsKey(&quot;void&quot;)) {</span>
-<span class="fc" id="L128">                attributes.remove(&quot;void&quot;);</span>
-<span class="fc" id="L129">                model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, false));</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">        if (elementDefinition.getType() == HTMLElementType.VOID) {</span>
+<span class="pc bpc" id="L126" title="1 of 4 branches missed.">            if (attributes != null &amp;&amp; attributes.containsKey(&quot;standalone&quot;)) {</span>
+<span class="fc" id="L127">                attributes.remove(&quot;standalone&quot;);</span>
+<span class="fc" id="L128">                model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, true));</span>
+<span class="pc bpc" id="L129" title="1 of 4 branches missed.">            } else if (attributes != null &amp;&amp; attributes.containsKey(&quot;void&quot;)) {</span>
+<span class="fc" id="L130">                attributes.remove(&quot;void&quot;);</span>
+<span class="fc" id="L131">                model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, false));</span>
             } else {
-<span class="fc bfc" id="L131" title="All 2 branches covered.">                if (encounteredVoidTags.add(name)) {</span>
-<span class="fc" id="L132">                    logger.warn(</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">                if (encounteredVoidTags.add(name)) {</span>
+<span class="fc" id="L134">                    logger.warn(</span>
                             &quot;Instructed to write a closing tag {} for an HTML void element.  &quot;
                             + &quot;This might cause processing errors further down the track.  &quot;
                             + &quot;To avoid this, either self close the opening element, remove the closing tag, or process this template using the XML processing mode.  &quot;
                             + &quot;See https://html.spec.whatwg.org/multipage/syntax.html#void-elements for more information on HTML void elements.&quot;,
                             name);
                 }
-<span class="fc" id="L139">                model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, false));</span>
-<span class="fc" id="L140">                model.add(modelFactory.createCloseElementTag(name, false, true));</span>
+<span class="fc" id="L141">                model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, false));</span>
+<span class="fc" id="L142">                model.add(modelFactory.createCloseElementTag(name, false, true));</span>
             }
-<span class="fc bfc" id="L142" title="All 4 branches covered.">        } else if (attributes != null &amp;&amp; attributes.containsKey(&quot;standalone&quot;)) { // Other standalone element</span>
-<span class="fc" id="L143">            attributes.remove(&quot;standalone&quot;);</span>
-<span class="fc" id="L144">            model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, true));</span>
+<span class="fc bfc" id="L144" title="All 4 branches covered.">        } else if (attributes != null &amp;&amp; attributes.containsKey(&quot;standalone&quot;)) { // Other standalone element</span>
+<span class="fc" id="L145">            attributes.remove(&quot;standalone&quot;);</span>
+<span class="fc" id="L146">            model.add(modelFactory.createStandaloneElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false, true));</span>
         } else { // Open/close element and potential text content
-<span class="fc" id="L146">            model.add(modelFactory.createOpenElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false));</span>
-<span class="fc bfc" id="L147" title="All 2 branches covered.">            if (!StringUtils.isEmpty(value)) {</span>
-<span class="fc" id="L148">                model.add(modelFactory.createText(value));</span>
+<span class="fc" id="L148">            model.add(modelFactory.createOpenElementTag(name, attributes, AttributeValueQuotes.DOUBLE, false));</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">            if (!StringUtils.isEmpty(value)) {</span>
+<span class="fc" id="L150">                model.add(modelFactory.createText(value));</span>
             }
-<span class="fc" id="L150">            model.add(modelFactory.createCloseElementTag(name));</span>
+<span class="fc" id="L152">            model.add(modelFactory.createCloseElementTag(name));</span>
         }
 
-<span class="fc" id="L153">        return model;</span>
+<span class="fc" id="L155">        return model;</span>
     }
 
     /**
@@ -160,11 +162,12 @@ public class ModelBuilder {
      * @param parent
      * @param child
      */
-    public void nodeCompleted(IModel parent, IModel child) {
-<span class="fc bfc" id="L164" title="All 2 branches covered.">        if (Extensions.asBoolean(parent)) {</span>
-<span class="fc" id="L165">            parent.insertModel(parent.size() - 1, child);</span>
+    @SuppressWarnings(&quot;null&quot;)
+    public void nodeCompleted(@Nullable IModel parent, @Nullable IModel child) {
+<span class="fc bfc" id="L167" title="All 2 branches covered.">        if (IModelExtensions.asBoolean(parent)) {</span>
+<span class="fc" id="L168">            parent.insertModel(parent.size() - 1, child);</span>
         }
-<span class="fc" id="L167">    }</span>
+<span class="fc" id="L170">    }</span>
 
     /**
      * Does nothing. Because models only copy events when added to one another,
@@ -176,7 +179,7 @@ public class ModelBuilder {
      * @param child
      */
     public void setParent(IModel parent, IModel child) {
-<span class="fc" id="L179">    }</span>
+<span class="fc" id="L182">    }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

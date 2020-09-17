@@ -17,6 +17,7 @@ package nz.net.ultraq.thymeleaf.fragments;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 
@@ -27,9 +28,7 @@ import javax.annotation.Nonnull;
  * @author zhanhb
  * @author Emanuel Rabina
  */
-<span class="fc" id="L30">public class FragmentParameterNamesExtractor {</span>
-
-<span class="fc" id="L32">    private static final Pattern FRAGMENT_WITH_PARAMETERS_PATTERN = Pattern.compile(&quot;.*?\\(.*\\)&quot;);</span>
+<span class="fc" id="L31">public class FragmentParameterNamesExtractor {</span>
 
     /**
      * Returns a list of parameter names for the given fragment definition.
@@ -39,21 +38,22 @@ import javax.annotation.Nonnull;
      */
     @Nonnull
     public List&lt;String&gt; extract(@Nonnull String fragmentDefinition) {
-
-        List&lt;String&gt; parameterNames;
-<span class="fc bfc" id="L44" title="All 2 branches covered.">        if (FRAGMENT_WITH_PARAMETERS_PATTERN.matcher(fragmentDefinition).matches()) {</span>
-<span class="fc" id="L45">            String parametersDefinition = fragmentDefinition.substring(</span>
-<span class="fc" id="L46">                    fragmentDefinition.indexOf('(') + 1, fragmentDefinition.lastIndexOf(')'));</span>
-<span class="fc" id="L47">            String[] definitions = parametersDefinition.split(&quot;,&quot;);</span>
-<span class="fc" id="L48">            parameterNames = new ArrayList&lt;&gt;(definitions.length);</span>
-<span class="fc bfc" id="L49" title="All 2 branches covered.">            for (String parameter : definitions) {</span>
-<span class="fc bfc" id="L50" title="All 2 branches covered.">                parameterNames.add(parameter.contains(&quot;=&quot;) ? parameter.substring(0, parameter.indexOf('=')).trim() : parameter.trim());</span>
+<span class="fc" id="L41">        Matcher matcher = Pattern.compile(&quot;.*?\\((.*)\\)&quot;).matcher(fragmentDefinition);</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        if (matcher.find()) {</span>
+<span class="fc" id="L43">            String[] split = matcher.group(1).split(&quot;,&quot;);</span>
+<span class="fc" id="L44">            List&lt;String&gt; result = new ArrayList&lt;&gt;(split.length);</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">            for (String string : split) {</span>
+<span class="fc" id="L46">                Matcher matcher1 = Pattern.compile(&quot;([^=]+)=?.*&quot;).matcher(string);</span>
+<span class="pc bpc" id="L47" title="1 of 2 branches missed.">                if (!matcher1.find()) {</span>
+<span class="nc" id="L48">                    throw new IndexOutOfBoundsException(&quot;index is out of range 0..-1 (index = 0)&quot;);</span>
+                }
+<span class="fc" id="L50">                result.add(matcher1.group(1).trim());</span>
             }
-<span class="fc" id="L52">        } else {</span>
-<span class="fc" id="L53">            parameterNames = new ArrayList&lt;&gt;(0);</span>
+<span class="fc" id="L52">            return result;</span>
+        } else {
+<span class="fc" id="L54">            return new ArrayList&lt;&gt;(0);</span>
         }
-<span class="fc" id="L55">        return parameterNames;</span>
     }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

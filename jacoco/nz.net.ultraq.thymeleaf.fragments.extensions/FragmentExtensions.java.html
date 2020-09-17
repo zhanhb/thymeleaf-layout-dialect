@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FragmentExtensions.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.fragments.extensions</a> &gt; <span class="el_source">FragmentExtensions.java</span></div><h1>FragmentExtensions.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2015, Emanuel Rabina (http://www.ultraq.net.nz/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package nz.net.ultraq.thymeleaf.fragments.extensions;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.model.IModel;
+import org.thymeleaf.processor.element.IElementModelStructureHandler;
+
+/**
+ * Holds the layout fragments encountered across layout/decorator and content
+ * templates for use later.
+ *
+ * @author zhanhb
+ * @author Emanuel Rabina
+ */
+<span class="nc" id="L33">public class FragmentExtensions {</span>
+
+    public static final String FRAGMENT_COLLECTION_KEY = &quot;LayoutDialect::FragmentCollection&quot;;
+
+    /**
+     * Retrieves the fragment collection for the current context.
+     *
+     * @param self
+     * @param fromDecorator
+     * @return A new or existing fragment collection.
+     */
+    @SuppressWarnings(&quot;CollectionWithoutInitialCapacity&quot;)
+    public static Map&lt;String, List&lt;IModel&gt;&gt; getFragmentCollection(ITemplateContext self, boolean fromDecorator) {
+
+        // If the template stack contains only 1 template and we've been called from
+        // the decorator, then always return a new fragment collection.  This seems
+        // to be one way to know if Thymeleaf is processing a new file and as such
+        // should have a fresh collection to work with, otherwise we may be using an
+        // older collection from an already-used context.
+        // See: https://github.com/ultraq/thymeleaf-layout-dialect/issues/189
+<span class="fc bfc" id="L53" title="All 4 branches covered.">        if (self.getTemplateStack().size() == 1 &amp;&amp; fromDecorator) {</span>
+<span class="fc" id="L54">            return new LinkedHashMap&lt;&gt;();</span>
+        }
+
+        @SuppressWarnings(&quot;unchecked&quot;)
+<span class="fc" id="L58">        Map&lt;String, List&lt;IModel&gt;&gt; fragmentCollection = (Map&lt;String, List&lt;IModel&gt;&gt;) self.getVariable(FRAGMENT_COLLECTION_KEY);</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        return fragmentCollection != null ? fragmentCollection : new LinkedHashMap&lt;&gt;();</span>
+    }
+
+    /**
+     * Set a fragment cache to contain any existing fragments, plus the given
+     * new fragments, with the same scope as setting a local variable.
+     *
+     * @param self
+     * @param context
+     * @param fromDecorator
+     * @param fragments The new fragments to add to the cache.
+     */
+    public static void setLocalFragmentCollection(IElementModelStructureHandler self, ITemplateContext context,
+            Map&lt;String, List&lt;IModel&gt;&gt; fragments, boolean fromDecorator) {
+<span class="fc" id="L73">        Map&lt;String, List&lt;IModel&gt;&gt; old = getFragmentCollection(context, fromDecorator);</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        for (Map.Entry&lt;String, List&lt;IModel&gt;&gt; entry : old.entrySet()) {</span>
+<span class="fc" id="L75">            String fragmentName = entry.getKey();</span>
+<span class="fc" id="L76">            List&lt;IModel&gt; fragmentList = entry.getValue();</span>
+
+<span class="fc" id="L78">            List&lt;IModel&gt; oldList = fragments.get(fragmentName);</span>
+<span class="pc bpc" id="L79" title="1 of 4 branches missed.">            if (oldList == null || oldList.isEmpty()) {</span>
+<span class="fc" id="L80">                fragments.put(fragmentName, fragmentList);</span>
+            } else {
+<span class="fc" id="L82">                List&lt;IModel&gt; list = new ArrayList&lt;&gt;(oldList.size() + fragmentList.size());</span>
+<span class="fc" id="L83">                list.addAll(oldList);</span>
+<span class="fc" id="L84">                list.addAll(fragmentList);</span>
+<span class="fc" id="L85">                fragments.put(fragmentName, list);</span>
+            }
+<span class="fc" id="L87">        }</span>
+<span class="fc" id="L88">        self.setLocalVariable(FRAGMENT_COLLECTION_KEY, fragments);</span>
+<span class="fc" id="L89">    }</span>
+
+    public static Map&lt;String, List&lt;IModel&gt;&gt; getFragmentCollection(ITemplateContext self) {
+<span class="fc" id="L92">        return getFragmentCollection(self, false);</span>
+    }
+
+    public static void setLocalFragmentCollection(IElementModelStructureHandler self, ITemplateContext context,
+            Map&lt;String, List&lt;IModel&gt;&gt; fragments) {
+<span class="fc" id="L97">        setLocalFragmentCollection(self, context, fragments, false);</span>
+<span class="fc" id="L98">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

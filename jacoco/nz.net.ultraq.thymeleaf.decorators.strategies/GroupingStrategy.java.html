@@ -16,10 +16,11 @@
 package nz.net.ultraq.thymeleaf.decorators.strategies;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.ListIterator;
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.models.extensions.ChildModelIterator;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
+import nz.net.ultraq.thymeleaf.models.extensions.ITemplateEventExtensions;
 import org.thymeleaf.model.IComment;
 import org.thymeleaf.model.IElementTag;
 import org.thymeleaf.model.IModel;
@@ -47,7 +48,7 @@ import org.thymeleaf.model.ITemplateEvent;
  * @since 1.2.6
  */
 @Deprecated
-<span class="fc" id="L50">public class GroupingStrategy implements SortingStrategy {</span>
+<span class="fc" id="L51">public class GroupingStrategy implements SortingStrategy {</span>
 
     /**
      * Figure out the enum for the given model.
@@ -63,29 +64,29 @@ import org.thymeleaf.model.ITemplateEvent;
         final int STYLESHEET = 5;
         final int OTHER = 6;
 
-<span class="fc" id="L66">        ITemplateEvent event = Extensions.first(model);</span>
+<span class="fc" id="L67">        ITemplateEvent event = IModelExtensions.first(model);</span>
 
-<span class="pc bpc" id="L68" title="1 of 2 branches missed.">        if (event instanceof IComment) {</span>
-<span class="nc" id="L69">            return COMMENT;</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">        if (event instanceof IComment) {</span>
+<span class="nc" id="L70">            return COMMENT;</span>
         }
-<span class="fc bfc" id="L71" title="All 2 branches covered.">        if (event instanceof IElementTag) {</span>
-<span class="fc" id="L72">            String elementCompleteName = ((IElementTag) event).getElementCompleteName();</span>
-<span class="pc bpc" id="L73" title="1 of 4 branches missed.">            if (event instanceof IProcessableElementTag &amp;&amp; &quot;meta&quot;.equals(elementCompleteName)) {</span>
-<span class="fc" id="L74">                return META;</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        if (event instanceof IElementTag) {</span>
+<span class="fc" id="L73">            String elementCompleteName = ((IElementTag) event).getElementCompleteName();</span>
+<span class="pc bpc" id="L74" title="1 of 4 branches missed.">            if (event instanceof IProcessableElementTag &amp;&amp; &quot;meta&quot;.equals(elementCompleteName)) {</span>
+<span class="fc" id="L75">                return META;</span>
             }
-<span class="pc bpc" id="L76" title="1 of 4 branches missed.">            if (event instanceof IOpenElementTag &amp;&amp; &quot;script&quot;.equals(elementCompleteName)) {</span>
-<span class="fc" id="L77">                return SCRIPT;</span>
+<span class="pc bpc" id="L77" title="1 of 4 branches missed.">            if (event instanceof IOpenElementTag &amp;&amp; &quot;script&quot;.equals(elementCompleteName)) {</span>
+<span class="fc" id="L78">                return SCRIPT;</span>
             }
-<span class="pc bpc" id="L79" title="3 of 4 branches missed.">            if (event instanceof IOpenElementTag &amp;&amp; &quot;style&quot;.equals(elementCompleteName)) {</span>
-<span class="nc" id="L80">                return STYLE;</span>
+<span class="pc bpc" id="L80" title="3 of 4 branches missed.">            if (event instanceof IOpenElementTag &amp;&amp; &quot;style&quot;.equals(elementCompleteName)) {</span>
+<span class="nc" id="L81">                return STYLE;</span>
             }
-<span class="pc bpc" id="L82" title="2 of 4 branches missed.">            if (event instanceof IProcessableElementTag &amp;&amp; &quot;link&quot;.equals(elementCompleteName)</span>
-<span class="fc bfc" id="L83" title="All 2 branches covered.">                    &amp;&amp; &quot;stylesheet&quot;.equals(((IProcessableElementTag) event).getAttributeValue(&quot;rel&quot;))) {</span>
-<span class="fc" id="L84">                return STYLESHEET;</span>
+<span class="pc bpc" id="L83" title="2 of 4 branches missed.">            if (event instanceof IProcessableElementTag &amp;&amp; &quot;link&quot;.equals(elementCompleteName)</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">                    &amp;&amp; &quot;stylesheet&quot;.equals(((IProcessableElementTag) event).getAttributeValue(&quot;rel&quot;))) {</span>
+<span class="fc" id="L85">                return STYLESHEET;</span>
             }
-<span class="fc" id="L86">            return OTHER;</span>
+<span class="fc" id="L87">            return OTHER;</span>
         }
-<span class="fc" id="L88">        return 0;</span>
+<span class="fc" id="L89">        return 0;</span>
     }
 
     /**
@@ -100,40 +101,43 @@ import org.thymeleaf.model.ITemplateEvent;
     @Override
     public int findPositionForModel(IModel headModel, IModel childModel) {
         // Discard text/whitespace nodes
-<span class="fc bfc" id="L103" title="All 2 branches covered.">        if (Extensions.isWhitespace(childModel)) {</span>
-<span class="fc" id="L104">            return -1;</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">        if (IModelExtensions.isWhitespace(childModel)) {</span>
+<span class="fc" id="L105">            return -1;</span>
         }
 
         // For backwards compatibility, match the location of any element at the
         // beginning of the &lt;head&gt; element.
-<span class="fc bfc" id="L109" title="All 2 branches covered.">        if (Extensions.isElementOf(childModel, &quot;title&quot;)) {</span>
-<span class="fc" id="L110">            int firstElementIndex = Extensions.findIndexOf(headModel, 1, Extensions::isOpeningElement);</span>
-<span class="fc bfc" id="L111" title="All 2 branches covered.">            if (firstElementIndex != -1) {</span>
-<span class="fc" id="L112">                return firstElementIndex;</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">        if (IModelExtensions.isElementOf(childModel, &quot;title&quot;)) {</span>
+<span class="fc" id="L111">            int firstElementIndex = IModelExtensions.findIndexOf(headModel, 1, ITemplateEventExtensions::isOpeningElement);</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">            if (firstElementIndex != -1) {</span>
+<span class="fc" id="L113">                return firstElementIndex;</span>
             }
-<span class="fc bfc" id="L114" title="All 2 branches covered.">            return headModel.size() &gt; 2 ? 2 : 1;</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">            return headModel.size() &gt; 2 ? 2 : 1;</span>
         }
 
-<span class="fc" id="L117">        int type = findMatchingType(childModel);</span>
-<span class="fc" id="L118">        ArrayList&lt;IModel&gt; list = new ArrayList&lt;&gt;(20);</span>
+<span class="fc" id="L118">        int type = findMatchingType(childModel);</span>
+<span class="fc" id="L119">        ArrayList&lt;IModel&gt; list = new ArrayList&lt;&gt;(20);</span>
 
-<span class="fc bfc" id="L120" title="All 2 branches covered.">        for (Iterator&lt;IModel&gt; it = Extensions.childModelIterator(headModel); it.hasNext();) {</span>
-<span class="fc" id="L121">            list.add(it.next());</span>
+<span class="fc" id="L121">        ChildModelIterator it = IModelExtensions.childModelIterator(headModel);</span>
+<span class="pc bpc" id="L122" title="1 of 2 branches missed.">        if (it != null) {</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">            while (it.hasNext()) {</span>
+<span class="fc" id="L124">                list.add(it.next());</span>
+            }
         }
 
-<span class="fc" id="L124">        ListIterator&lt;IModel&gt; listIterator = list.listIterator(list.size());</span>
-<span class="fc bfc" id="L125" title="All 2 branches covered.">        while (listIterator.hasPrevious()) {</span>
-<span class="fc" id="L126">            IModel headSubModel = listIterator.previous();</span>
-<span class="fc bfc" id="L127" title="All 2 branches covered.">            if (type == findMatchingType(headSubModel)) {</span>
-<span class="pc bpc" id="L128" title="1 of 2 branches missed.">                if (Extensions.asBoolean(headModel)) {</span>
-<span class="fc" id="L129">                    return Extensions.findIndexOfModel(headModel, headSubModel) + headSubModel.size();</span>
+<span class="fc" id="L128">        ListIterator&lt;IModel&gt; listIterator = list.listIterator(list.size());</span>
+<span class="fc bfc" id="L129" title="All 2 branches covered.">        while (listIterator.hasPrevious()) {</span>
+<span class="fc" id="L130">            IModel headSubModel = listIterator.previous();</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">            if (type == findMatchingType(headSubModel)) {</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">                if (IModelExtensions.asBoolean(headModel)) {</span>
+<span class="fc" id="L133">                    return IModelExtensions.findIndexOfModel(headModel, headSubModel) + headSubModel.size();</span>
                 }
                 break;
             }
-<span class="fc" id="L133">        }</span>
+<span class="fc" id="L137">        }</span>
 
-<span class="fc" id="L135">        return 1;</span>
+<span class="fc" id="L139">        return 1;</span>
     }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

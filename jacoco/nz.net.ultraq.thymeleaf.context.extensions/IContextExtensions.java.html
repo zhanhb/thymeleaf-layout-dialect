@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IContextExtensions.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.context.extensions</a> &gt; <span class="el_source">IContextExtensions.java</span></div><h1>IContextExtensions.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2016, Emanuel Rabina (http://www.ultraq.net.nz/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package nz.net.ultraq.thymeleaf.context.extensions;
+
+import javax.annotation.Nonnull;
+import nz.net.ultraq.thymeleaf.internal.Supplier;
+import org.thymeleaf.DialectConfiguration;
+import org.thymeleaf.context.IContext;
+import org.thymeleaf.context.IEngineContext;
+import org.thymeleaf.context.IExpressionContext;
+import org.thymeleaf.dialect.IProcessorDialect;
+
+/**
+ * Meta-programming extensions to the {@link IContext} class.
+ *
+ * @author Emanuel Rabina
+ */
+<span class="nc" id="L31">public class IContextExtensions {</span>
+
+    private static final String DIALECT_PREFIX_PREFIX = &quot;DialectPrefix::&quot;;
+
+    /**
+     * Enables use of the {@code value = context[key]} syntax over the context
+     * object, is a synonym for the {@code getVariable} method.
+     *
+     * @param self
+     * @param name Name of the variable on the context to retrieve.
+     * @return The variable value, or {@code null} if the variable isn't mapped
+     * to anything on the context.
+     */
+    public static Object getAt(IContext self, String name) {
+<span class="fc" id="L45">        return self.getVariable(name);</span>
+    }
+
+    /**
+     * Retrieves an item from the context, or creates one on the context if it
+     * doesn't yet exist.
+     *
+     * @param &lt;T&gt;
+     * @param self
+     * @param key
+     * @param closure
+     * @return The item cached on the context through the given key, or first
+     * constructed through the closure.
+     */
+    public static &lt;T&gt; T getOrCreate(@Nonnull IContext self, @Nonnull String key, Supplier&lt;T&gt; closure) {
+        @SuppressWarnings(&quot;unchecked&quot;)
+<span class="fc" id="L61">        T result = (T) getAt(self, key);</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        if (result == null) {</span>
+<span class="fc" id="L63">            result = closure.get();</span>
+<span class="fc" id="L64">            putAt(self, key, result);</span>
+        }
+<span class="fc" id="L66">        return result;</span>
+    }
+
+    /**
+     * Returns the configured prefix for the given dialect. If the dialect
+     * prefix has not been configured.
+     *
+     * @param self
+     * @param dialectClass
+     * @return The configured prefix for the dialect, or {@code null} if the
+     * dialect being queried hasn't been configured.
+     */
+    public static String getPrefixForDialect(@Nonnull IContext self, Class&lt;? extends IProcessorDialect&gt; dialectClass) {
+<span class="fc" id="L79">        return getOrCreate(self, DIALECT_PREFIX_PREFIX + dialectClass.getName(), () -&gt; {</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">            for (DialectConfiguration dialectConfig : ((IExpressionContext) self).getConfiguration().getDialectConfigurations()) {</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">                if (dialectClass.isInstance(dialectConfig.getDialect())) {</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">                    if (dialectConfig.isPrefixSpecified()) {</span>
+<span class="fc" id="L83">                        return dialectConfig.getPrefix();</span>
+                    }
+<span class="fc" id="L85">                    return ((IProcessorDialect) dialectConfig.getDialect()).getPrefix();</span>
+                }
+<span class="fc" id="L87">            }</span>
+<span class="nc" id="L88">            return null;</span>
+        });
+    }
+
+    /**
+     * Enables use of the {@code context[key] = value} syntax over the context
+     * object, is a synonym for the {@code setVariable} method.
+     *
+     * @param self
+     * @param name Name of the variable to map the value to.
+     * @param value The value to set.
+     */
+    public static void putAt(IContext self, String name, Object value) {
+<span class="fc" id="L101">        ((IEngineContext) self).setVariable(name, value);</span>
+<span class="fc" id="L102">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

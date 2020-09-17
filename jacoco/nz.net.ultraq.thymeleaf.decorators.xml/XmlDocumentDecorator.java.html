@@ -16,8 +16,8 @@
 package nz.net.ultraq.thymeleaf.decorators.xml;
 
 import nz.net.ultraq.thymeleaf.decorators.Decorator;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.models.AttributeMerger;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.ICloseElementTag;
 import org.thymeleaf.model.IComment;
@@ -38,7 +38,7 @@ public class XmlDocumentDecorator implements Decorator {
 
     // Find the root element of each document to work with
     private static IModel rootModelFinder(IModel documentModel) {
-<span class="fc" id="L41">        return Extensions.findModel(documentModel, documentEvent -&gt; documentEvent instanceof IProcessableElementTag);</span>
+<span class="fc" id="L41">        return IModelExtensions.findModel(documentModel, documentEvent -&gt; documentEvent instanceof IProcessableElementTag);</span>
     }
 
     private static boolean documentContainsDocType(IModel document) {
@@ -89,10 +89,10 @@ public class XmlDocumentDecorator implements Decorator {
             // Only copy doctypes if the source document doesn't already have one
 <span class="fc bfc" id="L90" title="All 2 branches covered.">            if (event instanceof IDocType) {</span>
 <span class="fc bfc" id="L91" title="All 2 branches covered.">                if (!documentContainsDocType(sourceDocumentModel)) {</span>
-<span class="fc" id="L92">                    Extensions.insertWithWhitespace(resultDocumentModel, 0, event, modelFactory);</span>
+<span class="fc" id="L92">                    IModelExtensions.insertWithWhitespace(resultDocumentModel, 0, event, modelFactory);</span>
                 }
 <span class="fc bfc" id="L94" title="All 2 branches covered.">            } else if (event instanceof IComment) {</span>
-<span class="fc" id="L95">                Extensions.insertWithWhitespace(resultDocumentModel, 0, event, modelFactory);</span>
+<span class="fc" id="L95">                IModelExtensions.insertWithWhitespace(resultDocumentModel, 0, event, modelFactory);</span>
 <span class="fc bfc" id="L96" title="All 2 branches covered.">            } else if (event instanceof IOpenElementTag) {</span>
 <span class="fc" id="L97">                break;</span>
             }
@@ -100,7 +100,7 @@ public class XmlDocumentDecorator implements Decorator {
 <span class="pc bpc" id="L100" title="1 of 2 branches missed.">        for (int i = size - 1; i &gt;= 0; i--) {</span>
 <span class="fc" id="L101">            ITemplateEvent event = targetDocumentModel.get(i);</span>
 <span class="fc bfc" id="L102" title="All 2 branches covered.">            if (event instanceof IComment) {</span>
-<span class="fc" id="L103">                Extensions.insertWithWhitespace(resultDocumentModel, resultDocumentModel.size(), event, modelFactory);</span>
+<span class="fc" id="L103">                IModelExtensions.insertWithWhitespace(resultDocumentModel, resultDocumentModel.size(), event, modelFactory);</span>
 <span class="fc bfc" id="L104" title="All 2 branches covered.">            } else if (event instanceof ICloseElementTag) {</span>
 <span class="fc" id="L105">                break;</span>
             }
@@ -109,5 +109,9 @@ public class XmlDocumentDecorator implements Decorator {
 <span class="fc" id="L109">        return resultDocumentModel;</span>
     }
 
+    public final ITemplateContext getContext() {
+<span class="nc" id="L113">        return this.context;</span>
+    }
+
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -17,8 +17,9 @@ package nz.net.ultraq.thymeleaf.decorators.html;
 
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
 import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
+import nz.net.ultraq.thymeleaf.models.extensions.ITemplateEventExtensions;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
@@ -44,10 +45,10 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
      * @param autoHeadMerging
      */
     public HtmlDocumentDecorator(ITemplateContext context, SortingStrategy sortingStrategy, boolean autoHeadMerging) {
-<span class="fc" id="L47">        super(context);</span>
-<span class="fc" id="L48">        this.sortingStrategy = sortingStrategy;</span>
-<span class="fc" id="L49">        this.autoHeadMerging = autoHeadMerging;</span>
-<span class="fc" id="L50">    }</span>
+<span class="fc" id="L48">        super(context);</span>
+<span class="fc" id="L49">        this.sortingStrategy = sortingStrategy;</span>
+<span class="fc" id="L50">        this.autoHeadMerging = autoHeadMerging;</span>
+<span class="fc" id="L51">    }</span>
 
     /**
      * Decorate an entire HTML page.
@@ -58,55 +59,67 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
      */
     @Override
     public IModel decorate(IModel targetDocumentModel, IModel sourceDocumentModel) {
-<span class="fc" id="L61">        IModelFactory modelFactory = context.getModelFactory();</span>
-<span class="fc" id="L62">        IModel resultDocumentModel = targetDocumentModel.cloneModel();</span>
+<span class="fc" id="L62">        IModelFactory modelFactory = context.getModelFactory();</span>
+<span class="fc" id="L63">        IModel resultDocumentModel = targetDocumentModel.cloneModel();</span>
         // Head decoration
-<span class="fc" id="L64">        ITemplateEventPredicate headModelFinder = event -&gt; Extensions.isOpeningElementOf(event, &quot;head&quot;);</span>
+<span class="fc" id="L65">        ITemplateEventPredicate headModelFinder = event -&gt; ITemplateEventExtensions.isOpeningElementOf(event, &quot;head&quot;);</span>
 
-<span class="pc bpc" id="L66" title="1 of 2 branches missed.">        if (autoHeadMerging) {</span>
-<span class="fc" id="L67">            IModel targetHeadModel = Extensions.findModel(resultDocumentModel, headModelFinder);</span>
-<span class="fc" id="L68">            IModel resultHeadModel = new HtmlHeadDecorator(context, sortingStrategy).decorate(targetHeadModel,</span>
-<span class="fc" id="L69">                    Extensions.findModel(sourceDocumentModel, headModelFinder)</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        if (autoHeadMerging) {</span>
+<span class="fc" id="L68">            IModel targetHeadModel = IModelExtensions.findModel(resultDocumentModel, headModelFinder);</span>
+<span class="fc" id="L69">            IModel resultHeadModel = new HtmlHeadDecorator(context, sortingStrategy).decorate(targetHeadModel,</span>
+<span class="fc" id="L70">                    IModelExtensions.findModel(sourceDocumentModel, headModelFinder)</span>
             );
-<span class="fc bfc" id="L71" title="All 2 branches covered.">            if (Extensions.asBoolean(resultHeadModel)) {</span>
-<span class="fc bfc" id="L72" title="All 2 branches covered.">                if (Extensions.asBoolean(targetHeadModel)) {</span>
-<span class="fc" id="L73">                    Extensions.replaceModel(resultDocumentModel, Extensions.findIndexOfModel(resultDocumentModel, targetHeadModel), resultHeadModel);</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">            if (IModelExtensions.asBoolean(resultHeadModel)) {</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">                if (IModelExtensions.asBoolean(targetHeadModel)) {</span>
+<span class="fc" id="L74">                    IModelExtensions.replaceModel(resultDocumentModel, IModelExtensions.findIndexOfModel(resultDocumentModel, targetHeadModel), resultHeadModel);</span>
                 } else {
-<span class="fc" id="L75">                    Extensions.insertModelWithWhitespace(resultDocumentModel, Extensions.findIndexOf(resultDocumentModel, event -&gt; {</span>
-<span class="fc bfc" id="L76" title="All 2 branches covered.">                        return Extensions.isOpeningElementOf(event, &quot;body&quot;)</span>
-<span class="fc bfc" id="L77" title="All 2 branches covered.">                                || Extensions.isClosingElementOf(event, &quot;html&quot;);</span>
+<span class="fc" id="L76">                    IModelExtensions.insertModelWithWhitespace(resultDocumentModel, IModelExtensions.findIndexOf(resultDocumentModel, event -&gt; {</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">                        return ITemplateEventExtensions.isOpeningElementOf(event, &quot;body&quot;)</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">                                || ITemplateEventExtensions.isClosingElementOf(event, &quot;html&quot;);</span>
                     }) - 1, resultHeadModel, modelFactory);
                 }
             }
-<span class="fc" id="L81">        } else {</span>
+<span class="fc" id="L82">        } else {</span>
             // TODO: If autoHeadMerging is false, this really shouldn't be needed as
             //       the basis for `resultDocumentModel` should be the source model.
             //       This 'hack' is OK for an experimental option, but the fact that
             //       it exists means I should rethink how the result model is made.
-<span class="nc" id="L86">            Extensions.replaceModel(resultDocumentModel,</span>
-<span class="nc" id="L87">                    Extensions.findIndexOf(resultDocumentModel, headModelFinder),</span>
-<span class="nc" id="L88">                    Extensions.findModel(sourceDocumentModel, headModelFinder)</span>
+<span class="fc" id="L87">            IModelExtensions.replaceModel(resultDocumentModel,</span>
+<span class="fc" id="L88">                    IModelExtensions.findIndexOf(resultDocumentModel, headModelFinder),</span>
+<span class="fc" id="L89">                    IModelExtensions.findModel(sourceDocumentModel, headModelFinder)</span>
             );
         }
 
         // Body decoration
-<span class="fc" id="L93">        ITemplateEventPredicate bodyModelFinder = event -&gt; Extensions.isOpeningElementOf(event, &quot;body&quot;);</span>
-<span class="fc" id="L94">        IModel targetBodyModel = Extensions.findModel(resultDocumentModel, bodyModelFinder);</span>
-<span class="fc" id="L95">        IModel resultBodyModel = new HtmlBodyDecorator(context).decorate(targetBodyModel,</span>
-<span class="fc" id="L96">                Extensions.findModel(sourceDocumentModel, bodyModelFinder)</span>
+<span class="fc" id="L94">        ITemplateEventPredicate bodyModelFinder = event -&gt; ITemplateEventExtensions.isOpeningElementOf(event, &quot;body&quot;);</span>
+<span class="fc" id="L95">        IModel targetBodyModel = IModelExtensions.findModel(resultDocumentModel, bodyModelFinder);</span>
+<span class="fc" id="L96">        IModel resultBodyModel = new HtmlBodyDecorator(context).decorate(targetBodyModel,</span>
+<span class="fc" id="L97">                IModelExtensions.findModel(sourceDocumentModel, bodyModelFinder)</span>
         );
-<span class="fc bfc" id="L98" title="All 2 branches covered.">        if (Extensions.asBoolean(resultBodyModel)) {</span>
-<span class="fc bfc" id="L99" title="All 2 branches covered.">            if (Extensions.asBoolean(targetBodyModel)) {</span>
-<span class="fc" id="L100">                Extensions.replaceModel(resultDocumentModel, Extensions.findIndexOfModel(resultDocumentModel, targetBodyModel), resultBodyModel);</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">        if (IModelExtensions.asBoolean(resultBodyModel)) {</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">            if (IModelExtensions.asBoolean(targetBodyModel)) {</span>
+<span class="fc" id="L101">                IModelExtensions.replaceModel(resultDocumentModel, IModelExtensions.findIndexOfModel(resultDocumentModel, targetBodyModel), resultBodyModel);</span>
             } else {
-<span class="fc" id="L102">                Extensions.insertModelWithWhitespace(resultDocumentModel, Extensions.findIndexOf(resultDocumentModel, event -&gt; {</span>
-<span class="fc" id="L103">                    return Extensions.isClosingElementOf(event, &quot;html&quot;);</span>
+<span class="fc" id="L103">                IModelExtensions.insertModelWithWhitespace(resultDocumentModel, IModelExtensions.findIndexOf(resultDocumentModel, event -&gt; {</span>
+<span class="fc" id="L104">                    return ITemplateEventExtensions.isClosingElementOf(event, &quot;html&quot;);</span>
                 }) - 1, resultBodyModel, modelFactory);
             }
         }
 
-<span class="fc" id="L108">        return super.decorate(resultDocumentModel, sourceDocumentModel);</span>
+<span class="fc" id="L109">        return super.decorate(resultDocumentModel, sourceDocumentModel);</span>
+    }
+
+    public final SortingStrategy getSortingStrategy() {
+<span class="nc" id="L113">        return sortingStrategy;</span>
+    }
+
+    public final boolean getAutoHeadMerging() {
+<span class="nc" id="L117">        return autoHeadMerging;</span>
+    }
+
+    public final boolean isAutoHeadMerging() {
+<span class="nc" id="L121">        return autoHeadMerging;</span>
     }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

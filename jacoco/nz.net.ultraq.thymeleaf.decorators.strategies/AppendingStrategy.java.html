@@ -16,7 +16,8 @@
 package nz.net.ultraq.thymeleaf.decorators.strategies;
 
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
+import nz.net.ultraq.thymeleaf.models.extensions.ITemplateEventExtensions;
 import org.thymeleaf.model.IModel;
 
 /**
@@ -39,7 +40,7 @@ import org.thymeleaf.model.IModel;
  * @author Emanuel Rabina
  */
 @Deprecated
-<span class="fc" id="L42">public class AppendingStrategy implements SortingStrategy {</span>
+<span class="fc" id="L43">public class AppendingStrategy implements SortingStrategy {</span>
 
     /**
      * Returns the position at the end of the {@code &lt;head&gt;} section.
@@ -50,24 +51,24 @@ import org.thymeleaf.model.IModel;
     @Override
     public int findPositionForModel(IModel headModel, IModel childModel) {
         // Discard text/whitespace nodes
-<span class="fc bfc" id="L53" title="All 2 branches covered.">        if (Extensions.isWhitespace(childModel)) {</span>
-<span class="fc" id="L54">            return -1;</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        if (IModelExtensions.isWhitespace(childModel)) {</span>
+<span class="fc" id="L55">            return -1;</span>
         }
 
-<span class="fc" id="L57">        int positions = headModel.size();</span>
+<span class="fc" id="L58">        int positions = headModel.size();</span>
 
         // For backwards compatibility, match the location of any element at the
         // beginning of the &lt;head&gt; element.
-<span class="fc bfc" id="L61" title="All 2 branches covered.">        if (Extensions.isElementOf(childModel, &quot;title&quot;)) {</span>
-<span class="fc" id="L62">            int firstElementIndex = Extensions.findIndexOf(headModel, 1, Extensions::isOpeningElement);</span>
-<span class="fc bfc" id="L63" title="All 2 branches covered.">            if (firstElementIndex != -1) {</span>
-<span class="fc" id="L64">                return firstElementIndex;</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        if (IModelExtensions.isElementOf(childModel, &quot;title&quot;)) {</span>
+<span class="fc" id="L63">            int firstElementIndex = IModelExtensions.findIndexOf(headModel, 1, ITemplateEventExtensions::isOpeningElement);</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">            if (firstElementIndex != -1) {</span>
+<span class="fc" id="L65">                return firstElementIndex;</span>
             }
-<span class="fc bfc" id="L66" title="All 2 branches covered.">            return positions &gt; 2 ? 2 : 1;</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">            return positions &gt; 2 ? 2 : 1;</span>
         }
 
-<span class="pc bpc" id="L69" title="1 of 2 branches missed.">        return positions - (positions &gt; 2 ? 2 : 1);</span>
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">        return positions - (positions &gt; 2 ? 2 : 1);</span>
     }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

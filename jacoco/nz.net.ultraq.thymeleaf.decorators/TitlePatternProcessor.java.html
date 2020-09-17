@@ -18,7 +18,7 @@ package nz.net.ultraq.thymeleaf.decorators;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.ITemplateContext;
@@ -104,7 +104,7 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
 
         // Break the title pattern up into tokens to map to their respective models
 <span class="fc" id="L106">        IModel titleModel = modelFactory.createModel();</span>
-<span class="fc bfc" id="L107" title="All 4 branches covered.">        if (Extensions.asBoolean(layoutTitle) &amp;&amp; Extensions.asBoolean(contentTitle)) {</span>
+<span class="fc bfc" id="L107" title="All 4 branches covered.">        if (IModelExtensions.asBoolean(layoutTitle) &amp;&amp; IModelExtensions.asBoolean(contentTitle)) {</span>
 <span class="fc" id="L108">            Matcher matcher = TOKEN_PATTERN.matcher(titlePattern);</span>
 <span class="fc bfc" id="L109" title="All 2 branches covered.">            while (matcher.find()) {</span>
 <span class="fc" id="L110">                String text = titlePattern.substring(matcher.regionStart(), matcher.start());</span>
@@ -119,9 +119,9 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
 <span class="pc bpc" id="L119" title="1 of 2 branches missed.">            if (!StringUtils.isEmpty(remainingText)) {</span>
 <span class="nc" id="L120">                titleModel.add(modelFactory.createText(remainingText));</span>
             }
-<span class="fc bfc" id="L122" title="All 2 branches covered.">        } else if (Extensions.asBoolean(contentTitle)) {</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">        } else if (IModelExtensions.asBoolean(contentTitle)) {</span>
 <span class="fc" id="L123">            titleModel.addModel(contentTitle);</span>
-<span class="pc bpc" id="L124" title="1 of 2 branches missed.">        } else if (Extensions.asBoolean(layoutTitle)) {</span>
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">        } else if (IModelExtensions.asBoolean(layoutTitle)) {</span>
 <span class="fc" id="L125">            titleModel.addModel(layoutTitle);</span>
         }
 
@@ -129,4 +129,4 @@ public class TitlePatternProcessor extends AbstractAttributeTagProcessor {
 <span class="fc" id="L129">    }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

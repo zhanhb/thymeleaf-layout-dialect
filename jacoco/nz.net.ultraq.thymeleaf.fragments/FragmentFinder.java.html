@@ -19,7 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IOpenElementTag;
 import org.thymeleaf.model.IProcessableElementTag;
@@ -72,7 +72,7 @@ public class FragmentFinder {
                     }
                 }
 <span class="fc bfc" id="L74" title="All 2 branches covered.">                if (!StringUtils.isEmpty(fragmentName)) {</span>
-<span class="fc" id="L75">                    IModel fragment = Extensions.getModel(model, eventIndex);</span>
+<span class="fc" id="L75">                    IModel fragment = IModelExtensions.getModel(model, eventIndex);</span>
 <span class="fc" id="L76">                    List&lt;IModel&gt; list = fragmentsMap.get(fragmentName);</span>
 <span class="fc bfc" id="L77" title="All 2 branches covered.">                    if (list == null) {</span>
 <span class="fc" id="L78">                        list = new LinkedList&lt;&gt;();</span>
@@ -91,5 +91,9 @@ public class FragmentFinder {
 <span class="fc" id="L91">        return fragmentsMap;</span>
     }
 
+    public final String getDialectPrefix() {
+<span class="nc" id="L95">        return dialectPrefix;</span>
+    }
+
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

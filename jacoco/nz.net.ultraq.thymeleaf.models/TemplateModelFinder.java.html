@@ -18,7 +18,7 @@ package nz.net.ultraq.thymeleaf.models;
 import java.util.Collections;
 import java.util.Objects;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.internal.IContextDelegate;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.TemplateModel;
 import org.thymeleaf.standard.expression.FragmentExpression;
@@ -71,7 +71,7 @@ public class TemplateModelFinder {
      */
     public TemplateModel findFragment(FragmentExpression fragmentExpression) {
 <span class="fc" id="L73">        String templateName = &quot;this&quot;;</span>
-<span class="fc" id="L74">        String dialectPrefix = Extensions.getPrefixForDialect(context, LayoutDialect.class);</span>
+<span class="fc" id="L74">        String dialectPrefix = IContextDelegate.getPrefixForDialect(context, LayoutDialect.class);</span>
 <span class="fc" id="L75">        IStandardExpression expression = fragmentExpression.getTemplateName();</span>
 <span class="fc bfc" id="L76" title="All 2 branches covered.">        if (expression != null) {</span>
 <span class="fc" id="L77">            Object result = expression.execute(context);</span>
@@ -157,5 +157,9 @@ public class TemplateModelFinder {
 <span class="fc" id="L157">        return find(templateName);</span>
     }
 
+    public final ITemplateContext getContext() {
+<span class="nc" id="L161">        return this.context;</span>
+    }
+
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

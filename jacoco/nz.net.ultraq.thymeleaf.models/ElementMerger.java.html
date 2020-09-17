@@ -15,7 +15,7 @@
  */
 package nz.net.ultraq.thymeleaf.models;
 
-import nz.net.ultraq.thymeleaf.internal.Extensions;
+import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.AttributeValueQuotes;
 import org.thymeleaf.model.IElementTag;
@@ -57,17 +57,17 @@ public class ElementMerger implements ModelMerger {
     public IModel merge(IModel targetModel, IModel sourceModel) {
         // If one of the parameters is missing return a copy of the other, or
         // nothing if both parameters are missing.
-<span class="fc bfc" id="L60" title="All 4 branches covered.">        if (!Extensions.asBoolean(targetModel) || !Extensions.asBoolean(sourceModel)) {</span>
-<span class="fc bfc" id="L61" title="All 2 branches covered.">            IModel result = Extensions.asBoolean(targetModel) ? targetModel.cloneModel() : null;</span>
-<span class="fc bfc" id="L62" title="All 4 branches covered.">            return Extensions.asBoolean(result) ? result : Extensions.asBoolean(sourceModel) ? sourceModel.cloneModel() : null;</span>
+<span class="fc bfc" id="L60" title="All 4 branches covered.">        if (!IModelExtensions.asBoolean(targetModel) || !IModelExtensions.asBoolean(sourceModel)) {</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">            IModel result = IModelExtensions.asBoolean(targetModel) ? targetModel.cloneModel() : null;</span>
+<span class="fc bfc" id="L62" title="All 4 branches covered.">            return IModelExtensions.asBoolean(result) ? result : IModelExtensions.asBoolean(sourceModel) ? sourceModel.cloneModel() : null;</span>
         }
 
 <span class="fc" id="L65">        IModelFactory modelFactory = context.getModelFactory();</span>
 
         // The result we want is the source model, but merged into the target root element attributes
-<span class="fc" id="L68">        ITemplateEvent sourceRootEvent = Extensions.first(sourceModel);</span>
+<span class="fc" id="L68">        ITemplateEvent sourceRootEvent = IModelExtensions.first(sourceModel);</span>
 <span class="fc" id="L69">        IModel sourceRootElement = modelFactory.createModel(sourceRootEvent);</span>
-<span class="fc" id="L70">        IProcessableElementTag targetRootEvent = (IProcessableElementTag) Extensions.first(targetModel);</span>
+<span class="fc" id="L70">        IProcessableElementTag targetRootEvent = (IProcessableElementTag) IModelExtensions.first(targetModel);</span>
 <span class="pc bpc" id="L71" title="1 of 2 branches missed.">        IModel targetRootElement = modelFactory.createModel(</span>
                 sourceRootEvent instanceof IOpenElementTag
 <span class="pc bnc" id="L73" title="All 2 branches missed.">                        ? modelFactory.createOpenElementTag(((IElementTag) sourceRootEvent).getElementCompleteName(),</span>
@@ -78,9 +78,13 @@ public class ElementMerger implements ModelMerger {
                                 : null);
 <span class="fc" id="L79">        IModel mergedRootElement = new AttributeMerger(context).merge(targetRootElement, sourceRootElement);</span>
 <span class="fc" id="L80">        IModel mergedModel = sourceModel.cloneModel();</span>
-<span class="fc" id="L81">        mergedModel.replace(0, Extensions.first(mergedRootElement));</span>
+<span class="fc" id="L81">        mergedModel.replace(0, IModelExtensions.first(mergedRootElement));</span>
 <span class="fc" id="L82">        return mergedModel;</span>
     }
 
+    public final ITemplateContext getContext() {
+<span class="nc" id="L86">        return context;</span>
+    }
+
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
