@@ -10,6 +10,7 @@
     <packaging>bundle</packaging>
     <name>Thymeleaf Layout Dialect</name>
     <description>Thymeleaf Layout Dialect rewritten in java.</description>
+    <url>${project.url}</url>
 
     <distributionManagement>
         <site>

@@ -8,6 +8,7 @@
     </parent>
     <artifactId>thymeleaf-layout-dialect-benchmark</artifactId>
     <description>A basic web application to test the performance of the Thymeleaf Layout Dialect</description>
+    <url>${project.url}</url>
 
     <properties>
         <start-class>nz.net.ultraq.thymeleaf.benchmark.BenchmarkApplication</start-class>

@@ -5,7 +5,7 @@
     <artifactId>thymeleaf-layout-dialect-build</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
-    <url>https://github.com/zhanhb/thymeleaf-layout-dialect</url>
+    <url>${project.url}</url>
     <inceptionYear>2016</inceptionYear>
 
     <licenses>
@@ -69,12 +69,12 @@
         <connection>scm:git:git@github.com:zhanhb/thymeleaf-layout-dialect.git</connection>
         <developerConnection>scm:git:git@github.com:zhanhb/thymeleaf-layout-dialect.git</developerConnection>
         <tag>HEAD</tag>
-        <url>https://github.com/zhanhb/thymeleaf-layout-dialect</url>
+        <url>${project.url}</url>
     </scm>
 
     <issueManagement>
         <system>Github</system>
-        <url>https://github.com/zhanhb/thymeleaf-layout-dialect/issues</url>
+        <url>${project.url}/issues</url>
     </issueManagement>
 
     <ciManagement>
@@ -131,6 +131,7 @@
         <osgi.private />
         <osgi.symbolicName>${project.groupId}.${project.artifactId}</osgi.symbolicName>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.url>https://github.com/zhanhb/thymeleaf-layout-dialect</project.url>
         <retrolambda-maven-plugin.version>2.5.7</retrolambda-maven-plugin.version>
         <revision>2.5.0.BUILD-SNAPSHOT</revision>
         <sortpom-maven-plugin.version>2.12.0</sortpom-maven-plugin.version>
@@ -434,7 +435,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-project-info-reports-plugin</artifactId>
                         <configuration>
-                            <webAccessUrl>https://github.com/zhanhb/thymeleaf-layout-dialect/tree/${project.scm.tag}</webAccessUrl>
+                            <webAccessUrl>${project.url}/tree/${project.scm.tag}</webAccessUrl>
                         </configuration>
                     </plugin>
                 </plugins>
