@@ -372,7 +372,7 @@
                         </execution>
                     </executions>
                     <configuration>
-                        <flattenMode>ossrh</flattenMode>
+                        <flattenMode>oss</flattenMode>
                         <pomElements>
                             <repositories>keep</repositories>
                         </pomElements>
