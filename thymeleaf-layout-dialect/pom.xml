@@ -7,7 +7,6 @@
         <version>${revision}</version>
     </parent>
     <artifactId>thymeleaf-layout-dialect</artifactId>
-    <packaging>bundle</packaging>
     <name>Thymeleaf Layout Dialect</name>
     <description>Thymeleaf Layout Dialect rewritten in java.</description>
     <url>${project-url}</url>
@@ -31,6 +30,7 @@
         <javassist.version>3.20.0-GA</javassist.version>
         <junit.version>4.13</junit.version>
         <mockito.version>2.28.2</mockito.version>
+        <module.name>com.github.zhanhb.thymeleaf</module.name>
         <objenesis.version>2.6</objenesis.version>
         <ognl3.version>3.1.12</ognl3.version>
         <osgi.export>!nz.net.ultraq.thymeleaf.internal,
@@ -256,9 +256,6 @@
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
-                        <manifestEntries>
-                            <Automatic-Module-Name>nz.net.ultraq.thymeleaf</Automatic-Module-Name>
-                        </manifestEntries>
                         <manifestSections>
                             <manifestSection>
                                 <name>nz/net/ultraq/thymeleaf/expressions/</name>

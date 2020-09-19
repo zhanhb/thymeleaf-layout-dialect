@@ -11,6 +11,7 @@
     <url>${project-url}</url>
 
     <properties>
+        <module.name>com.github.zhanhb.thymeleaf.benchmark</module.name>
         <start-class>nz.net.ultraq.thymeleaf.benchmark.BenchmarkApplication</start-class>
     </properties>
 
@@ -48,6 +49,10 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
