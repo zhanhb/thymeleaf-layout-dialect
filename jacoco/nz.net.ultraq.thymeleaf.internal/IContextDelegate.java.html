@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IContextDelegate.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Thymeleaf Layout Dialect</a> &gt; <a href="index.source.html" class="el_package">nz.net.ultraq.thymeleaf.internal</a> &gt; <span class="el_source">IContextDelegate.java</span></div><h1>IContextDelegate.java</h1><pre class="source lang-java linenums">package nz.net.ultraq.thymeleaf.internal;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import static java.lang.invoke.MethodHandles.*;
+import java.lang.invoke.MethodHandles.Lookup;
 import static java.lang.invoke.MethodType.methodType;
 import javax.annotation.Nonnull;
 import nz.net.ultraq.thymeleaf.context.extensions.IContextExtensions;
@@ -11,34 +11,33 @@ import org.thymeleaf.dialect.IProcessorDialect;
 
 <span class="nc" id="L12">public class IContextDelegate {</span>
 
-    private static final MethodHandle GET_PREFIX_FOR_DIALECT;
+<span class="fc" id="L14">    private static final MethodHandle GET_PREFIX_FOR_DIALECT = init();</span>
 
-    static {
-        MethodHandle handle;
-<span class="fc" id="L18">        MethodHandles.Lookup lookup = MethodHandles.publicLookup();</span>
+    @SuppressWarnings({&quot;UseSpecificCatch&quot;, &quot;BroadCatchBlock&quot;, &quot;TooBroadCatch&quot;})
+    private static MethodHandle init() {
+<span class="fc" id="L18">        Lookup lookup = lookup();</span>
         try {
-<span class="fc" id="L20">            handle = filterReturnValue(insertArguments(lookup.findStatic(Class.forName(&quot;org.codehaus.groovy.runtime.InvokerHelper&quot;), &quot;invokeMethod&quot;, methodType(Object.class, Object.class, String.class, Object.class)).asCollector(Object[].class, 1),</span>
-                    1, &quot;getPrefixForDialect&quot;),
-<span class="fc" id="L22">                    lookup.findStatic(Class.forName(&quot;org.codehaus.groovy.runtime.typehandling.ShortTypeHandling&quot;), &quot;castToString&quot;, methodType(String.class, Object.class)));</span>
-<span class="nc" id="L23">        } catch (ReflectiveOperationException ex) {</span>
             try {
-<span class="nc" id="L25">                handle = lookup.findStatic(IContextExtensions.class, &quot;getPrefixForDialect&quot;, methodType(String.class, IContext.class, Class.class));</span>
-<span class="nc" id="L26">            } catch (NoSuchMethodException | IllegalAccessException ex1) {</span>
-<span class="nc" id="L27">                throw new AssertionError(ex1);</span>
-<span class="nc" id="L28">            }</span>
-<span class="fc" id="L29">        }</span>
-<span class="fc" id="L30">        GET_PREFIX_FOR_DIALECT = handle;</span>
-<span class="fc" id="L31">    }</span>
+<span class="fc" id="L21">                return filterReturnValue(insertArguments(lookup.findStatic(Class.forName(&quot;org.codehaus.groovy.runtime.InvokerHelper&quot;), &quot;invokeMethod&quot;, methodType(Object.class, Object.class, String.class, Object.class)).asCollector(Object[].class, 1),</span>
+                        1, &quot;getPrefixForDialect&quot;),
+<span class="fc" id="L23">                        lookup.findStatic(Class.forName(&quot;org.codehaus.groovy.runtime.typehandling.ShortTypeHandling&quot;), &quot;castToString&quot;, methodType(String.class, Object.class)));</span>
+<span class="nc" id="L24">            } catch (ReflectiveOperationException | LinkageError ignored) {</span>
+<span class="nc" id="L25">                return lookup.findStatic(IContextExtensions.class, &quot;getPrefixForDialect&quot;, methodType(String.class, IContext.class, Class.class));</span>
+            }
+<span class="nc" id="L27">        } catch (Throwable ex) {</span>
+<span class="nc" id="L28">            return dropArguments(throwException(String.class, Throwable.class).bindTo(ex), 0, Object.class, Class.class);</span>
+        }
+    }
 
     public static String getPrefixForDialect(@Nonnull IContext self, Class&lt;? extends IProcessorDialect&gt; dialectClass) {
         try {
-<span class="fc" id="L35">            return (String) GET_PREFIX_FOR_DIALECT.invoke(self, dialectClass);</span>
-<span class="nc" id="L36">        } catch (RuntimeException | Error ex) {</span>
-<span class="nc" id="L37">            throw ex;</span>
-<span class="nc" id="L38">        } catch (Throwable ex) {</span>
-<span class="nc" id="L39">            throw new java.lang.reflect.UndeclaredThrowableException(ex);</span>
+<span class="fc" id="L34">            return (String) GET_PREFIX_FOR_DIALECT.invoke(self, dialectClass);</span>
+<span class="nc" id="L35">        } catch (RuntimeException | Error ex) {</span>
+<span class="nc" id="L36">            throw ex;</span>
+<span class="nc" id="L37">        } catch (Throwable ex) {</span>
+<span class="nc" id="L38">            throw new java.lang.reflect.UndeclaredThrowableException(ex);</span>
         }
     }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

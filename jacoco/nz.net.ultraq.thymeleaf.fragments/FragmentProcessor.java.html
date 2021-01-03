@@ -87,7 +87,7 @@ public class FragmentProcessor extends AbstractAttributeTagProcessor {
 <span class="fc" id="L87">        List&lt;IModel&gt; fragments = FragmentExtensions.getFragmentCollection(context).get(attributeValue);</span>
         // Replace the tag body with the fragment
 <span class="pc bpc" id="L89" title="1 of 4 branches missed.">        if (fragments != null &amp;&amp; !fragments.isEmpty()) {</span>
-<span class="fc" id="L90">            IModel fragment = fragments.get(0);</span>
+<span class="fc" id="L90">            IModel fragment = fragments.get(fragments.size() - 1);</span>
 <span class="fc" id="L91">            IModelFactory modelFactory = context.getModelFactory();</span>
 <span class="fc" id="L92">            IModel replacementModel = new ElementMerger(context).merge(modelFactory.createModel(tag), fragment);</span>
 
@@ -101,4 +101,4 @@ public class FragmentProcessor extends AbstractAttributeTagProcessor {
 <span class="fc" id="L101">    }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>
