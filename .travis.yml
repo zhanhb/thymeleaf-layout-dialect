@@ -15,7 +15,9 @@ install:
   - ./mvnw -V deploy -Dmaven.main.skip=true -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dmaven.deploy.skip=true -Dmaven.install.skip=true
 script:
   - if [ "$TRAVIS_JDK_VERSION" = openjdk8 ] && git config --get remote.origin.url 2>&1 | grep -F https://github.com/zhanhb/thymeleaf-layout-dialect -q && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./mvnw -s .travis/settings.xml deploy; else ./mvnw install; fi
-  - if [ "$TRAVIS_JDK_VERSION" = openjdk7 ]; then jdk_switcher use "$TRAVIS_JDK_VERSION"; ./mvnw -Djava.version=1.7 surefire:test; jdk_switcher use openjdk8; fi
+  - if [ "$TRAVIS_JDK_VERSION" = openjdk7 ]; then jdk_switcher use openjdk7; fi
+  - if [ "$TRAVIS_JDK_VERSION" = openjdk7 ]; then ./mvnw -Djava.version=1.7 surefire:test; fi
+  - if [ "$TRAVIS_JDK_VERSION" = openjdk7 ]; then jdk_switcher use openjdk8; fi
 before_cache:
   - ./mvnw build-helper:remove-project-artifact
   - find ~/.m2/ -type d -name '*-SNAPSHOT' -exec rm -rf '{}' \; 2>/dev/null
