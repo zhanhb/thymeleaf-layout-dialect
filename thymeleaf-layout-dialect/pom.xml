@@ -23,7 +23,7 @@
         <argLine>-Dfile.encoding=${file.encoding} -ea</argLine>
         <attoparser.version>2.0.5.RELEASE</attoparser.version>
         <byte-buddy.version>1.10.19</byte-buddy.version>
-        <commons-lang3.version>3.11</commons-lang3.version>
+        <commons-lang3.version>3.8.1</commons-lang3.version>
         <findbugs-jsr305.version>3.0.2</findbugs-jsr305.version>
         <guava.version>20.0</guava.version>
         <hamcrest.version>2.2</hamcrest.version>
