@@ -32,7 +32,7 @@
         <mockito.version>2.28.2</mockito.version>
         <module.name>com.github.zhanhb.thymeleaf</module.name>
         <objenesis.version>2.6</objenesis.version>
-        <ognl3.version>3.1.12</ognl3.version>
+        <ognl3.version>3.1.26</ognl3.version>
         <osgi.export>!nz.net.ultraq.thymeleaf.internal,
             nz.net.ultraq.thymeleaf.expressions;version=1.2.0,
             nz.net.ultraq.thymeleaf.*</osgi.export>
