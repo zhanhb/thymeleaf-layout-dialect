@@ -68,7 +68,7 @@
     <scm>
         <connection>scm:git:git@github.com:zhanhb/thymeleaf-layout-dialect.git</connection>
         <developerConnection>scm:git:git@github.com:zhanhb/thymeleaf-layout-dialect.git</developerConnection>
-        <tag>2.5.2.RELEASE</tag>
+        <tag>HEAD</tag>
         <url>${project-url}</url>
     </scm>
 
@@ -133,7 +133,7 @@
         <project-url>https://github.com/zhanhb/thymeleaf-layout-dialect</project-url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <retrolambda-maven-plugin.version>2.5.7</retrolambda-maven-plugin.version>
-        <revision>2.5.2</revision>
+        <revision>2.5.3.BUILD-SNAPSHOT</revision>
         <sortpom-maven-plugin.version>2.12.0</sortpom-maven-plugin.version>
         <versions-maven-plugin.version>2.8.1</versions-maven-plugin.version>
     </properties>
