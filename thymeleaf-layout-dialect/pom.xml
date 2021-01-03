@@ -22,8 +22,8 @@
     <properties>
         <argLine>-Dfile.encoding=${file.encoding} -ea</argLine>
         <attoparser.version>2.0.5.RELEASE</attoparser.version>
-        <byte-buddy.version>1.10.14</byte-buddy.version>
-        <commons-lang3.version>3.8.1</commons-lang3.version>
+        <byte-buddy.version>1.10.19</byte-buddy.version>
+        <commons-lang3.version>3.11</commons-lang3.version>
         <findbugs-jsr305.version>3.0.2</findbugs-jsr305.version>
         <guava.version>20.0</guava.version>
         <hamcrest.version>2.2</hamcrest.version>
@@ -43,10 +43,10 @@
             *</osgi.import>
         <osgi.private>nz.net.ultraq.thymeleaf.internal</osgi.private>
         <prerequisites.maven>3.2</prerequisites.maven>
-        <reflections.version>0.9.11</reflections.version>
+        <reflections.version>0.9.12</reflections.version>
         <slf4j.version>1.7.30</slf4j.version>
         <thymeleaf-testing.version>3.0.4.RELEASE</thymeleaf-testing.version>
-        <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
+        <thymeleaf.version>3.0.12.RELEASE</thymeleaf.version>
         <unbescape.version>1.1.6.RELEASE</unbescape.version>
     </properties>
 
