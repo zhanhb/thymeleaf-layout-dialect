@@ -43,7 +43,7 @@
             *</osgi.import>
         <osgi.private>nz.net.ultraq.thymeleaf.internal</osgi.private>
         <prerequisites.maven>3.2</prerequisites.maven>
-        <reflections.version>0.9.12</reflections.version>
+        <reflections.version>0.9.11</reflections.version>
         <slf4j.version>1.7.30</slf4j.version>
         <thymeleaf-testing.version>3.0.4.RELEASE</thymeleaf-testing.version>
         <thymeleaf.version>3.0.12.RELEASE</thymeleaf.version>
