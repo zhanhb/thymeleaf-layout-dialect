@@ -87,7 +87,7 @@ public class FragmentProcessor extends AbstractAttributeTagProcessor {
         List<IModel> fragments = FragmentExtensions.getFragmentCollection(context).get(attributeValue);
         // Replace the tag body with the fragment
         if (fragments != null && !fragments.isEmpty()) {
-            IModel fragment = fragments.get(0);
+            IModel fragment = fragments.get(fragments.size() - 1);
             IModelFactory modelFactory = context.getModelFactory();
             IModel replacementModel = new ElementMerger(context).merge(modelFactory.createModel(tag), fragment);
 

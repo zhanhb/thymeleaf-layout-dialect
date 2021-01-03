@@ -182,7 +182,7 @@ public class DecorateProcessor extends AbstractAttributeModelProcessor {
         structureHandler.setTemplateData(decorateTemplateData);
 
         // Save layout fragments for use later by layout:fragment processors
-        FragmentExtensions.setLocalFragmentCollection(structureHandler, context, pageFragments);
+        FragmentExtensions.setLocalFragmentCollection(structureHandler, context, pageFragments, true);
 
         // Scope variables in fragment definition to template.  Parameters *must* be
         // named as there is no mechanism for setting their name at the target
