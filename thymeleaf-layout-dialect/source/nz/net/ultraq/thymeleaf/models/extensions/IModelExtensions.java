@@ -22,9 +22,9 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import nz.net.ultraq.thymeleaf.internal.ITemplateEventConsumer;
-import nz.net.ultraq.thymeleaf.internal.ITemplateEventIntPredicate;
-import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
+import nz.net.ultraq.thymeleaf.internal.Consumer;
+import nz.net.ultraq.thymeleaf.internal.BiPredicate;
+import nz.net.ultraq.thymeleaf.internal.Predicate;
 import org.thymeleaf.model.ICloseElementTag;
 import org.thymeleaf.model.IElementTag;
 import org.thymeleaf.model.IModel;
@@ -69,7 +69,7 @@ public class IModelExtensions {
      * @param self
      * @param closure
      */
-    public static void each(@Nullable IModel self, @Nonnull ITemplateEventConsumer closure) {
+    public static void each(@Nullable IModel self, @Nonnull Consumer<ITemplateEvent> closure) {
         Iterator<ITemplateEvent> it = maskNull(self);
         while (it.hasNext()) {
             closure.accept(it.next());
@@ -138,7 +138,7 @@ public class IModelExtensions {
      * @param closure
      * @return {@code true} if every event satisfies the closure.
      */
-    public static boolean everyWithIndex(@Nullable IModel self, @Nonnull ITemplateEventIntPredicate closure) {
+    public static boolean everyWithIndex(@Nullable IModel self, @Nonnull BiPredicate<ITemplateEvent, Integer> closure) {
         int index = 0;
         for (Iterator<ITemplateEvent> it = maskNull(self); it.hasNext(); ++index) {
             if (!closure.test(it.next(), index)) {
@@ -158,7 +158,7 @@ public class IModelExtensions {
      * nothing matched.
      */
     @Nullable
-    public static ITemplateEvent find(@Nullable IModel self, @Nonnull ITemplateEventPredicate closure) {
+    public static ITemplateEvent find(@Nullable IModel self, @Nonnull Predicate<ITemplateEvent> closure) {
         for (Iterator<ITemplateEvent> it = maskNull(self); it.hasNext();) {
             ITemplateEvent event = it.next();
             if (closure.test(event)) {
@@ -176,7 +176,7 @@ public class IModelExtensions {
      * @return A list of matched events.
      */
     @Nonnull
-    public static List<ITemplateEvent> findAll(@Nullable IModel self, @Nonnull ITemplateEventPredicate closure) {
+    public static List<ITemplateEvent> findAll(@Nullable IModel self, @Nonnull Predicate<ITemplateEvent> closure) {
         @SuppressWarnings("CollectionWithoutInitialCapacity")
         ArrayList<ITemplateEvent> answer = new ArrayList<>();
         for (Iterator<ITemplateEvent> it = maskNull(self); it.hasNext();) {
@@ -197,7 +197,7 @@ public class IModelExtensions {
      * @return The index of the first event to match the closure criteria, or
      * {@code -1} if nothing matched.
      */
-    public static int findIndexOf(@Nonnull IModel self, @Nonnull ITemplateEventPredicate closure) {
+    public static int findIndexOf(@Nonnull IModel self, @Nonnull Predicate<ITemplateEvent> closure) {
         for (int i = 0, size = self.size(); i < size; i++) {
             ITemplateEvent event = self.get(i);
             boolean result = closure.test(event);
@@ -218,7 +218,7 @@ public class IModelExtensions {
      * {@code -1} if nothing matched.
      */
     public static int findIndexOf(@Nonnull IModel self, int startIndex,
-            @Nonnull ITemplateEventPredicate closure) {
+            @Nonnull Predicate<ITemplateEvent> closure) {
         for (int i = startIndex, size = self.size(); i < size; i++) {
             ITemplateEvent event = self.get(i);
             boolean result = closure.test(event);
@@ -256,7 +256,7 @@ public class IModelExtensions {
      * @return A model over the event that matches the closure criteria, or
      * {@code null} if nothing matched.
      */
-    public static IModel findModel(@Nonnull IModel self, @Nonnull ITemplateEventPredicate closure) {
+    public static IModel findModel(@Nonnull IModel self, @Nonnull Predicate<ITemplateEvent> closure) {
         return getModel(self, findIndexOf(self, closure));
     }
 

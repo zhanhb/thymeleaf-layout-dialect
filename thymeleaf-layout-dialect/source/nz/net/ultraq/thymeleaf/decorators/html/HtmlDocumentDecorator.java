@@ -17,12 +17,13 @@ package nz.net.ultraq.thymeleaf.decorators.html;
 
 import nz.net.ultraq.thymeleaf.decorators.SortingStrategy;
 import nz.net.ultraq.thymeleaf.decorators.xml.XmlDocumentDecorator;
-import nz.net.ultraq.thymeleaf.internal.ITemplateEventPredicate;
+import nz.net.ultraq.thymeleaf.internal.Predicate;
 import nz.net.ultraq.thymeleaf.models.extensions.IModelExtensions;
 import nz.net.ultraq.thymeleaf.models.extensions.ITemplateEventExtensions;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
+import org.thymeleaf.model.ITemplateEvent;
 
 /**
  * A decorator made to work over an HTML document. Decoration for a document
@@ -62,7 +63,7 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
         IModelFactory modelFactory = context.getModelFactory();
         IModel resultDocumentModel = targetDocumentModel.cloneModel();
         // Head decoration
-        ITemplateEventPredicate headModelFinder = event -> ITemplateEventExtensions.isOpeningElementOf(event, "head");
+        Predicate<ITemplateEvent> headModelFinder = event -> ITemplateEventExtensions.isOpeningElementOf(event, "head");
 
         if (autoHeadMerging) {
             IModel targetHeadModel = IModelExtensions.findModel(resultDocumentModel, headModelFinder);
@@ -91,7 +92,7 @@ public class HtmlDocumentDecorator extends XmlDocumentDecorator {
         }
 
         // Body decoration
-        ITemplateEventPredicate bodyModelFinder = event -> ITemplateEventExtensions.isOpeningElementOf(event, "body");
+        Predicate<ITemplateEvent> bodyModelFinder = event -> ITemplateEventExtensions.isOpeningElementOf(event, "body");
         IModel targetBodyModel = IModelExtensions.findModel(resultDocumentModel, bodyModelFinder);
         IModel resultBodyModel = new HtmlBodyDecorator(context).decorate(targetBodyModel,
                 IModelExtensions.findModel(sourceDocumentModel, bodyModelFinder)

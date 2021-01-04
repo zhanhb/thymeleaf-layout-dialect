@@ -15,15 +15,13 @@
  */
 package nz.net.ultraq.thymeleaf.internal;
 
-import org.thymeleaf.model.ITemplateEvent;
-
 /**
  *
  * @author zhanhb
  */
 @FunctionalInterface
-public interface ITemplateEventPredicate {
+public interface BiPredicate<T, U> {
 
-    boolean test(ITemplateEvent event);
+    boolean test(T event, U index);
 
 }

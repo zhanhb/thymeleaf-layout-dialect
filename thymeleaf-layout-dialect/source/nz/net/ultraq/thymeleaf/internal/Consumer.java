@@ -15,15 +15,13 @@
  */
 package nz.net.ultraq.thymeleaf.internal;
 
-import org.thymeleaf.model.ITemplateEvent;
-
 /**
  *
  * @author zhanhb
  */
 @FunctionalInterface
-public interface ITemplateEventConsumer {
+public interface Consumer<T> {
 
-    void accept(ITemplateEvent get);
+    void accept(T get);
 
 }
