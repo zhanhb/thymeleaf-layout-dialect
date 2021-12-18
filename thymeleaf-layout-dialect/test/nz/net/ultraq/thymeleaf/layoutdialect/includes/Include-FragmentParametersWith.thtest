@@ -11,7 +11,7 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <body>
 	<div layout:include="~{Page :: text}" th:with="greeting='Hello!'">
-		<p layout:fragment="more-text">Source text.</p>
+		<p layout:fragment="more-text" th:with="message=${'=='+greeting+'=='}">[[${message}]]</p>
 	</div>
 </body>
 </html>
@@ -23,7 +23,7 @@
 <body>
 	<div layout:fragment="text">
 		<p th:text="${greeting}">Greeting goes here</p>
-		<p layout:fragment="more-text">Replaced text</p>
+		<p layout:fragment="more-text" th:with="not_used=0">Replaced text</p>
 	</div>
 </body>
 </html>
@@ -35,7 +35,7 @@
 <body>
 	<div>
 		<p>Hello!</p>
-		<p>Source text.</p>
+		<p>==Hello!==</p>
 	</div>
 </body>
 </html>

@@ -106,4 +106,16 @@ class VariableDeclarationMergerTests extends Specification {
 		then:
 			result == source
 	}
+
+	def "Expressions containing an equal sign"() {
+		given:
+			def target = 'message=${\'=====welcome, \' + name + \'=====\'}'
+			def source = 'title=\'abc=bcd\''
+
+		when:
+			def result = merger.merge(target, source)
+
+		then:
+			result == 'message=${\'=====welcome, \' + name + \'=====\'},title=\'abc=bcd\''
+	}
 }
